@@ -1,24 +1,4 @@
 <script lang="ts">
-  let count = $state(0);
-  let isOn = $state(false);
-
-  const container = {
-    width: 100,
-    height: 50,
-    backgroundColor: "var(--hue-3-transparent)",
-    borderRadius: 50,
-    cursor: "pointer",
-    display: "flex",
-    padding: 10,
-  };
-
-  const handle = {
-    width: 50,
-    height: 50,
-    backgroundColor: "#9911ff",
-    borderRadius: "50%",
-  };
-
   const container2 = {
     display: "flex",
     flexDirection: "column",
@@ -47,6 +27,7 @@
 
   import { AnimatePresence, motion } from "motion";
   import { styleToStr, Previous } from "runed";
+  import WorkingExamples from "./working-examples.svelte";
 
   let isVisible = $state(true);
   const wasVisible = new Previous(() => isVisible);
@@ -74,77 +55,4 @@
   </motion.button>
 </div>
 
-<motion.div
-  style={{ width: 100, height: 100, backgroundColor: "red", marginTop: 50 }}
-  initial={{ rotate: 0 }}
-  animate={{ rotate: 60 + count, x: count }}
-  whileHover={{ scale: 1.1 }}
-  whileTap={{ scale: 0.95 }}
-  onHoverStart={() => console.log("hover started!")}
-/>
-
-<button onclick={() => (count += 50)}>Click me</button>
-
-<!-- very odd scenario, but nested layout animation works -->
-<motion.div onclick={() => (isOn = !isOn)}>
-  <button
-    style={styleToStr({
-      ...container,
-      justifyContent: "flex-" + (!isOn ? "start" : "end"),
-      marginTop: 50,
-    })}
-  >
-    <motion.li
-      style={handle}
-      layout
-      layoutDependency={isOn}
-      transition={{
-        type: "spring",
-        visualDuration: 0.2,
-        bounce: 0.2,
-      }}
-    />
-  </button>
-</motion.div>
-
-<!-- nested layout animation works -->
-<motion.button
-  style={{ ...container, justifyContent: "flex-" + (isOn ? "start" : "end"), marginTop: 50 }}
-  onclick={() => (isOn = !isOn)}
-  layoutRoot
->
-  <motion.div
-    style={handle}
-    layout
-    layoutDependency={isOn}
-    transition={{
-      type: "spring",
-      visualDuration: 0.2,
-      bounce: 0.2,
-    }}
-  />
-</motion.button>
-
-<!-- nested layout animation does not work -->
-<motion.ul
-  style={{ ...container, justifyContent: "flex-" + (!isOn ? "start" : "end"), marginTop: 50 }}
-  onclick={() => (isOn = !isOn)}
->
-  <motion.li
-    style={handle}
-    layout
-    layoutDependency={isOn}
-    transition={{
-      type: "spring",
-      visualDuration: 0.2,
-      bounce: 0.2,
-    }}
-  />
-</motion.ul>
-
-<!-- <motion.div>Hello</motion.div>
-<motion.div
-  style="width: 100px; height: 100px; background-color: red"
-  animate={{ rotate: 360 }}
-  transition={{ duration: 1 }}
-/> -->
+<!-- <WorkingExamples /> -->
