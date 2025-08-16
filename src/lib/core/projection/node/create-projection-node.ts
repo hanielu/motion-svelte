@@ -77,7 +77,6 @@ import type {
   ProjectionNodeOptions,
   ScrollMeasurements,
 } from "./types.js";
-import { nextSeq } from "$lib/utils/debug-seq.js";
 
 const metrics = {
   nodes: 0,
@@ -438,20 +437,6 @@ export function createProjectionNode<I>({
       this.isSVG = isSVGElement(instance) && !isSVGSVGElement(instance);
 
       this.instance = instance;
-      console.log(
-        "[haniel][",
-        nextSeq(),
-        "][projection] mount id=",
-        this.id,
-        "depth=",
-        this.depth,
-        "layout=",
-        this.options.layout,
-        "layoutId=",
-        this.options.layoutId,
-        "layoutRoot=",
-        this.options.layoutRoot
-      );
 
       const { layoutId, layout, visualElement } = this.options;
       if (visualElement && !visualElement.current) {
@@ -542,25 +527,6 @@ export function createProjectionNode<I>({
              */
             const hasOnlyRelativeTargetChanged = !hasLayoutChanged && hasRelativeLayoutChanged;
 
-            console.log(
-              "[haniel][",
-              nextSeq(),
-              "][projection] didUpdate check id=",
-              this.id,
-              "hasLayoutChanged=",
-              hasLayoutChanged,
-              "hasRelativeLayoutChanged=",
-              hasRelativeLayoutChanged,
-              "hasTargetChanged=",
-              hasTargetChanged,
-              "hasOnlyRelativeTargetChanged=",
-              hasOnlyRelativeTargetChanged,
-              "currentAnimation=",
-              !!this.currentAnimation,
-              "layoutRoot=",
-              this.options.layoutRoot
-            );
-
             if (
               this.options.layoutRoot ||
               this.resumeFrom ||
@@ -583,18 +549,6 @@ export function createProjectionNode<I>({
                 animationOptions.type = false;
               }
 
-              console.log(
-                "[haniel][",
-                nextSeq(),
-                "][projection] start layout animation id=",
-                this.id,
-                "hasLayoutChanged=",
-                hasLayoutChanged,
-                "hasOnlyRelativeTargetChanged=",
-                hasOnlyRelativeTargetChanged,
-                "layoutRoot=",
-                this.options.layoutRoot
-              );
               this.startAnimation(animationOptions);
               /**
                * Set animation origin after starting animation to avoid layout jump
@@ -659,16 +613,6 @@ export function createProjectionNode<I>({
       if (this.isUpdateBlocked()) return;
 
       this.isUpdating = true;
-      console.log(
-        "[haniel][",
-        nextSeq(),
-        "][projection] root.startUpdate id=",
-        this.id,
-        "nodes=",
-        this.nodes?.size,
-        "updateBlockedByResize=",
-        this.updateBlockedByResize
-      );
 
       this.nodes && this.nodes.forEach(resetSkewAndRotation);
       this.animationId++;
@@ -686,21 +630,6 @@ export function createProjectionNode<I>({
         this.options.onExitComplete && this.options.onExitComplete();
         return;
       }
-
-      console.log(
-        "[haniel][",
-        nextSeq(),
-        "][projection] willUpdate id=",
-        this.id,
-        "layout=",
-        this.options.layout,
-        "layoutId=",
-        this.options.layoutId,
-        "layoutRoot=",
-        this.options.layoutRoot,
-        "isLayoutDirty(before)=",
-        this.isLayoutDirty
-      );
 
       /**
        * If we're running optimised appear animations then these must be
@@ -723,12 +652,6 @@ export function createProjectionNode<I>({
       if (this.isLayoutDirty) return;
 
       this.isLayoutDirty = true;
-      console.log(
-        "[haniel][",
-        nextSeq(),
-        "][projection] willUpdate set isLayoutDirty: id=",
-        this.id
-      );
       for (let i = 0; i < this.path.length; i++) {
         const node = this.path[i];
         node.shouldResetTransform = true;
@@ -759,16 +682,6 @@ export function createProjectionNode<I>({
       this.updateScheduled = false;
 
       const updateWasBlocked = this.isUpdateBlocked();
-      console.log(
-        "[haniel][",
-        nextSeq(),
-        "][projection] root.update id=",
-        this.id,
-        "blocked=",
-        updateWasBlocked,
-        "isUpdating(before)=",
-        this.isUpdating
-      );
 
       // When doing an instant transition, we skip the layout update,
       // but should still clean up the measurements so that the next
@@ -799,21 +712,18 @@ export function createProjectionNode<I>({
          * Write
          */
         this.nodes!.forEach(resetTransformStyle);
-        console.log("[haniel][", nextSeq(), "][projection] root.update resetTransformStyle done");
 
         /**
          * Read ==================
          */
         // Update layout measurements of updated children
         this.nodes!.forEach(updateLayout);
-        console.log("[haniel][", nextSeq(), "][projection] root.update updateLayout done");
 
         /**
          * Write
          */
         // Notify listeners that the layout is updated
         this.nodes!.forEach(notifyLayoutUpdate);
-        console.log("[haniel][", nextSeq(), "][projection] root.update notifyLayoutUpdate done");
       }
 
       this.clearAllSnapshots();
@@ -838,14 +748,6 @@ export function createProjectionNode<I>({
     didUpdate() {
       if (!this.updateScheduled) {
         this.updateScheduled = true;
-        console.log(
-          "[haniel][",
-          nextSeq(),
-          "][projection] root.didUpdate scheduleUpdate id=",
-          this.id,
-          "animationId=",
-          this.animationId
-        );
         microtask.read(this.scheduleUpdate);
       }
     }
@@ -859,12 +761,6 @@ export function createProjectionNode<I>({
     scheduleUpdateProjection() {
       if (!this.projectionUpdateScheduled) {
         this.projectionUpdateScheduled = true;
-        console.log(
-          "[haniel][",
-          nextSeq(),
-          "][projection] root.scheduleUpdateProjection id=",
-          this.id
-        );
         frame.preRender(this.updateProjection, false, true);
       }
     }
@@ -907,7 +803,6 @@ export function createProjectionNode<I>({
         metrics.nodes = metrics.calculatedTargetDeltas = metrics.calculatedProjections = 0;
       }
 
-      console.log("[haniel][", nextSeq(), "][projection] root.updateProjection id=", this.id);
       this.nodes!.forEach(propagateDirtyNodes);
       this.nodes!.forEach(resolveTargetDelta);
       this.nodes!.forEach(calcProjection);
@@ -964,30 +859,6 @@ export function createProjectionNode<I>({
       this.isLayoutDirty = false;
       this.projectionDelta = undefined;
       this.notifyListeners("measure", this.layout.layoutBox);
-      const l = this.layout.layoutBox;
-      const currentBoxJson = JSON.stringify(
-        { x: { min: l.x.min, max: l.x.max }, y: { min: l.y.min, max: l.y.max } },
-        null,
-        2
-      );
-      const prevBoxJson = prevLayout
-        ? JSON.stringify(
-            {
-              x: { min: prevLayout.layoutBox.x.min, max: prevLayout.layoutBox.x.max },
-              y: { min: prevLayout.layoutBox.y.min, max: prevLayout.layoutBox.y.max },
-            },
-            null,
-            2
-          )
-        : null;
-      console.log(
-        "[haniel][",
-        nextSeq(),
-        "][projection] updateLayout id=",
-        this.id,
-        "box=\n" + currentBoxJson,
-        "prev?=\n" + prevBoxJson
-      );
 
       const { visualElement } = this.options;
       visualElement &&
@@ -1417,24 +1288,6 @@ export function createProjectionNode<I>({
       if (this.resolvedRelativeTargetAt === frameData.timestamp) {
         canSkip = false;
       }
-
-      console.log(
-        "[haniel][",
-        nextSeq(),
-        "][projection] calcProjection id=",
-        this.id,
-        "canSkip=",
-        canSkip,
-        {
-          isShared,
-          isProjectionDirty: this.isProjectionDirty,
-          parentDirty: !!this.parent?.isProjectionDirty,
-          isSharedProjectionDirty: this.isSharedProjectionDirty,
-          isTransformDirty: this.isTransformDirty,
-          resolvedRelativeTargetAt: this.resolvedRelativeTargetAt,
-          ts: frameData.timestamp,
-        }
-      );
 
       if (canSkip) return;
 
@@ -2142,47 +1995,6 @@ function notifyLayoutUpdate(node: IProjectionNode) {
         }
       }
     }
-
-    console.log(
-      "[haniel][",
-      nextSeq(),
-      "][projection] notify didUpdate id=",
-      (node as any).id,
-      "lead=",
-      node.isLead(),
-      "hasLayoutChanged=",
-      hasLayoutChanged,
-      "hasRelativeLayoutChanged=",
-      hasRelativeLayoutChanged,
-      "animationType=",
-      animationType
-    );
-    try {
-      const layoutJson = JSON.stringify(
-        {
-          x: { min: layout.x.min, max: layout.x.max },
-          y: { min: layout.y.min, max: layout.y.max },
-        },
-        null,
-        2
-      );
-      const snapshotJson = JSON.stringify(
-        {
-          x: { min: snapshot.layoutBox.x.min, max: snapshot.layoutBox.x.max },
-          y: { min: snapshot.layoutBox.y.min, max: snapshot.layoutBox.y.max },
-        },
-        null,
-        2
-      );
-      console.log(
-        "[haniel][",
-        nextSeq(),
-        "][projection] notify didUpdate boxes id=",
-        (node as any).id,
-        "\nlayout=\n" + layoutJson,
-        "\nsnapshot=\n" + snapshotJson
-      );
-    } catch {}
 
     node.notifyListeners("didUpdate", {
       layout,

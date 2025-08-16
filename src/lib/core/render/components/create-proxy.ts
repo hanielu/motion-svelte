@@ -4,7 +4,6 @@ import type { FeaturePackages } from "../../motion/features/types.js";
 import type { MotionProps } from "../../motion/types.js";
 import type { DOMMotionComponents } from "../dom/types.js";
 import type { CreateVisualElement } from "../types.js";
-import { nextSeq } from "$lib/utils/debug-seq.js";
 
 /**
  * I'd rather the return type of `custom` to be implicit but this throws
@@ -44,14 +43,12 @@ export function createMotionProxy(
      */
     get: (_target, key: string) => {
       if (key === "create") return factory;
-      console.log("[haniel][", nextSeq(), "][create-proxy] get: key=", key);
       if (!componentCache.has(key)) {
-        console.log("[haniel][", nextSeq(), "][create-proxy] get: cache miss key=", key);
         componentCache.set(
           key,
           createMotionComponent(key, undefined, preloadedFeatures, createDomVisualElement)
         );
-      } else console.log("[haniel][", nextSeq(), "][create-proxy] get: cache hit key=", key);
+      }
       return componentCache.get(key)!;
     },
   }) as MotionProxy;

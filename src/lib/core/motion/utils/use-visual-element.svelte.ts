@@ -16,8 +16,7 @@ import type { MotionProps } from "../types.js";
 import type { VisualState } from "./use-visual-state.svelte.js";
 import type { Component } from "svelte";
 import { optimizedAppearDataAttribute } from "$lib/core/animation/optimized-appear/data-id.js";
-import { read, type ReadableBox } from "runed";
-import { nextSeq } from "$lib/utils/debug-seq.js";
+import type { ReadableBox } from "runed";
 
 export function useVisualElement<
   Props extends Record<string, any>,
@@ -64,19 +63,6 @@ export function useVisualElement<
       })
     : null;
 
-  if (visualElement) {
-    console.log(
-      "[haniel][",
-      nextSeq(),
-      "][useVE] created VE type=",
-      (visualElement as any).type,
-      "allowProjection=",
-      (visualElement as any).options?.allowProjection
-    );
-  } else {
-    console.log("[haniel][", nextSeq(), "][useVE] skipped VE creation (no renderer)");
-  }
-
   const initialLayoutGroupConfig = SwitchLayoutGroupContext.current;
 
   $effect.pre(() => {
@@ -88,28 +74,12 @@ export function useVisualElement<
       projectionNodeConstructor &&
       (visualElement.type === "html" || visualElement.type === "svg")
     ) {
-      console.log(
-        "[haniel][",
-        nextSeq(),
-        "][useVE] createProjectionNode: ctor=",
-        !!projectionNodeConstructor,
-        "type=",
-        visualElement.type
-      );
       createProjectionNode(
         visualElement,
         props.current,
         projectionNodeConstructor,
         initialLayoutGroupConfig
       );
-    } else {
-      if (visualElement && !visualElement.projection) {
-        console.log(
-          "[haniel][",
-          nextSeq(),
-          "][useVE] no projection node (maybe layoutRoot=false and no layout props)"
-        );
-      }
     }
   });
 
@@ -121,12 +91,7 @@ export function useVisualElement<
      * `update` unnecessarily. This ensures we skip the initial update.
      */
     if (visualElement && isMounted) {
-      console.log(
-        "[haniel][",
-        nextSeq(),
-        "][useVE] update props keys=",
-        Object.keys(props.current || {})
-      );
+      console.log("[haniel] update", props.current);
       visualElement.update(props.current, presenceContext);
     }
   });

@@ -35,7 +35,6 @@ import {
 import { updateMotionValuesFromProps } from "./utils/motion-values.js";
 import { resolveVariantFromProps } from "./utils/resolve-variants.js";
 import { read, type ReadableBox } from "runed";
-import { nextSeq } from "$lib/utils/debug-seq.js";
 
 const propEventHandlers = [
   "AnimationStart",
@@ -385,7 +384,6 @@ export abstract class VisualElement<
     visualElementStore.set(instance, this);
 
     if (this.projection && !this.projection.instance) {
-      console.log("[haniel][", nextSeq(), "][VE] projection.mount instance=", instance);
       this.projection.mount(instance);
     }
 
@@ -414,14 +412,6 @@ export abstract class VisualElement<
       );
     }
 
-    console.log(
-      "[haniel][",
-      nextSeq(),
-      "][VE] mounted type=",
-      (this as any).type,
-      "hasProjection=",
-      !!this.projection
-    );
     this.parent?.addChild(this);
     this.update(this.props, this.presenceContext);
   }
@@ -583,7 +573,7 @@ export abstract class VisualElement<
    * added to our map, old ones removed, and listeners updated.
    */
   update(props: MotionProps, presenceContext: PresenceContextProps | null) {
-    console.log("[haniel][", nextSeq(), "][VE] update props: keys=", Object.keys(props || {}));
+    console.log("[haniel] update", props);
     if (props.transformTemplate || this.props.transformTemplate) {
       this.scheduleRender();
     }

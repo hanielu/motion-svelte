@@ -9,7 +9,6 @@ import type { Box } from "motion-utils";
 import type { MotionConfigContext } from "../../context/motion-config-context.js";
 import type { MotionProps } from "../../motion/types.js";
 import { measureViewportBox } from "../../projection/utils/measure.js";
-import { nextSeq } from "$lib/utils/debug-seq.js";
 import { DOMVisualElement } from "../dom/DOMVisualElement.js";
 import type { DOMVisualElementOptions } from "../dom/types.js";
 import type { ResolvedValues } from "../types.js";
@@ -53,27 +52,7 @@ export class HTMLVisualElement extends DOMVisualElement<
     instance: HTMLElement,
     { transformPagePoint }: MotionProps & Partial<MotionConfigContext>
   ): Box {
-    const box = measureViewportBox(instance, transformPagePoint);
-    try {
-      const r = instance.getBoundingClientRect();
-      console.log(
-        "[haniel][",
-        nextSeq(),
-        "][measureViewport] node=",
-        instance.tagName,
-        "rect=",
-        { x: r.x, y: r.y, w: r.width, h: r.height },
-        "latestValuesTransforms=",
-        {
-          x: (this as any).latestValues?.x,
-          y: (this as any).latestValues?.y,
-          scale: (this as any).latestValues?.scale,
-          scaleX: (this as any).latestValues?.scaleX,
-          scaleY: (this as any).latestValues?.scaleY,
-        }
-      );
-    } catch {}
-    return box;
+    return measureViewportBox(instance, transformPagePoint);
   }
 
   build(renderState: HTMLRenderState, latestValues: ResolvedValues, props: MotionProps) {

@@ -14,7 +14,6 @@
   import { VisualElement } from "../../../render/VisualElement.js";
   import type { MotionProps } from "../../types.js";
   import { onMount } from "svelte";
-  import { nextSeq } from "$lib/utils/debug-seq.js";
 
   let { visualElement, layoutId, layoutDependency, drag = false }: MeasureProps = $props();
 
@@ -23,25 +22,7 @@
   const layoutGroup = $derived(LayoutGroupContext.current);
   const switchLayoutGroup = $derived(SwitchLayoutGroupContext.current);
 
-  let prevProps: { layoutDependency: typeof layoutDependency; isPresent: typeof isPresent } = {
-    layoutDependency: undefined,
-    isPresent: { current: undefined },
-  };
-
-  $effect.pre(() => {
-    void layoutDependency;
-    void isPresent;
-
-    return () => {
-      console.log(
-        "[haniel][",
-        nextSeq(),
-        "][measure-layout] pre: prevProps=",
-        JSON.stringify(prevProps)
-      );
-      prevProps = { layoutDependency, isPresent };
-    };
-  });
+  let prevProps = { layoutDependency: undefined, isPresent: { current: undefined } as any };
 
   let hasTakenAnySnapshot = false;
 
@@ -66,15 +47,16 @@
     return _safeToRemove && _safeToRemove();
   }
 
+  $effect.pre(() => {
+    void layoutDependency;
+    void isPresent.current;
+
+    return () => {
+      prevProps = { layoutDependency, isPresent };
+    };
+  });
+
   onMount(() => {
-    console.log(
-      "[haniel][",
-      nextSeq(),
-      "][measure-layout] mount layoutId=",
-      layoutId,
-      "isPresent=",
-      isPresent.current
-    );
     addScaleCorrector(defaultScaleCorrectors);
 
     const { projection } = visualElement;
@@ -94,7 +76,6 @@
 
     // componentWillUnmount
     return () => {
-      console.log("[haniel][", nextSeq(), "][measure-layout] unmount layoutId=", layoutId);
       const promoteContext = switchLayoutGroup;
       const { projection } = visualElement;
 
@@ -113,19 +94,19 @@
     // If this component is a layout root, ensure we pre-snapshot its subtree
     // before any DOM mutations. This avoids affecting siblings outside this root.
     if (projection.options?.layoutRoot) {
-      if (!projection.root.isUpdating) {
-        projection.root.startUpdate();
+      if (!projection.root?.isUpdating) {
+        projection.root?.startUpdate();
       }
 
-      const stack: any[] = [projection];
+      const stack = [projection];
       while (stack.length) {
         const node = stack.pop();
-        const opts = (node as any).options;
+        const opts = node?.options;
         if (opts?.layout || opts?.layoutId || opts?.layoutRoot) {
-          node.willUpdate(false);
+          node?.willUpdate(false);
         }
-        if ((node as any).children) {
-          (node as any).children.forEach((child: any) => stack.push(child));
+        if (node?.children) {
+          node.children.forEach(child => stack.push(child));
         }
       }
     }
@@ -135,25 +116,6 @@
     const { projection } = visualElement;
 
     if (!projection) return;
-    const rect = visualElement.current.getBoundingClientRect();
-    console.log("[haniel][", nextSeq(), "][measure-layout] pre: rect=", rect);
-
-    console.log(
-      "[haniel][",
-      nextSeq(),
-      "][measure-layout] pre: willUpdate? layoutDependency=",
-      layoutDependency,
-      "drag=",
-      drag,
-      "isPresent=",
-      isPresent.current,
-      "nodeId=",
-      projection.id,
-      "parentHasProjection=",
-      !!projection.parent,
-      "rootIsUpdating=",
-      projection.root?.isUpdating
-    );
 
     /**
      * TODO: We use this data in relegate to determine whether to
@@ -170,17 +132,17 @@
       drag ||
       prevProps.layoutDependency !== layoutDependency ||
       layoutDependency === undefined ||
-      prevProps.isPresent.current !== isPresent.current
+      prevProps.isPresent !== isPresent.current
     ) {
-      console.log("[haniel][", nextSeq(), "][measure-layout] calling willUpdate()");
       projection.willUpdate();
+      console.log("[haniel] measure layout willUpdate");
     } else {
-      console.log("[haniel][", nextSeq(), "][measure-layout] safeToRemove() (no change)");
+      console.log("[haniel] measure layout safeToRemove");
       safeToRemove();
     }
 
-    if (prevProps.isPresent.current !== isPresent.current) {
-      if (isPresent) {
+    if (prevProps.isPresent !== isPresent.current) {
+      if (isPresent.current) {
         projection.promote();
       } else if (!projection.relegate()) {
         /**
@@ -202,17 +164,10 @@
   $effect(() => {
     const { projection } = visualElement;
     if (projection) {
-      console.log("[haniel][", nextSeq(), "][measure-layout] didUpdate: root.didUpdate()");
       projection.root!.didUpdate();
 
       microtask.postRender(() => {
         if (!projection.currentAnimation && projection.isLead()) {
-          console.log(
-            "[haniel][",
-            nextSeq(),
-            "][measure-layout] postRender: no currentAnimation, lead=",
-            projection.isLead()
-          );
           safeToRemove();
         }
       });

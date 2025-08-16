@@ -8,14 +8,6 @@ export function renderHTML(
   styleProp?: MotionStyle,
   projection?: IProjectionNode
 ) {
-  if ((styleProp as any)?.__logRender) {
-    console.log(
-      "[haniel][renderHTML] render: projection=",
-      !!projection,
-      "style keys=",
-      Object.keys(style)
-    );
-  }
   const elementStyle = element.style;
 
   let key: string;

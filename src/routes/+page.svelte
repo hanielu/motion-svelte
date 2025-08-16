@@ -85,9 +85,33 @@
 
 <button onclick={() => (count += 50)}>Click me</button>
 
+<!-- very odd scenario, but nested layout animation works -->
+<motion.div onclick={() => (isOn = !isOn)}>
+  <button
+    style={styleToStr({
+      ...container,
+      justifyContent: "flex-" + (!isOn ? "start" : "end"),
+      marginTop: 50,
+    })}
+  >
+    <motion.li
+      style={handle}
+      layout
+      layoutDependency={isOn}
+      transition={{
+        type: "spring",
+        visualDuration: 0.2,
+        bounce: 0.2,
+      }}
+    />
+  </button>
+</motion.div>
+
+<!-- nested layout animation works -->
 <motion.button
   style={{ ...container, justifyContent: "flex-" + (isOn ? "start" : "end"), marginTop: 50 }}
   onclick={() => (isOn = !isOn)}
+  layoutRoot
 >
   <motion.div
     style={handle}
@@ -101,10 +125,10 @@
   />
 </motion.button>
 
+<!-- nested layout animation does not work -->
 <motion.ul
   style={{ ...container, justifyContent: "flex-" + (!isOn ? "start" : "end"), marginTop: 50 }}
   onclick={() => (isOn = !isOn)}
-  layoutRoot
 >
   <motion.li
     style={handle}

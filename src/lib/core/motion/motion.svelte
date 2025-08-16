@@ -29,7 +29,6 @@
     PresenceCollectorContext,
   } from "../components/animate-presence/presence-collector.svelte";
   import { motionComponentSymbol } from "./utils/symbol.js";
-  import { nextSeq } from "$lib/utils/debug-seq.js";
 
   export interface MotionComponentConfig<
     TagName extends keyof DOMMotionComponents | string = "div",
@@ -207,16 +206,6 @@
     const layoutProjection = $derived(getProjectionFunctionality(configAndProps));
 
     $effect(() => {
-      console.log(
-        "[haniel][",
-        nextSeq(),
-        "][motion] projection: layoutRoot=",
-        !!configAndProps.layoutRoot,
-        "hasProjectionNode=",
-        !!layoutProjection.ProjectionNode,
-        "hasMeasureLayout=",
-        !!layoutProjection.MeasureLayout
-      );
       MeasureLayout = layoutProjection.MeasureLayout;
     });
 
@@ -231,18 +220,7 @@
       visualState,
       read(() => configAndProps),
       createVisualElement,
-      () => {
-        const ctor = layoutProjection.ProjectionNode;
-        if (!ctor) {
-          console.log(
-            "[haniel][",
-            nextSeq(),
-            "][motion] ProjectionNode missing; layoutRoot=",
-            !!configAndProps.layoutRoot
-          );
-        }
-        return ctor;
-      }
+      () => layoutProjection.ProjectionNode
     );
   }
 
