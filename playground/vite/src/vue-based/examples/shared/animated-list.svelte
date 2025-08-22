@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { motion } from 'motion-sv';
+	import type { LayoutMotionNamespace } from 'motion-sv';
 	import { css } from 'runed';
 	import type { Snippet } from 'svelte';
 
 	interface AnimatedProps {
 		title: string;
-		update: () => void;
+		update: LayoutMotionNamespace['update'];
 		children: Snippet<
 			[
 				props: {
@@ -103,33 +103,27 @@
 
 	const filtered = $derived(items.filter((x) => x.text.toLowerCase().includes(filter.toLowerCase())));
 
-	function add() {
+	const add = update.with(() => {
 		const t = draft.trim();
 		if (!t) return;
 		items.unshift({ id: nextId, text: t });
 		nextId += 1;
 		draft = '';
-		update();
-	}
+	});
 
-	function removeById(id: number) {
+	const removeById = update.with((id: number) => {
 		const i = items.findIndex((x) => x.id === id);
 		if (i > -1) items.splice(i, 1);
-		update();
-	}
+	});
 
-	function shuffle() {
+	const shuffle = update.with(() => {
 		for (let i = items.length - 1; i > 0; i--) {
 			const j = Math.floor(Math.random() * (i + 1));
 			[items[i], items[j]] = [items[j], items[i]];
 		}
-		update();
-	}
+	});
 
-	function clear() {
-		items.length = 0;
-		update();
-	}
+	const clear = update.with(() => (items.length = 0));
 </script>
 
 <div style={css(styles.app)}>

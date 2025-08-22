@@ -6,6 +6,7 @@
 	let {
 		inherit = true,
 		id,
+		children,
 	}: LayoutGroupProps & { children: Snippet<[props: { forceRender: () => void; key: Ref<number> }]> } = $props();
 
 	const { forceRender, key } = useLayoutGroupProvider({

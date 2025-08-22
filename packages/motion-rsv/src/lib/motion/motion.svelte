@@ -217,10 +217,6 @@
 		);
 	}
 
-	setTimeout(() => {
-		console.log('[haniel] latestValues', context.visualElement.latestValues);
-	}, 10000);
-
 	/**
 	 * If we need to measure the element we load this functionality in a
 	 * separate class component in order to gain access to getSnapshotBeforeUpdate.

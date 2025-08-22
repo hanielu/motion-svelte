@@ -16,14 +16,33 @@
 		borderRadius: '50%',
 	};
 
-	import { motion } from 'motion-sv';
+	import { motion, createLayoutMotion } from 'motion-sv';
 	import { css } from 'runed';
 
 	let isOn = $state(false);
+
+	const layout = createLayoutMotion(motion);
+	const toggle = layout.update.with(() => (isOn = !isOn));
 </script>
 
-<!-- very odd scenario, but nested layout animation works -->
-<motion.div onclick={() => (isOn = !isOn)}>
+<!-- nested layout animation works -->
+<motion.button
+	style={{ ...container, justifyContent: 'flex-' + (isOn ? 'start' : 'end'), marginTop: 50 }}
+	onclick={toggle}
+>
+	<layout.div
+		style={handle}
+		layoutDependency={isOn}
+		transition={{
+			type: 'spring',
+			visualDuration: 0.2,
+			bounce: 0.2,
+		}}
+	/>
+</motion.button>
+
+<!-- nested layout animation does work as expected -->
+<!-- <motion.div onclick={toggle}>
 	<button
 		style={css({
 			...container,
@@ -31,9 +50,8 @@
 			marginTop: 50,
 		})}
 	>
-		<motion.div
+		<layout.div
 			style={handle}
-			layout
 			layoutDependency={isOn}
 			transition={{
 				type: 'spring',
@@ -42,25 +60,7 @@
 			}}
 		/>
 	</button>
-</motion.div>
-
-<!-- nested layout animation works -->
-<!-- <motion.button
-	style={{ ...container, justifyContent: 'flex-' + (isOn ? 'start' : 'end'), marginTop: 50 }}
-	onclick={() => (isOn = !isOn)}
-	layoutRoot
->
-	<motion.div
-		style={handle}
-		layout
-		layoutDependency={isOn}
-		transition={{
-			type: 'spring',
-			visualDuration: 0.2,
-			bounce: 0.2,
-		}}
-	/>
-</motion.button> -->
+</motion.div> -->
 
 <!-- nested layout animation does not work, as expected -->
 <!-- <motion.ul

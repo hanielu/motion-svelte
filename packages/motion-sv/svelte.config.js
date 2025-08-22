@@ -18,26 +18,6 @@ const config = {
 		alias: {
 			'@': './src/lib',
 			'framer-motion/dist/es': './src/lib/framer-motion/dist/es',
-			// 'framer-motion/dist/es/render/store.mjs': './src/lib/framer-motion/dist/es/render/store.mjs',
-			// 'framer-motion/dist/es/projection/node/HTMLProjectionNode.mjs':
-			// 	'./src/lib/framer-motion/dist/es/projection/node/HTMLProjectionNode.mjs',
-			// 'framer-motion/dist/es/projection/styles/scale-border-radius.mjs':
-			// 	'./src/lib/framer-motion/dist/es/projection/styles/scale-border-radius.mjs',
-			// 'framer-motion/dist/es/projection/styles/scale-box-shadow.mjs':
-			// 	'./src/lib/framer-motion/dist/es/projection/styles/scale-box-shadow.mjs',
-			// 'framer-motion/dist/es/projection/styles/scale-correction.mjs':
-			// 	'./src/lib/framer-motion/dist/es/projection/styles/scale-correction.mjs',
-			// 'framer-motion/dist/es/projection/node/state.mjs': 'node_modules/framer-motion/dist/es/projection/node/state.mjs',
-			// 'framer-motion/dist/es/render/html/HTMLVisualElement.mjs':
-			// 	'./src/lib/framer-motion/dist/es/render/html/HTMLVisualElement.mjs',
-			// 'framer-motion/dist/es/render/svg/SVGVisualElement.mjs':
-			// 	'./src/lib/framer-motion/dist/es/render/svg/SVGVisualElement.mjs',
-			// 'framer-motion/dist/es/animation/interfaces/motion-value.mjs':
-			// 	'./src/lib/framer-motion/dist/es/animation/interfaces/motion-value.mjs',
-			// 'framer-motion/dist/es/render/utils/setters.mjs': './src/lib/framer-motion/dist/es/render/utils/setters.mjs',
-			// 'framer-motion/dist/es/utils/reduced-motion/state.mjs':
-			// 	'./src/lib/framer-motion/dist/es/utils/reduced-motion/state.mjs',
-			// 'framer-motion/dist/es/utils/delay.mjs': './src/lib/framer-motion/dist/es/utils/delay.mjs',
 		},
 	},
 };

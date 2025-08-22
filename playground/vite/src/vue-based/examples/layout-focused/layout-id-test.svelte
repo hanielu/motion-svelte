@@ -26,13 +26,8 @@
 				<motion.li
 					class="tab"
 					initial={false}
-					animate={{
-						backgroundColor: item.label === selectedTab.label ? '#eee' : '#eee0',
-					}}
-					onclick={() => {
-						selectedTab = item;
-						layout.update();
-					}}
+					animate={{ backgroundColor: item.label === selectedTab.label ? '#eee' : '#eee0' }}
+					onclick={layout.update.with(() => (selectedTab = item))}
 				>
 					{`${item.icon} ${item.label}`}
 					{#if item.label === selectedTab.label}

@@ -1,5 +1,5 @@
 import { getContext, hasContext, setContext } from 'svelte';
-import { box, type ReadableBox } from './box.svelte.js';
+import { read, type ReadableBox } from './box.svelte.js';
 
 // Type utilities to reduce duplication
 type UnboxedType<T> = T extends ReadableBox<infer U> ? U : never;
@@ -86,7 +86,7 @@ export class Context<TContext> {
 	 * @param fallback Optional fallback value (not a function)
 	 */
 	static boxed<T>(name: string, fallback?: T): Context<ReadableBox<T>> {
-		const fallbackBox = fallback !== undefined ? box.with(() => fallback) : undefined;
+		const fallbackBox = fallback !== undefined ? read(() => fallback) : undefined;
 		return new Context<ReadableBox<T>>(name, fallbackBox);
 	}
 
@@ -112,7 +112,7 @@ export class Context<TContext> {
 	 * Note: Only use this method if TContext is ReadableBox<T>
 	 */
 	setWith(getter: () => UnboxedType<TContext>): TContext {
-		const boxedValue = box.with(getter);
+		const boxedValue = read(getter);
 		return this.set(boxedValue as TContext);
 	}
 }

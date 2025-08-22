@@ -3,7 +3,7 @@
 	import type { MotionCreateOptions, MotionNameSpace } from './utils.js';
 	import type { MotionState } from '@/state/motion-state.js';
 	import type { Snippet } from 'svelte';
-	import { Context } from 'runed';
+	import { Context, withProp } from 'runed';
 
 	export interface LayoutMotionScope {
 		states: Set<MotionState>;
@@ -18,6 +18,33 @@
 		 * Expose update that runs beforeUpdate on registered states in parent-first order
 		 */
 		update: () => void;
+	} & {
+		update: {
+			/**
+			 * Allows you to pass a function that will be called to run the update
+			 * e.g
+			 *
+			 * ```ts
+			 * const layout = createLayoutMotion(motion);
+			 * const fn = layout.update.with(() => deleteAll());
+			 * // called in an event handler or something
+			 * fn();
+			 * ```
+			 *
+			 * instead of
+			 *
+			 * ```ts
+			 * const layout = createLayoutMotion(motion);
+			 * const fn = () => {
+			 * 	deleteAll();
+			 * 	layout.update();
+			 * }
+			 * // called in an event handler or something
+			 * fn();
+			 * ```
+			 */
+			with: <A extends unknown[], R>(fn: (...args: A) => R) => (...args: A) => R;
+		};
 	};
 
 	/**
@@ -27,6 +54,7 @@
 	 * https://github.com/sveltejs/svelte/issues/16648#issuecomment-3201964832
 	 * so we have to allow a user to trigger a beforeUpdate manually after they make
 	 * a state change that's affect the layout of the component they want animated
+	 *
 	 * @param base - The base motion namespace to create a layout motion namespace from
 	 */
 	export function createLayoutMotion(base: MotionNameSpace): LayoutMotionNamespace {
@@ -49,6 +77,16 @@
 			});
 		}
 
+		function updateWith<A extends unknown[], R>(fn: (...args: A) => R): (...args: A) => R {
+			return (...args: A) => {
+				const result = fn(...args);
+				update();
+				return result;
+			};
+		}
+
+		update.with = updateWith;
+
 		return new Proxy(base as LayoutMotionNamespace, {
 			get(target, key) {
 				if (key === 'update') return update;
@@ -57,7 +95,7 @@
 						const Component = target.create(component, options);
 						return (anchor: any, props: any) => {
 							return Provider(anchor, {
-								children: ((a: any) => Component(a, props)) as Snippet,
+								children: ((a: any) => Component(a, withProp(props, 'layout', true))) as Snippet,
 								scope,
 							});
 						};
@@ -67,7 +105,7 @@
 				const Component = target[key as keyof MotionNameSpace];
 				return (anchor: any, props: any) => {
 					return Provider(anchor, {
-						children: ((a: any) => Component(a, props)) as Snippet,
+						children: ((a: any) => Component(a, withProp(props, 'layout', true))) as Snippet,
 						scope,
 					});
 				};

@@ -95,6 +95,8 @@
 		features: ref([]),
 		strict: false,
 	});
+	// layout motion scope context
+	const layoutMotionScope = LayoutMotionScopeContext.getOr(null);
 
 	/**
 	 * If we're in development mode, check to make sure we're not rendering a motion component
@@ -143,9 +145,7 @@
 	// then updated in onUpdated (which is $effect.pre)
 	const state = new MotionState(motionOptions, parentState!);
 	MotionStateContext.set(state);
-
-	const layoutMotionScope = LayoutMotionScopeContext.getOr(null);
-	if (layoutMotionScope) layoutMotionScope.register(state);
+	layoutMotionScope?.register(state);
 
 	const getAttrs = $derived.by(() => {
 		const isSVG = state.type === 'svg';
@@ -225,7 +225,19 @@
 	// });
 
 	// onUpdated
-	watch.pre(
+	// now technically, a watch.pre would be more accurate to vue's onUpdated,
+	// but I noticed something odd when i tried it:
+	// for the basic layout toggle example, it would not work as expected.
+	// More specifically, if the first button's handle had a `layoutDependency` prop,
+	// e.g. `<motion.div layoutDependency={isOn} />`,
+	// then each subsequent button's handle with a `layoutId` prop would not work as expected.
+	// they'd kinda flicker when toggling (I guess going from opacity 0->1?)
+	// unless I set `crossfade={false}` on the handle(s) with the `layoutId` prop.
+	// Nothing I tried would fix it. (setting `layoutRoot` on the button, or using `LayoutGroup` or both)
+	// so we're using a watch instead.
+	//
+	// TBD if we'll run into other issues with this.
+	watch(
 		() => motionOptions,
 		(options) => {
 			state.update(options);

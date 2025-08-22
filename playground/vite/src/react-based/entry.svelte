@@ -5,9 +5,9 @@
 	import RollingBox from './examples/rolling-box.svelte';
 </script>
 
-<RollingBox />
+<!-- <RollingBox /> -->
 
-<!-- <EnterExitBasic /> -->
+<EnterExitBasic />
 <!-- <EnterExitList /> -->
 <!-- <BasicLayoutToggle /> -->
 <!-- <WorkingExamples /> -->
