@@ -3,5 +3,5 @@
 	import ReactEntry from './react-based/entry.svelte';
 </script>
 
-<!-- <ReactEntry /> -->
-<VueEntry />
+<ReactEntry />
+<!-- <VueEntry /> -->
