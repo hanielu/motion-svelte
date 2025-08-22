@@ -6,12 +6,12 @@ import MeasureLayout from "./layout/measure-layout.svelte";
 import type { FeaturePackages } from "./types.js";
 
 export const drag: FeaturePackages = {
-  pan: {
-    Feature: PanGesture,
-  },
-  drag: {
-    Feature: DragGesture,
-    ProjectionNode: HTMLProjectionNode,
-    MeasureLayout,
-  },
+	pan: {
+		Feature: PanGesture,
+	},
+	drag: {
+		Feature: DragGesture,
+		ProjectionNode: HTMLProjectionNode,
+		MeasureLayout,
+	},
 };

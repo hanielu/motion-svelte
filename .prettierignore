@@ -1,4 +1,19 @@
-# Package Managers
+.DS_Store
+node_modules
+build
+dist
+.svelte-kit
+package
+.env
+.env.*
+!.env.example
+.yarn
+misc
+.netlify
+public
+$houdini
+
+# Ignore files for PNPM, NPM and YARN
 package-lock.json
 pnpm-lock.yaml
 yarn.lock

@@ -1,6 +1,6 @@
-import { convertBoundingBoxToBox, transformBoxPoints } from '@/projection/conversion.js';
-import { translateAxis } from '@/projection/geometry/delta-apply.js';
-import type { IProjectionNode, TransformPoint } from 'framer-motion';
+import { convertBoundingBoxToBox, transformBoxPoints } from "@/projection/conversion.js";
+import { translateAxis } from "@/projection/geometry/delta-apply.js";
+import type { IProjectionNode, TransformPoint } from "framer-motion";
 
 export function measureViewportBox(instance: HTMLElement, transformPoint?: TransformPoint) {
 	return convertBoundingBoxToBox(transformBoxPoints(instance.getBoundingClientRect(), transformPoint));

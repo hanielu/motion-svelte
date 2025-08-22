@@ -5,48 +5,48 @@
 	const container = {
 		width: 100,
 		height: 50,
-		backgroundColor: 'var(--hue-3-transparent)',
+		backgroundColor: "var(--hue-3-transparent)",
 		borderRadius: 50,
-		cursor: 'pointer',
-		display: 'flex',
+		cursor: "pointer",
+		display: "flex",
 		padding: 10,
 	};
 
 	const handle = {
 		width: 50,
 		height: 50,
-		backgroundColor: '#9911ff',
-		borderRadius: '50%',
+		backgroundColor: "#9911ff",
+		borderRadius: "50%",
 	};
 
 	const container2 = {
-		display: 'flex',
-		flexDirection: 'column',
+		display: "flex",
+		flexDirection: "column",
 		width: 100,
 		height: 160,
-		position: 'relative',
+		position: "relative",
 	};
 
 	const box = {
 		width: 100,
 		height: 100,
-		backgroundColor: '#0cdcf7',
-		borderRadius: '10px',
+		backgroundColor: "#0cdcf7",
+		borderRadius: "10px",
 	};
 
 	const button = {
-		backgroundColor: '#0cdcf7',
-		borderRadius: '10px',
-		padding: '10px 20px',
-		color: '#0f1115',
-		position: 'absolute',
+		backgroundColor: "#0cdcf7",
+		borderRadius: "10px",
+		padding: "10px 20px",
+		color: "#0f1115",
+		position: "absolute",
 		bottom: 0,
 		left: 0,
 		right: 0,
 	};
 
-	import { motion } from 'motion-sv';
-	import { css, Previous } from 'runed';
+	import { motion } from "motion-sv";
+	import { css, Previous } from "runed";
 
 	let isVisible = $state(true);
 	const wasVisible = new Previous(() => isVisible);
@@ -76,12 +76,12 @@
 
 <motion.div
 	id="test"
-	style={{ width: 100, height: 100, backgroundColor: 'red', marginTop: 50 }}
+	style={{ width: 100, height: 100, backgroundColor: "red", marginTop: 50 }}
 	initial={{ rotate: 0 }}
 	animate={{ rotate: 60 + count, x: count }}
 	whileHover={{ scale: 1.1 }}
 	whilePress={{ scale: 0.95 }}
-	onHoverStart={() => console.log('hover started!')}
+	onHoverStart={() => console.log("hover started!")}
 />
 
 <button onclick={() => (count += 50)}>Click me</button>

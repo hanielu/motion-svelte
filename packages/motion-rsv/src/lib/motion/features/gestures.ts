@@ -5,16 +5,16 @@ import { InViewFeature } from "./viewport/index.js";
 import type { FeaturePackages } from "./types.js";
 
 export const gestureAnimations: FeaturePackages = {
-  inView: {
-    Feature: InViewFeature,
-  },
-  tap: {
-    Feature: PressGesture,
-  },
-  focus: {
-    Feature: FocusGesture,
-  },
-  hover: {
-    Feature: HoverGesture,
-  },
+	inView: {
+		Feature: InViewFeature,
+	},
+	tap: {
+		Feature: PressGesture,
+	},
+	focus: {
+		Feature: FocusGesture,
+	},
+	hover: {
+		Feature: HoverGesture,
+	},
 };

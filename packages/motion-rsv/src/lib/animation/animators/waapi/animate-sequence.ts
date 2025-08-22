@@ -4,13 +4,11 @@ import type { AnimationSequence, SequenceOptions } from "../../sequence/types.js
 import { animateElements } from "./animate-elements.js";
 
 export function animateSequence(definition: AnimationSequence, options?: SequenceOptions) {
-  const animations: AnimationPlaybackControls[] = [];
+	const animations: AnimationPlaybackControls[] = [];
 
-  createAnimationsFromSequence(definition, options).forEach(
-    ({ keyframes, transition }, element: Element) => {
-      animations.push(...animateElements(element, keyframes, transition));
-    }
-  );
+	createAnimationsFromSequence(definition, options).forEach(({ keyframes, transition }, element: Element) => {
+		animations.push(...animateElements(element, keyframes, transition));
+	});
 
-  return new GroupAnimationWithThen(animations);
+	return new GroupAnimationWithThen(animations);
 }

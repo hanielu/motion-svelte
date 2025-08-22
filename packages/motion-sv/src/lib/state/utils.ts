@@ -1,20 +1,20 @@
-import type { $Transition, AsTag, Options, VariantType } from '@/types/index.js';
+import type { $Transition, AsTag, Options, VariantType } from "@/types/index.js";
 
 export function resolveVariant(
-	definition?: Options['animate'],
-	variants?: Options['variants'],
-	custom?: Options['custom']
+	definition?: Options["animate"],
+	variants?: Options["variants"],
+	custom?: Options["custom"]
 ): VariantType | undefined {
 	if (Array.isArray(definition)) {
 		return definition.reduce((acc, item) => {
 			const resolvedVariant = resolveVariant(item, variants, custom);
 			return resolvedVariant ? { ...acc, ...resolvedVariant } : acc;
 		}, {});
-	} else if (typeof definition === 'object') {
+	} else if (typeof definition === "object") {
 		return definition as VariantType;
 	} else if (definition && variants) {
 		const variant = variants[definition as string];
-		return typeof variant === 'function' ? variant(custom) : variant;
+		return typeof variant === "function" ? variant(custom) : variant;
 	}
 }
 
@@ -53,71 +53,71 @@ export function getOptions(options: $Transition, key: string): $Transition {
 }
 
 export function isCssVar(name: string) {
-	return name?.startsWith('--');
+	return name?.startsWith("--");
 }
 
 export const noopReturn = <V>(v: V) => v;
 
 export function isNumber(value: any): boolean {
-	return typeof value === 'number';
+	return typeof value === "number";
 }
 
 export const svgElements = [
-	'animate',
-	'circle',
-	'defs',
-	'desc',
-	'ellipse',
-	'g',
-	'image',
-	'line',
-	'filter',
-	'marker',
-	'mask',
-	'metadata',
-	'path',
-	'pattern',
-	'polygon',
-	'polyline',
-	'rect',
-	'stop',
-	'svg',
-	'switch',
-	'symbol',
-	'text',
-	'tspan',
-	'use',
-	'view',
-	'clipPath',
-	'feBlend',
-	'feColorMatrix',
-	'feComponentTransfer',
-	'feComposite',
-	'feConvolveMatrix',
-	'feDiffuseLighting',
-	'feDisplacementMap',
-	'feDistantLight',
-	'feDropShadow',
-	'feFlood',
-	'feFuncA',
-	'feFuncB',
-	'feFuncG',
-	'feFuncR',
-	'feGaussianBlur',
-	'feImage',
-	'feMerge',
-	'feMergeNode',
-	'feMorphology',
-	'feOffset',
-	'fePointLight',
-	'feSpecularLighting',
-	'feSpotLight',
-	'feTile',
-	'feTurbulence',
-	'foreignObject',
-	'linearGradient',
-	'radialGradient',
-	'textPath',
+	"animate",
+	"circle",
+	"defs",
+	"desc",
+	"ellipse",
+	"g",
+	"image",
+	"line",
+	"filter",
+	"marker",
+	"mask",
+	"metadata",
+	"path",
+	"pattern",
+	"polygon",
+	"polyline",
+	"rect",
+	"stop",
+	"svg",
+	"switch",
+	"symbol",
+	"text",
+	"tspan",
+	"use",
+	"view",
+	"clipPath",
+	"feBlend",
+	"feColorMatrix",
+	"feComponentTransfer",
+	"feComposite",
+	"feConvolveMatrix",
+	"feDiffuseLighting",
+	"feDisplacementMap",
+	"feDistantLight",
+	"feDropShadow",
+	"feFlood",
+	"feFuncA",
+	"feFuncB",
+	"feFuncG",
+	"feFuncR",
+	"feGaussianBlur",
+	"feImage",
+	"feMerge",
+	"feMergeNode",
+	"feMorphology",
+	"feOffset",
+	"fePointLight",
+	"feSpecularLighting",
+	"feSpotLight",
+	"feTile",
+	"feTurbulence",
+	"foreignObject",
+	"linearGradient",
+	"radialGradient",
+	"textPath",
 ] as const;
 type UnionStringArray<T extends Readonly<string[]>> = T[number];
 export type SVGElements = UnionStringArray<typeof svgElements>;

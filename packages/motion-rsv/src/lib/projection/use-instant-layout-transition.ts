@@ -1,14 +1,12 @@
-import { rootProjectionNode } from "./node/HTMLProjectionNode"
+import { rootProjectionNode } from "./node/HTMLProjectionNode";
 
-export function useInstantLayoutTransition(): (
-    cb?: (() => void) | undefined
-) => void {
-    return startTransition
+export function useInstantLayoutTransition(): (cb?: (() => void) | undefined) => void {
+	return startTransition;
 }
 
 function startTransition(callback?: () => void) {
-    if (!rootProjectionNode.current) return
-    rootProjectionNode.current.isUpdating = false
-    rootProjectionNode.current.blockUpdate()
-    callback && callback()
+	if (!rootProjectionNode.current) return;
+	rootProjectionNode.current.isUpdating = false;
+	rootProjectionNode.current.blockUpdate();
+	callback && callback();
 }

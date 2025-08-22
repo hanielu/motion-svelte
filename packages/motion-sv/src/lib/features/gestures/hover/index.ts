@@ -1,14 +1,14 @@
-import type { MotionState } from '@/state/motion-state.js';
-import { Feature, extractEventInfo } from '@/features/index.js';
-import { frame, hover } from 'framer-motion/dom';
+import type { MotionState } from "@/state/motion-state.js";
+import { Feature, extractEventInfo } from "@/features/index.js";
+import { frame, hover } from "framer-motion/dom";
 
-function handleHoverEvent(state: MotionState, event: PointerEvent, lifecycle: 'Start' | 'End') {
+function handleHoverEvent(state: MotionState, event: PointerEvent, lifecycle: "Start" | "End") {
 	const props = state.options;
 	if (props.whileHover) {
-		state.setActive('whileHover', lifecycle === 'Start');
+		state.setActive("whileHover", lifecycle === "Start");
 	}
 
-	const eventName = `onHover${lifecycle}` as 'onHoverStart' | 'onHoverEnd';
+	const eventName = `onHover${lifecycle}` as "onHoverStart" | "onHoverEnd";
 
 	const callback = props[eventName];
 	if (callback) {
@@ -43,9 +43,9 @@ export class HoverGesture extends Feature {
 		// Unmount previous hover handler
 		this.unmount();
 		this.unmount = hover(element, (el, startEvent) => {
-			handleHoverEvent(this.state, startEvent, 'Start');
+			handleHoverEvent(this.state, startEvent, "Start");
 			return (endEvent) => {
-				handleHoverEvent(this.state, endEvent, 'End');
+				handleHoverEvent(this.state, endEvent, "End");
 			};
 		});
 	}

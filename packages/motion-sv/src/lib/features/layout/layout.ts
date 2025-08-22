@@ -1,8 +1,8 @@
-import { Feature } from '@/features/feature.js';
-import type { MotionState } from '@/state/motion-state.js';
-import { addScaleCorrector } from '@/projection/styles/scale-correction.js';
-import { defaultScaleCorrector } from './config.js';
-import { globalProjectionState } from '@/projection/node/state.js';
+import { Feature } from "@/features/feature.js";
+import type { MotionState } from "@/state/motion-state.js";
+import { addScaleCorrector } from "@/projection/styles/scale-correction.js";
+import { defaultScaleCorrector } from "./config.js";
+import { globalProjectionState } from "@/projection/node/state.js";
 
 export class LayoutFeature extends Feature {
 	constructor(state: MotionState) {
@@ -11,7 +11,7 @@ export class LayoutFeature extends Feature {
 	}
 
 	beforeUpdate() {
-		this.state.willUpdate('beforeUpdate');
+		this.state.willUpdate("beforeUpdate");
 	}
 
 	update(): void {
@@ -41,7 +41,7 @@ export class LayoutFeature extends Feature {
 	beforeUnmount(): void {
 		const projection = this.state.visualElement.projection;
 		if (projection) {
-			this.state.willUpdate('beforeUnmount');
+			this.state.willUpdate("beforeUnmount");
 			if (this.state.options.layoutId) {
 				projection.isPresent = false;
 				projection.relegate();

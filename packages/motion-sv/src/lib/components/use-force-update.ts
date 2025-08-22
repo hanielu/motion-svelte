@@ -1,5 +1,5 @@
-import type { Ref } from 'runed';
-import { ref } from 'runed';
+import type { Ref } from "runed";
+import { ref } from "runed";
 
 export function useForceUpdate(): [() => void, Ref<number>] {
 	const key = ref(0);

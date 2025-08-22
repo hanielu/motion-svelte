@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { motion, AnimatePresence } from 'motion-sv';
-	import { css } from 'runed';
-	import AnimatedList from '../shared/animated-list.svelte';
+	import { motion, AnimatePresence } from "motion-sv";
+	import { css } from "runed";
+	import AnimatedList from "../shared/animated-list.svelte";
 </script>
 
 <AnimatedList title="Basic Layout List">
@@ -16,7 +16,7 @@
 						opacity: 1,
 						y: 0,
 						scale: 1,
-						transition: { type: 'spring', stiffness: 500, damping: 30 },
+						transition: { type: "spring", stiffness: 500, damping: 30 },
 					}}
 					exit={{ opacity: 0, y: 8, scale: 0.98, transition: { duration: 0.18 } }}
 					layout

@@ -7,22 +7,22 @@ export type DelayedFunction = (overshoot: number) => void;
  * Timeout defined in ms
  */
 export function delay(callback: DelayedFunction, timeout: number) {
-  const start = time.now();
+	const start = time.now();
 
-  const checkElapsed = ({ timestamp }: FrameData) => {
-    const elapsed = timestamp - start;
+	const checkElapsed = ({ timestamp }: FrameData) => {
+		const elapsed = timestamp - start;
 
-    if (elapsed >= timeout) {
-      cancelFrame(checkElapsed);
-      callback(elapsed - timeout);
-    }
-  };
+		if (elapsed >= timeout) {
+			cancelFrame(checkElapsed);
+			callback(elapsed - timeout);
+		}
+	};
 
-  frame.setup(checkElapsed, true);
+	frame.setup(checkElapsed, true);
 
-  return () => cancelFrame(checkElapsed);
+	return () => cancelFrame(checkElapsed);
 }
 
 export function delayInSeconds(callback: DelayedFunction, timeout: number) {
-  return delay(callback, secondsToMilliseconds(timeout));
+	return delay(callback, secondsToMilliseconds(timeout));
 }

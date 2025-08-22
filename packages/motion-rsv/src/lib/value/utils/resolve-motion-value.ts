@@ -6,5 +6,5 @@ import { type AnyResolvedKeyframe, isMotionValue, type MotionValue } from "motio
  * TODO: Remove and move to library
  */
 export function resolveMotionValue(value?: AnyResolvedKeyframe | MotionValue): AnyResolvedKeyframe {
-  return isMotionValue(value) ? value.get() : value;
+	return isMotionValue(value) ? value.get() : value;
 }

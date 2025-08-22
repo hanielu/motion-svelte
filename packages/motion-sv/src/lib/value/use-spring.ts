@@ -1,10 +1,10 @@
-import { animateValue, frame, frameData, isMotionValue, motionValue } from 'framer-motion/dom';
-import type { JSAnimation, MotionValue } from 'framer-motion/dom';
-import type { AnyResolvedKeyframe, SpringOptions } from 'framer-motion';
-import { watch, extract, type MaybeGetter } from 'runed';
+import { animateValue, frame, frameData, isMotionValue, motionValue } from "framer-motion/dom";
+import type { JSAnimation, MotionValue } from "framer-motion/dom";
+import type { AnyResolvedKeyframe, SpringOptions } from "framer-motion";
+import { watch, extract, type MaybeGetter } from "runed";
 
 function toNumber(v: string | number) {
-	if (typeof v === 'number') return v;
+	if (typeof v === "number") return v;
 	return parseFloat(v);
 }
 
@@ -60,7 +60,7 @@ export function useSpring(
 		activeSpringAnimation = animateValue({
 			keyframes: [value.get(), latestValue],
 			velocity: value.getVelocity(),
-			type: 'spring',
+			type: "spring",
 			restDelta: 0.001,
 			restSpeed: 0.01,
 			...springConfig,
@@ -81,7 +81,7 @@ export function useSpring(
 	);
 
 	if (isMotionValue(source)) {
-		source.on('change', (v) => {
+		source.on("change", (v) => {
 			value.set(toNumber(v));
 		});
 	}

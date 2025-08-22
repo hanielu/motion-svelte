@@ -1,4 +1,4 @@
-import type { Options } from '@/types/index.js';
+import type { Options } from "@/types/index.js";
 
 /**
  * Core animation update function that handles all animation state changes and execution
@@ -10,8 +10,8 @@ import type { Options } from '@/types/index.js';
 export interface AnimateUpdatesOptions {
 	controlActiveState?: Partial<Record<string, boolean>>;
 	controlDelay?: number;
-	directAnimate?: Options['animate'];
-	directTransition?: Options['transition'];
+	directAnimate?: Options["animate"];
+	directTransition?: Options["transition"];
 	isExit?: boolean;
 }
 

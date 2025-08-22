@@ -4,30 +4,30 @@ import { noop } from "motion-utils";
 import { VisualElementDragControls } from "./VisualElementDragControls.js";
 
 export class DragGesture extends Feature<HTMLElement> {
-  controls: VisualElementDragControls;
+	controls: VisualElementDragControls;
 
-  removeGroupControls: Function = noop;
-  removeListeners: Function = noop;
+	removeGroupControls: Function = noop;
+	removeListeners: Function = noop;
 
-  constructor(node: VisualElement<HTMLElement>) {
-    super(node);
-    this.controls = new VisualElementDragControls(node);
-  }
+	constructor(node: VisualElement<HTMLElement>) {
+		super(node);
+		this.controls = new VisualElementDragControls(node);
+	}
 
-  mount() {
-    // If we've been provided a DragControls for manual control over the drag gesture,
-    // subscribe this component to it on mount.
-    const { dragControls } = this.node.getProps();
+	mount() {
+		// If we've been provided a DragControls for manual control over the drag gesture,
+		// subscribe this component to it on mount.
+		const { dragControls } = this.node.getProps();
 
-    if (dragControls) {
-      this.removeGroupControls = dragControls.subscribe(this.controls);
-    }
+		if (dragControls) {
+			this.removeGroupControls = dragControls.subscribe(this.controls);
+		}
 
-    this.removeListeners = this.controls.addListeners() || noop;
-  }
+		this.removeListeners = this.controls.addListeners() || noop;
+	}
 
-  unmount() {
-    this.removeGroupControls();
-    this.removeListeners();
-  }
+	unmount() {
+		this.removeGroupControls();
+		this.removeListeners();
+	}
 }

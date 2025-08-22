@@ -7,12 +7,12 @@ import { optimizedAppearDataAttribute } from "./data-id.js";
  * ensure React types don't end up in the generic DOM bundle.
  */
 export interface WithAppearProps {
-  props: {
-    [optimizedAppearDataAttribute]?: string;
-    values?: {
-      [key: string]: MotionValue<number> | MotionValue<string>;
-    };
-  };
+	props: {
+		[optimizedAppearDataAttribute]?: string;
+		values?: {
+			[key: string]: MotionValue<number> | MotionValue<string>;
+		};
+	};
 }
 
 export type HandoffFunction = (storeId: string, valueName: string, frame: Batcher) => number | null;
@@ -22,22 +22,22 @@ export type HandoffFunction = (storeId: string, valueName: string, frame: Batche
  * triggering the optimized appear animations, and Motion.
  */
 declare global {
-  interface Window {
-    MotionHandoffAnimation?: HandoffFunction;
-    MotionHandoffMarkAsComplete?: (elementId: string) => void;
-    MotionHandoffIsComplete?: (elementId: string) => boolean;
-    MotionHasOptimisedAnimation?: (elementId?: string, valueName?: string) => boolean;
-    MotionCancelOptimisedAnimation?: (
-      elementId?: string,
-      valueName?: string,
-      frame?: Batcher,
-      canResume?: boolean
-    ) => void;
-    MotionCheckAppearSync?: (
-      visualElement: WithAppearProps,
-      valueName: string,
-      value: MotionValue
-    ) => VoidFunction | void;
-    MotionIsMounted?: boolean;
-  }
+	interface Window {
+		MotionHandoffAnimation?: HandoffFunction;
+		MotionHandoffMarkAsComplete?: (elementId: string) => void;
+		MotionHandoffIsComplete?: (elementId: string) => boolean;
+		MotionHasOptimisedAnimation?: (elementId?: string, valueName?: string) => boolean;
+		MotionCancelOptimisedAnimation?: (
+			elementId?: string,
+			valueName?: string,
+			frame?: Batcher,
+			canResume?: boolean
+		) => void;
+		MotionCheckAppearSync?: (
+			visualElement: WithAppearProps,
+			valueName: string,
+			value: MotionValue
+		) => VoidFunction | void;
+		MotionIsMounted?: boolean;
+	}
 }

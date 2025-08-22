@@ -1,4 +1,4 @@
-import { type EventListenerWithPointInfo, addDomEvent, addPointerInfo } from '@/events/index.js';
+import { type EventListenerWithPointInfo, addDomEvent, addPointerInfo } from "@/events/index.js";
 
 export function addPointerEvent(
 	target: EventTarget,

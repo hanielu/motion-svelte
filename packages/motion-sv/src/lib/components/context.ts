@@ -1,8 +1,8 @@
-import type { MotionState } from '@/state/index.js';
-import type { IProjectionNode } from 'framer-motion';
-import { Context, type Ref } from 'runed';
+import type { MotionState } from "@/state/index.js";
+import type { IProjectionNode } from "framer-motion";
+import { Context, type Ref } from "runed";
 
-export const MotionStateContext = new Context<MotionState>('MotionState');
+export const MotionStateContext = new Context<MotionState>("MotionState");
 
 export interface NodeGroup {
 	add: (node: IProjectionNode) => void;
@@ -16,4 +16,4 @@ export interface LayoutGroupState {
 	key?: Ref<number>;
 }
 
-export const LayoutGroupContext = new Context<LayoutGroupState>('LayoutGroup');
+export const LayoutGroupContext = new Context<LayoutGroupState>("LayoutGroup");

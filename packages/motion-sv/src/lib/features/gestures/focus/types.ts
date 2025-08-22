@@ -1,4 +1,4 @@
-import type { TargetAndTransition, VariantLabels } from 'motion-dom';
+import type { TargetAndTransition, VariantLabels } from "motion-dom";
 
 export type FocusProps = {
 	/**

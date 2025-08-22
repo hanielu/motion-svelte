@@ -1,36 +1,36 @@
 <script lang="ts" module>
-	import Motion from './motion.svelte';
-	import type { Component, Snippet } from 'svelte';
-	import type { DOMMotionComponents } from '../render/dom/types.js';
-	import type { CreateVisualElement } from '../render/types.js';
-	import type { FeatureBundle, FeaturePackages } from './features/types.js';
-	import type { MotionProps } from './types.js';
-	import { loadFeatures } from './features/load-features.js';
-	import { isSVGComponent } from '../render/dom/utils/is-svg-component.js';
-	import { useHTMLVisualState } from '../render/html/use-html-visual-state.js';
-	import { useSVGVisualState } from '../render/svg/use-svg-visual-state.js';
-	import { MotionConfigContext } from '../context/motion-config-context.js';
-	import { LayoutGroupContext } from '../context/layout-group-context.js';
-	import { useCreateMotionContext } from '../context/motion-context/create.svelte.js';
-	import { LazyContext } from '../context/lazy-context.js';
-	import { warning, invariant } from 'motion-utils';
-	import { featureDefinitions } from './features/definitions.js';
-	import { isBrowser } from '../utils/is-browser.js';
-	import type { MeasureProps } from './features/layout/measure-layout.svelte';
-	import { read } from 'runed';
-	import { useVisualElement } from './utils/use-visual-element.svelte.js';
-	import { MotionContext } from '../context/motion-context/index.js';
-	import UseRender from '../render/dom/use-render.svelte';
-	import { useMotionRef } from './utils/use-motion-ref.js';
-	import type { HTMLRenderState } from '../render/html/types.js';
-	import type { SVGRenderState } from '../render/svg/types.js';
+	import Motion from "./motion.svelte";
+	import type { Component, Snippet } from "svelte";
+	import type { DOMMotionComponents } from "../render/dom/types.js";
+	import type { CreateVisualElement } from "../render/types.js";
+	import type { FeatureBundle, FeaturePackages } from "./features/types.js";
+	import type { MotionProps } from "./types.js";
+	import { loadFeatures } from "./features/load-features.js";
+	import { isSVGComponent } from "../render/dom/utils/is-svg-component.js";
+	import { useHTMLVisualState } from "../render/html/use-html-visual-state.js";
+	import { useSVGVisualState } from "../render/svg/use-svg-visual-state.js";
+	import { MotionConfigContext } from "../context/motion-config-context.js";
+	import { LayoutGroupContext } from "../context/layout-group-context.js";
+	import { useCreateMotionContext } from "../context/motion-context/create.svelte.js";
+	import { LazyContext } from "../context/lazy-context.js";
+	import { warning, invariant } from "motion-utils";
+	import { featureDefinitions } from "./features/definitions.js";
+	import { isBrowser } from "../utils/is-browser.js";
+	import type { MeasureProps } from "./features/layout/measure-layout.svelte";
+	import { read } from "runed";
+	import { useVisualElement } from "./utils/use-visual-element.svelte.js";
+	import { MotionContext } from "../context/motion-context/index.js";
+	import UseRender from "../render/dom/use-render.svelte";
+	import { useMotionRef } from "./utils/use-motion-ref.js";
+	import type { HTMLRenderState } from "../render/html/types.js";
+	import type { SVGRenderState } from "../render/svg/types.js";
 	import {
 		default as PresenceCollector,
 		PresenceCollectorContext,
-	} from '../components/animate-presence/presence-collector.svelte';
-	import { motionComponentSymbol } from './utils/symbol.js';
+	} from "../components/animate-presence/presence-collector.svelte";
+	import { motionComponentSymbol } from "./utils/symbol.js";
 
-	export interface MotionComponentConfig<TagName extends keyof DOMMotionComponents | string = 'div'> {
+	export interface MotionComponentConfig<TagName extends keyof DOMMotionComponents | string = "div"> {
 		preloadedFeatures?: FeatureBundle;
 		createVisualElement?: CreateVisualElement;
 		Component: TagName | Component<any>;
@@ -46,10 +46,10 @@
 	export type MotionComponent<T, P> = T extends keyof DOMMotionComponents
 		? DOMMotionComponents[T]
 		: Component<
-				Omit<MotionComponentProps<P>, 'children'> & {
-					children?: 'children' extends keyof P
-						? P['children'] | MotionComponentProps<P>['children']
-						: MotionComponentProps<P>['children'];
+				Omit<MotionComponentProps<P>, "children"> & {
+					children?: "children" extends keyof P
+						? P["children"] | MotionComponentProps<P>["children"]
+						: MotionComponentProps<P>["children"];
 				}
 			>;
 
@@ -68,7 +68,7 @@
 	 */
 	export function createMotionComponent<
 		Props extends Record<string, any>,
-		TagName extends keyof DOMMotionComponents | string = 'div',
+		TagName extends keyof DOMMotionComponents | string = "div",
 	>(
 		Component: TagName | string | Component<Props>,
 		{ forwardMotionProps = false }: MotionComponentOptions = {},
@@ -112,7 +112,7 @@
 
 	function useLayoutId({ layoutId }: MotionProps) {
 		const layoutGroupId = LayoutGroupContext.current.id;
-		return layoutGroupId && layoutId !== undefined ? layoutGroupId + '-' + layoutId : layoutId;
+		return layoutGroupId && layoutId !== undefined ? layoutGroupId + "-" + layoutId : layoutId;
 	}
 
 	function useStrictMode(configAndProps: MotionProps, preloadedFeatures?: FeaturePackages) {
@@ -122,12 +122,12 @@
 		 * If we're in development mode, check to make sure we're not rendering a motion component
 		 * as a child of LazyMotion, as this will break the file-size benefits of using it.
 		 */
-		if (process.env.NODE_ENV !== 'production' && preloadedFeatures && isStrict) {
+		if (process.env.NODE_ENV !== "production" && preloadedFeatures && isStrict) {
 			const strictMessage =
-				'You have rendered a `motion` component within a `LazyMotion` component. This will break tree shaking. Import and render a `m` component instead.';
+				"You have rendered a `motion` component within a `LazyMotion` component. This will break tree shaking. Import and render a `m` component instead.";
 			configAndProps.ignoreStrict
-				? warning(false, strictMessage, 'lazy-strict-mode')
-				: invariant(false, strictMessage, 'lazy-strict-mode');
+				? warning(false, strictMessage, "lazy-strict-mode")
+				: invariant(false, strictMessage, "lazy-strict-mode");
 		}
 	}
 

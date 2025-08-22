@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
-	import type { VariantLabels } from '../../motion/types.js';
-	import { PresenceContext, type PresenceContextProps } from '$lib/context/presence-context.js';
-	import { PresenceCollectorContext } from './presence-collector.svelte';
-	import { read } from 'runed';
+	import type { Snippet } from "svelte";
+	import type { VariantLabels } from "../../motion/types.js";
+	import { PresenceContext, type PresenceContextProps } from "$lib/context/presence-context.js";
+	import { PresenceCollectorContext } from "./presence-collector.svelte";
+	import { read } from "runed";
 
 	interface PresenceChildProps {
 		children: Snippet;
@@ -12,8 +12,8 @@
 		initial?: false | VariantLabels;
 		custom?: any;
 		presenceAffectsLayout: boolean;
-		mode: 'sync' | 'popLayout' | 'wait';
-		anchorX?: 'left' | 'right';
+		mode: "sync" | "popLayout" | "wait";
+		anchorX?: "left" | "right";
 		root?: HTMLElement | ShadowRoot;
 	}
 

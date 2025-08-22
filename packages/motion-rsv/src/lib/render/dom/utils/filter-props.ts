@@ -6,11 +6,10 @@ let shouldForward = (key: string) => !isValidMotionProp(key);
 export type IsValidProp = (key: string) => boolean;
 
 export function loadExternalIsValidProp(isValidProp?: IsValidProp) {
-  if (typeof isValidProp !== "function") return;
+	if (typeof isValidProp !== "function") return;
 
-  // Explicitly filter our events
-  shouldForward = (key: string) =>
-    key.startsWith("on") ? !isValidMotionProp(key) : isValidProp(key);
+	// Explicitly filter our events
+	shouldForward = (key: string) => (key.startsWith("on") ? !isValidMotionProp(key) : isValidProp(key));
 }
 
 /**
@@ -27,52 +26,52 @@ export function loadExternalIsValidProp(isValidProp?: IsValidProp) {
  * actually required.
  */
 try {
-  /**
-   * We attempt to import this package but require won't be defined in esm environments, in that case
-   * isPropValid will have to be provided via `MotionContext`. In a 6.0.0 this should probably be removed
-   * in favour of explicit injection.
-   */
-  loadExternalIsValidProp(require("@emotion/is-prop-valid").default);
+	/**
+	 * We attempt to import this package but require won't be defined in esm environments, in that case
+	 * isPropValid will have to be provided via `MotionContext`. In a 6.0.0 this should probably be removed
+	 * in favour of explicit injection.
+	 */
+	loadExternalIsValidProp(require("@emotion/is-prop-valid").default);
 } catch {
-  // We don't need to actually do anything here - the fallback is the existing `isPropValid`.
+	// We don't need to actually do anything here - the fallback is the existing `isPropValid`.
 }
 
 export function filterProps(props: MotionProps, isDom: boolean, forwardMotionProps: boolean) {
-  const filteredProps: MotionProps = {};
+	const filteredProps: MotionProps = {};
 
-  for (const key in props) {
-    /**
-     * values is considered a valid prop by Emotion, so if it's present
-     * this will be rendered out to the DOM unless explicitly filtered.
-     *
-     * We check the type as it could be used with the `feColorMatrix`
-     * element, which we support.
-     */
-    if (
-      key === "values" &&
-      typeof props.values === "object"
-      // ||      ["$$slots", "children"].includes(key)
-    )
-      continue;
+	for (const key in props) {
+		/**
+		 * values is considered a valid prop by Emotion, so if it's present
+		 * this will be rendered out to the DOM unless explicitly filtered.
+		 *
+		 * We check the type as it could be used with the `feColorMatrix`
+		 * element, which we support.
+		 */
+		if (
+			key === "values" &&
+			typeof props.values === "object"
+			// ||      ["$$slots", "children"].includes(key)
+		)
+			continue;
 
-    // if (props.layoutRoot) {
-    //   console.log("key prop", key);
-    // }
+		// if (props.layoutRoot) {
+		//   console.log("key prop", key);
+		// }
 
-    if (
-      shouldForward(key) ||
-      (forwardMotionProps === true && isValidMotionProp(key)) ||
-      (!isDom && !isValidMotionProp(key)) ||
-      // If trying to use native HTML drag events, forward drag listeners
-      (props["draggable" as keyof MotionProps] && key.startsWith("onDrag"))
-    ) {
-      // console.log("forwarding prop", key);
-      filteredProps[key as keyof MotionProps] = props[key as keyof MotionProps];
-    }
-  }
+		if (
+			shouldForward(key) ||
+			(forwardMotionProps === true && isValidMotionProp(key)) ||
+			(!isDom && !isValidMotionProp(key)) ||
+			// If trying to use native HTML drag events, forward drag listeners
+			(props["draggable" as keyof MotionProps] && key.startsWith("onDrag"))
+		) {
+			// console.log("forwarding prop", key);
+			filteredProps[key as keyof MotionProps] = props[key as keyof MotionProps];
+		}
+	}
 
-  // console.log("props", props);
-  // console.log("filteredProps", filteredProps);
+	// console.log("props", props);
+	// console.log("filteredProps", filteredProps);
 
-  return filteredProps;
+	return filteredProps;
 }

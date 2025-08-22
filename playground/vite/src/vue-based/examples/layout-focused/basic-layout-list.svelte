@@ -1,7 +1,7 @@
 <script lang="ts">
-	import AnimatedList from '../shared/animated-list.svelte';
-	import { css } from 'runed';
-	import { motion, createLayoutMotion } from 'motion-sv';
+	import AnimatedList from "../shared/animated-list.svelte";
+	import { css } from "runed";
+	import { motion, createLayoutMotion } from "motion-sv";
 
 	const layout = createLayoutMotion(motion);
 	const update = layout.update;
@@ -18,7 +18,7 @@
 						opacity: 1,
 						y: 0,
 						scale: 1,
-						transition: { type: 'spring', stiffness: 500, damping: 30 },
+						transition: { type: "spring", stiffness: 500, damping: 30 },
 					}}
 				>
 					<div style={css(styles.left)}>

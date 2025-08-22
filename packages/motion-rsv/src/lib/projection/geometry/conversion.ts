@@ -6,14 +6,14 @@ import type { BoundingBox, Box, TransformPoint } from "motion-utils";
  * as a map of single-axis min/max values.
  */
 export function convertBoundingBoxToBox({ top, left, right, bottom }: BoundingBox): Box {
-  return {
-    x: { min: left, max: right },
-    y: { min: top, max: bottom },
-  };
+	return {
+		x: { min: left, max: right },
+		y: { min: top, max: bottom },
+	};
 }
 
 export function convertBoxToBoundingBox({ x, y }: Box): BoundingBox {
-  return { top: y.min, right: x.max, bottom: y.max, left: x.min };
+	return { top: y.min, right: x.max, bottom: y.max, left: x.min };
 }
 
 /**
@@ -22,14 +22,14 @@ export function convertBoxToBoundingBox({ x, y }: Box): BoundingBox {
  * when measuring DOM elements and DOM event points.
  */
 export function transformBoxPoints(point: BoundingBox, transformPoint?: TransformPoint) {
-  if (!transformPoint) return point;
-  const topLeft = transformPoint({ x: point.left, y: point.top });
-  const bottomRight = transformPoint({ x: point.right, y: point.bottom });
+	if (!transformPoint) return point;
+	const topLeft = transformPoint({ x: point.left, y: point.top });
+	const bottomRight = transformPoint({ x: point.right, y: point.bottom });
 
-  return {
-    top: topLeft.y,
-    left: topLeft.x,
-    bottom: bottomRight.y,
-    right: bottomRight.x,
-  };
+	return {
+		top: topLeft.y,
+		left: topLeft.x,
+		bottom: bottomRight.y,
+		right: bottomRight.x,
+	};
 }

@@ -1,6 +1,6 @@
-import { isFunction } from './is.js';
-import { type MaybeBoxOrGetter, box } from './box.svelte.js';
-import type { Getter } from './types.js';
+import { isFunction } from "./is.js";
+import { type MaybeBoxOrGetter, box } from "./box.svelte.js";
+import type { Getter } from "./types.js";
 
 export function unbox<T>(value: MaybeBoxOrGetter<T>): T {
 	if (box.isBox(value)) {

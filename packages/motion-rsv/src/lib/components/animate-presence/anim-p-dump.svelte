@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
-	import type { AnimatePresenceProps } from './types.js';
-	import { usePresence } from './use-presence.svelte.js';
-	import { PresenceCollectorContext, type ComponentKey, type PresenceEntry } from './presence-collector.svelte';
-	import { LayoutGroupContext } from '$lib/context/layout-group-context.js';
-	import { PresenceContext } from '$lib/context/presence-context.js';
-	import type { VariantLabels } from 'motion-dom';
+	import type { Snippet } from "svelte";
+	import type { AnimatePresenceProps } from "./types.js";
+	import { usePresence } from "./use-presence.svelte.js";
+	import { PresenceCollectorContext, type ComponentKey, type PresenceEntry } from "./presence-collector.svelte";
+	import { LayoutGroupContext } from "$lib/context/layout-group-context.js";
+	import { PresenceContext } from "$lib/context/presence-context.js";
+	import type { VariantLabels } from "motion-dom";
 
 	let {
 		children,
@@ -13,9 +13,9 @@
 		initial = true,
 		onExitComplete,
 		presenceAffectsLayout = true,
-		mode = 'sync',
+		mode = "sync",
 		propagate = false,
-		anchorX = 'left',
+		anchorX = "left",
 		root,
 	}: AnimatePresenceProps = $props();
 
@@ -38,7 +38,7 @@
 				if (i >= 0) presentChildren[i] = entry;
 				else presentChildren = [...presentChildren, entry];
 				return () => {
-					console.log('unregistering', entry.key);
+					console.log("unregistering", entry.key);
 					presentChildren = presentChildren.filter((e) => e.key !== entry.key);
 				};
 			},
@@ -80,7 +80,7 @@
 				}
 			}
 
-			if (mode === 'wait' && exiting.length) {
+			if (mode === "wait" && exiting.length) {
 				renderedChildren = exiting;
 			} else {
 				renderedChildren = nextChildren;

@@ -1,9 +1,9 @@
-import type { AsTag, Options } from '@/types/index.js';
-import type { DOMMotionComponents } from 'framer-motion';
-import type { Component } from 'svelte';
+import type { AsTag, Options } from "@/types/index.js";
+import type { DOMMotionComponents } from "framer-motion";
+import type { Component } from "svelte";
 
-export interface MotionProps<T extends AsTag = 'div', K = unknown>
-	extends Omit<Options<K>, 'motionConfig' | 'layoutGroup'> {
+export interface MotionProps<T extends AsTag = "div", K = unknown>
+	extends Omit<Options<K>, "motionConfig" | "layoutGroup"> {
 	as?: T;
 	asChild?: boolean;
 	ref?: HTMLElement | SVGElement | null;
@@ -11,11 +11,11 @@ export interface MotionProps<T extends AsTag = 'div', K = unknown>
 	// press?: Options['press'];
 	// inView?: Options['inView'];
 	// focus?: Options['focus'];
-	whileDrag?: Options['whileDrag'];
-	whileHover?: Options['whileHover'];
-	whilePress?: Options['whilePress'];
-	whileInView?: Options['whileInView'];
-	whileFocus?: Options['whileFocus'];
+	whileDrag?: Options["whileDrag"];
+	whileHover?: Options["whileHover"];
+	whilePress?: Options["whilePress"];
+	whileInView?: Options["whileInView"];
+	whileFocus?: Options["whileFocus"];
 	forwardMotionProps?: boolean;
 	// features?: Feature[]
 	ignoreStrict?: boolean;
@@ -27,13 +27,13 @@ export type MotionComponentProps<Props> = {
 		ref?: HTMLElement | SVGElement | null;
 	};
 
-export type MotionComponent<T extends AsTag = 'div', P = unknown> = T extends keyof DOMMotionComponents
+export type MotionComponent<T extends AsTag = "div", P = unknown> = T extends keyof DOMMotionComponents
 	? DOMMotionComponents[T]
 	: Component<
-			Omit<MotionComponentProps<P>, 'children'> & {
-				children?: 'children' extends keyof P
-					? P['children'] | MotionComponentProps<P>['children']
-					: MotionComponentProps<P>['children'];
+			Omit<MotionComponentProps<P>, "children"> & {
+				children?: "children" extends keyof P
+					? P["children"] | MotionComponentProps<P>["children"]
+					: MotionComponentProps<P>["children"];
 			}
 		>;
 

@@ -3,17 +3,17 @@ import { MotionConfigContext } from "../../context/motion-config-context.js";
 import { useReducedMotion } from "./use-reduced-motion.js";
 
 export function useReducedMotionConfig() {
-  const reducedMotionPreference = useReducedMotion();
+	const reducedMotionPreference = useReducedMotion();
 
-  return read(() => {
-    const { reducedMotion } = MotionConfigContext.current;
+	return read(() => {
+		const { reducedMotion } = MotionConfigContext.current;
 
-    if (reducedMotion === "never") {
-      return false;
-    } else if (reducedMotion === "always") {
-      return true;
-    } else {
-      return reducedMotionPreference;
-    }
-  });
+		if (reducedMotion === "never") {
+			return false;
+		} else if (reducedMotion === "always") {
+			return true;
+		} else {
+			return reducedMotionPreference;
+		}
+	});
 }

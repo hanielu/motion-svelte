@@ -1,30 +1,30 @@
-import { isAnimationControls } from '@/animation/utils.js';
-import type { AnimateUpdates } from '@/features/animation/types.js';
-import { Feature } from '@/features/feature.js';
-import { type MotionState, mountedStates } from '@/state/index.js';
-import { visualElementStore } from 'framer-motion/dist/es/render/store.mjs';
-import { motionEvent } from '@/state/event.js';
-import { style } from '@/state/style.js';
-import { transformResetValue } from '@/state/transform.js';
-import { hasChanged, resolveVariant } from '@/state/utils.js';
-import type { $Transition, AnimationFactory, Options, VariantType } from '@/types/index.js';
-import { isDef } from 'runed';
-import type { VisualElement } from 'framer-motion';
-import { noop } from 'framer-motion/dom';
-import { animateVisualElement } from 'framer-motion/dist/es/animation/interfaces/visual-element.mjs';
-import { createVisualElement } from '@/state/create-visual-element.js';
-import { prefersReducedMotion } from 'framer-motion/dist/es/utils/reduced-motion/state.mjs';
-import { calcChildStagger } from '@/features/animation/calc-child-stagger.js';
+import { isAnimationControls } from "@/animation/utils.js";
+import type { AnimateUpdates } from "@/features/animation/types.js";
+import { Feature } from "@/features/feature.js";
+import { type MotionState, mountedStates } from "@/state/index.js";
+import { visualElementStore } from "framer-motion/dist/es/render/store.mjs";
+import { motionEvent } from "@/state/event.js";
+import { style } from "@/state/style.js";
+import { transformResetValue } from "@/state/transform.js";
+import { hasChanged, resolveVariant } from "@/state/utils.js";
+import type { $Transition, AnimationFactory, Options, VariantType } from "@/types/index.js";
+import { isDef } from "runed";
+import type { VisualElement } from "framer-motion";
+import { noop } from "framer-motion/dom";
+import { animateVisualElement } from "framer-motion/dist/es/animation/interfaces/visual-element.mjs";
+import { createVisualElement } from "@/state/create-visual-element.js";
+import { prefersReducedMotion } from "framer-motion/dist/es/utils/reduced-motion/state.mjs";
+import { calcChildStagger } from "@/features/animation/calc-child-stagger.js";
 
 const STATE_TYPES = [
-	'initial',
-	'animate',
-	'whileInView',
-	'whileHover',
-	'whilePress',
-	'whileDrag',
-	'whileFocus',
-	'exit',
+	"initial",
+	"animate",
+	"whileInView",
+	"whileHover",
+	"whilePress",
+	"whileDrag",
+	"whileFocus",
+	"exit",
 ] as const;
 export type StateType = (typeof STATE_TYPES)[number];
 
@@ -76,7 +76,7 @@ export class AnimationFeature extends Feature {
 		// check if the user has reduced motion
 		const { reducedMotion } = this.state.options.motionConfig;
 		this.state.visualElement.shouldReduceMotion =
-			reducedMotion === 'always' || (reducedMotion === 'user' && !!prefersReducedMotion.current);
+			reducedMotion === "always" || (reducedMotion === "user" && !!prefersReducedMotion.current);
 
 		const prevTarget = this.state.target;
 		this.state.target = { ...this.state.baseTarget };
@@ -123,11 +123,11 @@ export class AnimationFeature extends Feature {
 		 * Finish the animation and dispatch events
 		 */
 		const finishAnimation = (animationPromise: Promise<any>) => {
-			element.dispatchEvent(motionEvent('motionstart', animationTarget));
+			element.dispatchEvent(motionEvent("motionstart", animationTarget));
 			this.state.options.onAnimationStart?.(animationTarget);
 			animationPromise
 				.then(() => {
-					element.dispatchEvent(motionEvent('motioncomplete', animationTarget, isExit));
+					element.dispatchEvent(motionEvent("motioncomplete", animationTarget, isExit));
 					this.state.options.onAnimationComplete?.(animationTarget);
 				})
 				.catch(noop);
@@ -138,8 +138,8 @@ export class AnimationFeature extends Feature {
 		 */
 		const getAnimationPromise = () => {
 			const animationPromise = transition?.when
-				? (transition.when === 'beforeChildren' ? getAnimation() : getChildAnimations()).then(() =>
-						transition.when === 'beforeChildren' ? getChildAnimations() : getAnimation()
+				? (transition.when === "beforeChildren" ? getAnimation() : getChildAnimations()).then(() =>
+						transition.when === "beforeChildren" ? getChildAnimations() : getAnimation()
 					)
 				: Promise.all([getAnimation(), getChildAnimations()]);
 
@@ -164,7 +164,7 @@ export class AnimationFeature extends Feature {
 		const { staggerChildren = 0, staggerDirection = 1, delayChildren = 0 } = transition || {};
 		const numChildren = visualElement.variantChildren.size;
 		const maxStaggerDuration = (numChildren - 1) * staggerChildren;
-		const delayIsFunction = typeof delayChildren === 'function';
+		const delayIsFunction = typeof delayChildren === "function";
 		const generateStaggerDuration = delayIsFunction
 			? (i: number) => delayChildren(i, numChildren)
 			: // Support deprecated staggerChildren,will be removed in next major version
@@ -200,7 +200,7 @@ export class AnimationFeature extends Feature {
 			if (!hasChanged(prevTarget[key], this.state.target[key])) continue;
 			this.state.baseTarget[key] ??= style.get(this.state.element, key) as string;
 			target[key] =
-				this.state.target[key] === 'none' && isDef(transformResetValue[key])
+				this.state.target[key] === "none" && isDef(transformResetValue[key])
 					? transformResetValue[key]
 					: this.state.target[key];
 		}
@@ -225,8 +225,8 @@ export class AnimationFeature extends Feature {
 		directTransition,
 	}: {
 		controlActiveState: Partial<Record<string, boolean>> | undefined;
-		directAnimate: Options['animate'];
-		directTransition: Options['transition'] | undefined;
+		directAnimate: Options["animate"];
+		directTransition: Options["transition"] | undefined;
 	}) {
 		let variantTransition = this.state.options.transition;
 		let variant: VariantType = {};
@@ -245,7 +245,7 @@ export class AnimationFeature extends Feature {
 				resolvedVariant = controlVariant ? Object.assign(controlVariant || {}, resolvedVariant) : variant;
 			}
 			if (!resolvedVariant) return;
-			if (name !== 'initial') variantTransition = resolvedVariant.transition || this.state.options.transition || {};
+			if (name !== "initial") variantTransition = resolvedVariant.transition || this.state.options.transition || {};
 			variant = Object.assign(variant, resolvedVariant);
 		});
 
@@ -255,7 +255,7 @@ export class AnimationFeature extends Feature {
 		}
 
 		Object.entries(variant).forEach(([key, value]) => {
-			if (key === 'transition') return;
+			if (key === "transition") return;
 			this.state.target[key] = value;
 		});
 		return variantTransition;

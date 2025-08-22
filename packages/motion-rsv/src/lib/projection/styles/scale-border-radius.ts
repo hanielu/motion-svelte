@@ -3,8 +3,8 @@ import type { Axis } from "motion-utils";
 import type { ScaleCorrectorDefinition } from "./types.js";
 
 export function pixelsToPercent(pixels: number, axis: Axis): number {
-  if (axis.max === axis.min) return 0;
-  return (pixels / (axis.max - axis.min)) * 100;
+	if (axis.max === axis.min) return 0;
+	return (pixels / (axis.max - axis.min)) * 100;
 }
 
 /**
@@ -15,28 +15,28 @@ export function pixelsToPercent(pixels: number, axis: Axis): number {
  * a paint each time. If we animate between the two in percentage we'll avoid a paint.
  */
 export const correctBorderRadius: ScaleCorrectorDefinition = {
-  correct: (latest, node) => {
-    if (!node.target) return latest;
+	correct: (latest, node) => {
+		if (!node.target) return latest;
 
-    /**
-     * If latest is a string, if it's a percentage we can return immediately as it's
-     * going to be stretched appropriately. Otherwise, if it's a pixel, convert it to a number.
-     */
-    if (typeof latest === "string") {
-      if (px.test(latest)) {
-        latest = parseFloat(latest);
-      } else {
-        return latest;
-      }
-    }
+		/**
+		 * If latest is a string, if it's a percentage we can return immediately as it's
+		 * going to be stretched appropriately. Otherwise, if it's a pixel, convert it to a number.
+		 */
+		if (typeof latest === "string") {
+			if (px.test(latest)) {
+				latest = parseFloat(latest);
+			} else {
+				return latest;
+			}
+		}
 
-    /**
-     * If latest is a number, it's a pixel value. We use the current viewportBox to calculate that
-     * pixel value as a percentage of each axis
-     */
-    const x = pixelsToPercent(latest, node.target.x);
-    const y = pixelsToPercent(latest, node.target.y);
+		/**
+		 * If latest is a number, it's a pixel value. We use the current viewportBox to calculate that
+		 * pixel value as a percentage of each axis
+		 */
+		const x = pixelsToPercent(latest, node.target.x);
+		const y = pixelsToPercent(latest, node.target.y);
 
-    return `${x}% ${y}%`;
-  },
+		return `${x}% ${y}%`;
+	},
 };

@@ -6,8 +6,8 @@ import type { Axis, AxisDelta, Box } from "motion-utils";
  * This is a mutative operation.
  */
 export function copyAxisInto(axis: Axis, originAxis: Axis) {
-  axis.min = originAxis.min;
-  axis.max = originAxis.max;
+	axis.min = originAxis.min;
+	axis.max = originAxis.max;
 }
 
 /**
@@ -16,8 +16,8 @@ export function copyAxisInto(axis: Axis, originAxis: Axis) {
  * This is a mutative operation.
  */
 export function copyBoxInto(box: Box, originBox: Box) {
-  copyAxisInto(box.x, originBox.x);
-  copyAxisInto(box.y, originBox.y);
+	copyAxisInto(box.x, originBox.x);
+	copyAxisInto(box.y, originBox.y);
 }
 
 /**
@@ -26,8 +26,8 @@ export function copyBoxInto(box: Box, originBox: Box) {
  * This is a mutative operation.
  */
 export function copyAxisDeltaInto(delta: AxisDelta, originDelta: AxisDelta) {
-  delta.translate = originDelta.translate;
-  delta.scale = originDelta.scale;
-  delta.originPoint = originDelta.originPoint;
-  delta.origin = originDelta.origin;
+	delta.translate = originDelta.translate;
+	delta.scale = originDelta.scale;
+	delta.originPoint = originDelta.originPoint;
+	delta.origin = originDelta.origin;
 }

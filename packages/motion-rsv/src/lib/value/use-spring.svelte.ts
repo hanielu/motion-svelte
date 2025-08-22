@@ -1,10 +1,4 @@
-import {
-  type AnyResolvedKeyframe,
-  attachSpring,
-  isMotionValue,
-  MotionValue,
-  type SpringOptions,
-} from "motion-dom";
+import { type AnyResolvedKeyframe, attachSpring, isMotionValue, MotionValue, type SpringOptions } from "motion-dom";
 // import { useContext, useInsertionEffect } from "react"
 import { MotionConfigContext } from "../context/motion-config-context.js";
 import { useMotionValue } from "./use-motion-value.js";
@@ -29,33 +23,27 @@ import { useTransform } from "./use-transform.js";
  *
  * @public
  */
-export function useSpring(
-  source: MotionValue<string>,
-  options?: SpringOptions
-): MotionValue<string>;
+export function useSpring(source: MotionValue<string>, options?: SpringOptions): MotionValue<string>;
 export function useSpring(source: string, options?: SpringOptions): MotionValue<string>;
-export function useSpring(
-  source: MotionValue<number>,
-  options?: SpringOptions
-): MotionValue<number>;
+export function useSpring(source: MotionValue<number>, options?: SpringOptions): MotionValue<number>;
 export function useSpring(source: number, options?: SpringOptions): MotionValue<number>;
 export function useSpring(
-  source: MotionValue<string> | MotionValue<number> | AnyResolvedKeyframe,
-  options: SpringOptions = {}
+	source: MotionValue<string> | MotionValue<number> | AnyResolvedKeyframe,
+	options: SpringOptions = {}
 ) {
-  const isStatic = $derived(MotionConfigContext.current.isStatic);
-  const getFromSource = () => (isMotionValue(source) ? source.get() : source);
+	const isStatic = $derived(MotionConfigContext.current.isStatic);
+	const getFromSource = () => (isMotionValue(source) ? source.get() : source);
 
-  // isStatic will never change, allowing early hooks return
-  if (isStatic) {
-    return useTransform(getFromSource);
-  }
+	// isStatic will never change, allowing early hooks return
+	if (isStatic) {
+		return useTransform(getFromSource);
+	}
 
-  const value = useMotionValue(getFromSource());
+	const value = useMotionValue(getFromSource());
 
-  $effect.pre(() => {
-    return attachSpring(value, source, options);
-  });
+	$effect.pre(() => {
+		return attachSpring(value, source, options);
+	});
 
-  return value;
+	return value;
 }

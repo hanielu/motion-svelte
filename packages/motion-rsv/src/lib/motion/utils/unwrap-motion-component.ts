@@ -8,12 +8,10 @@ import { motionComponentSymbol } from "./symbol.js";
  *
  * If the component is not a `motion` component it returns undefined.
  */
-export function unwrapMotionComponent(
-  component: Component | string
-): Component | string | undefined {
-  if (isMotionComponent(component)) {
-    return component[motionComponentSymbol as keyof typeof component];
-  }
+export function unwrapMotionComponent(component: Component | string): Component | string | undefined {
+	if (isMotionComponent(component)) {
+		return component[motionComponentSymbol as keyof typeof component];
+	}
 
-  return undefined;
+	return undefined;
 }

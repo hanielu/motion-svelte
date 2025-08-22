@@ -2,22 +2,22 @@
 	const container = {
 		width: 100,
 		height: 50,
-		backgroundColor: 'var(--hue-3-transparent)',
+		backgroundColor: "var(--hue-3-transparent)",
 		borderRadius: 50,
-		cursor: 'pointer',
-		display: 'flex',
+		cursor: "pointer",
+		display: "flex",
 		padding: 10,
 	};
 
 	const handle = {
 		width: 50,
 		height: 50,
-		backgroundColor: '#9911ff',
-		borderRadius: '50%',
+		backgroundColor: "#9911ff",
+		borderRadius: "50%",
 	};
 
-	import { motion, createLayoutMotion } from 'motion-sv';
-	import { css } from 'runed';
+	import { motion, createLayoutMotion } from "motion-sv";
+	import { css } from "runed";
 
 	let isOn = $state(false);
 
@@ -27,14 +27,14 @@
 
 <!-- nested layout animation works -->
 <motion.button
-	style={{ ...container, justifyContent: 'flex-' + (isOn ? 'start' : 'end'), marginTop: 50 }}
+	style={{ ...container, justifyContent: "flex-" + (isOn ? "start" : "end"), marginTop: 50 }}
 	onclick={toggle}
 >
 	<layout.div
 		style={handle}
 		layoutDependency={isOn}
 		transition={{
-			type: 'spring',
+			type: "spring",
 			visualDuration: 0.2,
 			bounce: 0.2,
 		}}

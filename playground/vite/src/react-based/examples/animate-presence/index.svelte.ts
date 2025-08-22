@@ -5,29 +5,29 @@ import { AnimatePresence, motion } from "motion";
 import { styleToStr } from "runed";
 
 const container2 = {
-  display: "flex",
-  flexDirection: "column",
-  width: 100,
-  height: 160,
-  position: "relative",
+	display: "flex",
+	flexDirection: "column",
+	width: 100,
+	height: 160,
+	position: "relative",
 };
 
 const box = {
-  width: 100,
-  height: 100,
-  backgroundColor: "#0cdcf7",
-  borderRadius: "10px",
+	width: 100,
+	height: 100,
+	backgroundColor: "#0cdcf7",
+	borderRadius: "10px",
 };
 
 const button = {
-  backgroundColor: "#0cdcf7",
-  borderRadius: "10px",
-  padding: "10px 20px",
-  color: "#0f1115",
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  right: 0,
+	backgroundColor: "#0cdcf7",
+	borderRadius: "10px",
+	padding: "10px 20px",
+	color: "#0f1115",
+	position: "absolute",
+	bottom: 0,
+	left: 0,
+	right: 0,
 };
 
 let isVisible = $state(true);

@@ -6,25 +6,16 @@ import { resolveVariantFromProps } from "./resolve-variants.js";
  * Resovles a variant if it's a variant resolver
  */
 export function resolveVariant(
-  visualElement: VisualElement,
-  definition?: TargetAndTransition | TargetResolver,
-  custom?: any
+	visualElement: VisualElement,
+	definition?: TargetAndTransition | TargetResolver,
+	custom?: any
 ): TargetAndTransition;
 export function resolveVariant(
-  visualElement: VisualElement,
-  definition?: AnimationDefinition,
-  custom?: any
+	visualElement: VisualElement,
+	definition?: AnimationDefinition,
+	custom?: any
 ): TargetAndTransition | undefined;
-export function resolveVariant(
-  visualElement: VisualElement,
-  definition?: AnimationDefinition,
-  custom?: any
-) {
-  const props = visualElement.getProps();
-  return resolveVariantFromProps(
-    props,
-    definition,
-    custom !== undefined ? custom : props.custom,
-    visualElement
-  );
+export function resolveVariant(visualElement: VisualElement, definition?: AnimationDefinition, custom?: any) {
+	const props = visualElement.getProps();
+	return resolveVariantFromProps(props, definition, custom !== undefined ? custom : props.custom, visualElement);
 }

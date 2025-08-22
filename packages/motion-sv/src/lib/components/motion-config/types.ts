@@ -1,21 +1,21 @@
-import type { Options } from '@/types/index.js';
+import type { Options } from "@/types/index.js";
 
 /**
  * Motion configuration state shared through context
  */
 export interface MotionConfigState {
 	/** Default transition settings for animations */
-	transition?: Options['transition'];
+	transition?: Options["transition"];
 	/**
 	 * @deprecated Use `reducedMotion` instead
 	 */
-	reduceMotion?: 'user' | 'never' | 'always';
+	reduceMotion?: "user" | "never" | "always";
 	/** Controls motion reduction based on user preference or explicit setting */
-	reducedMotion?: 'user' | 'never' | 'always';
+	reducedMotion?: "user" | "never" | "always";
 	/** Custom nonce for CSP compliance with inline styles */
 	nonce?: string;
 	/** Options for the inView prop */
-	inViewOptions?: Options['inViewOptions'];
+	inViewOptions?: Options["inViewOptions"];
 }
 
 /** Props interface matching the config state */

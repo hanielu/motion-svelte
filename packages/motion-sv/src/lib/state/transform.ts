@@ -1,21 +1,21 @@
-import type { CssPropertyDefinition, CssPropertyDefinitionMap } from '@/types/index.js';
-import { noopReturn } from '@/state/utils.js';
+import type { CssPropertyDefinition, CssPropertyDefinitionMap } from "@/types/index.js";
+import { noopReturn } from "@/state/utils.js";
 
 const rotation: CssPropertyDefinition = {
-	syntax: '<angle>',
-	initialValue: '0deg',
+	syntax: "<angle>",
+	initialValue: "0deg",
 	toDefaultUnit: (v: number) => `${v}deg`,
 };
 
 const baseTransformProperties: CssPropertyDefinitionMap = {
 	translate: {
-		syntax: '<length-percentage>',
-		initialValue: '0px',
+		syntax: "<length-percentage>",
+		initialValue: "0px",
 		toDefaultUnit: (v: number) => `${v}px`,
 	},
 	rotate: rotation,
 	scale: {
-		syntax: '<number>',
+		syntax: "<number>",
 		initialValue: 1,
 		toDefaultUnit: noopReturn,
 	},
@@ -26,36 +26,36 @@ const baseTransformProperties: CssPropertyDefinitionMap = {
  * An ordered array of each transformable value. By default, transform values
  * will be sorted to this order.
  */
-const order = ['translate', 'scale', 'rotate', 'skew'];
+const order = ["translate", "scale", "rotate", "skew"];
 
 /**
  * A list of all transformable axes. We'll use this list to generated a version
  * of each axes for each transform.
  */
-export const axes = ['', 'X', 'Y', 'Z'];
+export const axes = ["", "X", "Y", "Z"];
 
 export const transformDefinitions = new Map<string, CssPropertyDefinition>();
 /**
  * Generate a list of every possible transform key
  */
 const transforms = [
-	'transformPerspective',
-	'x',
-	'y',
-	'z',
-	'translateX',
-	'translateY',
-	'translateZ',
-	'scale',
-	'scaleX',
-	'scaleY',
-	'rotate',
-	'rotateX',
-	'rotateY',
-	'rotateZ',
-	'skew',
-	'skewX',
-	'skewY',
+	"transformPerspective",
+	"x",
+	"y",
+	"z",
+	"translateX",
+	"translateY",
+	"translateZ",
+	"scale",
+	"scaleX",
+	"scaleY",
+	"rotate",
+	"rotateX",
+	"rotateY",
+	"rotateZ",
+	"skew",
+	"skewX",
+	"skewY",
 ];
 order.forEach((name) => {
 	axes.forEach((axis) => {
@@ -71,9 +71,9 @@ const transformLookup = new Set(transforms);
 export const isTransform = (name: string) => transformLookup.has(name);
 
 export const transformAlias = {
-	x: 'translateX',
-	y: 'translateY',
-	z: 'translateZ',
+	x: "translateX",
+	y: "translateY",
+	z: "translateZ",
 };
 
 export function compareTransformOrder([a]: [string, any], [b]: [string, any]) {
@@ -85,7 +85,7 @@ function transformListToString(template: string, [name, value]: [string, any]) {
 }
 
 export function buildTransformTemplate(transforms: [string, any][]): string {
-	return transforms.sort(compareTransformOrder).reduce(transformListToString, '').trim();
+	return transforms.sort(compareTransformOrder).reduce(transformListToString, "").trim();
 }
 
 export const transformResetValue = {

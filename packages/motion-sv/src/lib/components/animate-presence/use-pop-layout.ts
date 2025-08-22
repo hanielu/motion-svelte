@@ -1,13 +1,13 @@
-import type { AnimatePresenceProps } from './types.js';
-import type { MotionState } from '@/state/motion-state.js';
-import { frame } from 'framer-motion/dom';
-import { useMotionConfig } from '../motion-config/index.js';
+import type { AnimatePresenceProps } from "./types.js";
+import type { MotionState } from "@/state/motion-state.js";
+import { frame } from "framer-motion/dom";
+import { useMotionConfig } from "../motion-config/index.js";
 
 export function usePopLayout(props: AnimatePresenceProps) {
 	const styles = new WeakMap<MotionState, HTMLStyleElement>();
 	const config = useMotionConfig();
 	function addPopStyle(state: MotionState) {
-		if (props.mode !== 'popLayout') return;
+		if (props.mode !== "popLayout") return;
 		const element = state.element as HTMLElement;
 		const parent = element.offsetParent;
 		const parentWidth = parent instanceof HTMLElement ? parent.offsetWidth || 0 : 0;
@@ -19,10 +19,10 @@ export function usePopLayout(props: AnimatePresenceProps) {
 			right: 0,
 		};
 		size.right = parentWidth - size.width - size.left;
-		const x = props.anchorX === 'left' ? `left: ${size.left}` : `right: ${size.right}`;
+		const x = props.anchorX === "left" ? `left: ${size.left}` : `right: ${size.right}`;
 
 		state.element.dataset.motionPopId = state.id;
-		const style = document.createElement('style');
+		const style = document.createElement("style");
 		if (config.value.nonce) {
 			style.nonce = config.value.nonce;
 		}

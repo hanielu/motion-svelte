@@ -1,7 +1,7 @@
-import { transformProps } from "motion-dom"
+import { transformProps } from "motion-dom";
 
 export const appearStoreId = (elementId: string, valueName: string) => {
-    const key = transformProps.has(valueName) ? "transform" : valueName
+	const key = transformProps.has(valueName) ? "transform" : valueName;
 
-    return `${elementId}: ${key}`
-}
+	return `${elementId}: ${key}`;
+};

@@ -1,28 +1,28 @@
 <script lang="ts">
-	import { css } from 'runed';
-	import { AnimatePresence, motion } from 'motion-rsv';
+	import { css } from "runed";
+	import { AnimatePresence, motion } from "motion-rsv";
 
 	const container = {
-		display: 'flex',
-		flexDirection: 'column',
+		display: "flex",
+		flexDirection: "column",
 		width: 100,
 		height: 160,
-		position: 'relative',
+		position: "relative",
 	};
 
 	const box = {
 		width: 100,
 		height: 100,
-		backgroundColor: '#0cdcf7',
-		borderRadius: '10px',
+		backgroundColor: "#0cdcf7",
+		borderRadius: "10px",
 	};
 
 	const button = {
-		backgroundColor: '#0cdcf7',
-		borderRadius: '10px',
-		padding: '10px 20px',
-		color: '#0f1115',
-		position: 'absolute',
+		backgroundColor: "#0cdcf7",
+		borderRadius: "10px",
+		padding: "10px 20px",
+		color: "#0f1115",
+		position: "absolute",
 		bottom: 0,
 		left: 0,
 		right: 0,
@@ -45,6 +45,6 @@
 		{/if}
 	</AnimatePresence>
 	<motion.button style={button} onclick={() => (isVisible = !isVisible)} whileTap={{ y: 1 }}>
-		{isVisible ? 'Hide' : 'Show'}
+		{isVisible ? "Hide" : "Show"}
 	</motion.button>
 </div>

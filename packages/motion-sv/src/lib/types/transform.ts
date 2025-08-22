@@ -1,1 +1,1 @@
-export type { TransformOptions } from 'framer-motion/dom'
+export type { TransformOptions } from "framer-motion/dom";

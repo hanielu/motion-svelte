@@ -3,35 +3,31 @@ import { extractEventInfo } from "../events/event-info.js";
 import { Feature } from "../motion/features/Feature.js";
 import type { VisualElement } from "../render/VisualElement.js";
 
-function handleHoverEvent(
-  node: VisualElement<Element>,
-  event: PointerEvent,
-  lifecycle: "Start" | "End"
-) {
-  const { props } = node;
+function handleHoverEvent(node: VisualElement<Element>, event: PointerEvent, lifecycle: "Start" | "End") {
+	const { props } = node;
 
-  if (node.animationState && props.whileHover) {
-    node.animationState.setActive("whileHover", lifecycle === "Start");
-  }
+	if (node.animationState && props.whileHover) {
+		node.animationState.setActive("whileHover", lifecycle === "Start");
+	}
 
-  const eventName = ("onHover" + lifecycle) as "onHoverStart" | "onHoverEnd";
-  const callback = props[eventName];
-  if (callback) {
-    frame.postRender(() => callback(event, extractEventInfo(event)));
-  }
+	const eventName = ("onHover" + lifecycle) as "onHoverStart" | "onHoverEnd";
+	const callback = props[eventName];
+	if (callback) {
+		frame.postRender(() => callback(event, extractEventInfo(event)));
+	}
 }
 
 export class HoverGesture extends Feature<Element> {
-  mount() {
-    const { current } = this.node;
-    if (!current) return;
+	mount() {
+		const { current } = this.node;
+		if (!current) return;
 
-    this.unmount = hover(current, (_element, startEvent) => {
-      handleHoverEvent(this.node, startEvent, "Start");
+		this.unmount = hover(current, (_element, startEvent) => {
+			handleHoverEvent(this.node, startEvent, "Start");
 
-      return endEvent => handleHoverEvent(this.node, endEvent, "End");
-    });
-  }
+			return (endEvent) => handleHoverEvent(this.node, endEvent, "End");
+		});
+	}
 
-  unmount() {}
+	unmount() {}
 }

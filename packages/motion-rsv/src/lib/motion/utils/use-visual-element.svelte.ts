@@ -1,19 +1,19 @@
-import { LazyContext } from '$lib/context/lazy-context.js';
-import { MotionConfigContext } from '$lib/context/motion-config-context.js';
-import { MotionContext } from '$lib/context/motion-context/index.js';
-import { PresenceContext } from '$lib/context/presence-context.js';
-import { SwitchLayoutGroupContext, type InitialPromotionConfig } from '$lib/context/switch-layout-group-context.js';
-import type { IProjectionNode } from '$lib/projection/node/types.js';
-import type { DOMMotionComponents } from '$lib/render/dom/types.js';
-import type { HTMLRenderState } from '$lib/render/html/types.js';
-import type { SVGRenderState } from '$lib/render/svg/types.js';
-import type { CreateVisualElement } from '$lib/render/types.js';
-import type { VisualElement } from '$lib/render/VisualElement.js';
-import type { MotionProps } from '../types.js';
-import type { VisualState } from './use-visual-state.js';
-import type { Component } from 'svelte';
-import { optimizedAppearDataAttribute } from '$lib/animation/optimized-appear/data-id.js';
-import type { ReadableBox } from 'runed';
+import { LazyContext } from "$lib/context/lazy-context.js";
+import { MotionConfigContext } from "$lib/context/motion-config-context.js";
+import { MotionContext } from "$lib/context/motion-context/index.js";
+import { PresenceContext } from "$lib/context/presence-context.js";
+import { SwitchLayoutGroupContext, type InitialPromotionConfig } from "$lib/context/switch-layout-group-context.js";
+import type { IProjectionNode } from "$lib/projection/node/types.js";
+import type { DOMMotionComponents } from "$lib/render/dom/types.js";
+import type { HTMLRenderState } from "$lib/render/html/types.js";
+import type { SVGRenderState } from "$lib/render/svg/types.js";
+import type { CreateVisualElement } from "$lib/render/types.js";
+import type { VisualElement } from "$lib/render/VisualElement.js";
+import type { MotionProps } from "../types.js";
+import type { VisualState } from "./use-visual-state.js";
+import type { Component } from "svelte";
+import { optimizedAppearDataAttribute } from "$lib/animation/optimized-appear/data-id.js";
+import type { ReadableBox } from "runed";
 
 export function useVisualElement<Props extends Record<string, any>, TagName extends keyof DOMMotionComponents | string>(
 	Component: TagName | string | Component<Props>,
@@ -56,7 +56,7 @@ export function useVisualElement<Props extends Record<string, any>, TagName exte
 			visualElement &&
 			!visualElement.projection &&
 			projectionNodeConstructor &&
-			(visualElement.type === 'html' || visualElement.type === 'svg')
+			(visualElement.type === "html" || visualElement.type === "svg")
 		) {
 			createProjectionNode(visualElement, props.current, projectionNodeConstructor, initialLayoutGroupConfig);
 		}
@@ -70,7 +70,7 @@ export function useVisualElement<Props extends Record<string, any>, TagName exte
 		 * `update` unnecessarily. This ensures we skip the initial update.
 		 */
 		if (visualElement && isMounted) {
-			console.log('[haniel] update', props.current);
+			console.log("[haniel] update", props.current);
 			visualElement.update(props.current, presenceContext);
 		}
 	});
@@ -151,7 +151,7 @@ function createProjectionNode(
 
 	visualElement.projection = new ProjectionNodeConstructor(
 		visualElement.latestValues,
-		props['data-framer-portal-id'] ? undefined : getClosestProjectingNode(visualElement.parent)
+		props["data-framer-portal-id"] ? undefined : getClosestProjectingNode(visualElement.parent)
 	) as IProjectionNode;
 
 	visualElement.projection.setOptions({
@@ -166,7 +166,7 @@ function createProjectionNode(
 		 * ensuring it gets called if there's no potential layout animations.
 		 *
 		 */
-		animationType: typeof layout === 'string' ? layout : 'both',
+		animationType: typeof layout === "string" ? layout : "both",
 		initialPromotionConfig,
 		crossfade: layoutCrossfade,
 		layoutScroll,
@@ -184,7 +184,7 @@ function getClosestProjectingNode(
 		: getClosestProjectingNode(visualElement.parent);
 }
 
-function needsContinuousMeasurement(drag: MotionProps['drag'], dragConstraints: MotionProps['dragConstraints']) {
+function needsContinuousMeasurement(drag: MotionProps["drag"], dragConstraints: MotionProps["dragConstraints"]) {
 	if (!dragConstraints) return Boolean(drag);
 
 	// Direct element reference
@@ -192,8 +192,8 @@ function needsContinuousMeasurement(drag: MotionProps['drag'], dragConstraints: 
 
 	// Check if it's a static constraint object
 	if (
-		typeof dragConstraints === 'object' &&
-		('left' in dragConstraints || 'right' in dragConstraints || 'top' in dragConstraints || 'bottom' in dragConstraints)
+		typeof dragConstraints === "object" &&
+		("left" in dragConstraints || "right" in dragConstraints || "top" in dragConstraints || "bottom" in dragConstraints)
 	) {
 		return Boolean(drag); // Static constraints don't need continuous measurement
 	}

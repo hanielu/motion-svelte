@@ -1,15 +1,15 @@
-import type { MotionState } from '@/state/motion-state.js';
-import { Feature } from '@/features/index.js';
-import { frame, inView } from 'framer-motion/dom';
-import type { Options } from '@/types/index.js';
+import type { MotionState } from "@/state/motion-state.js";
+import { Feature } from "@/features/index.js";
+import { frame, inView } from "framer-motion/dom";
+import type { Options } from "@/types/index.js";
 
-function handleHoverEvent(state: MotionState, entry: IntersectionObserverEntry, lifecycle: 'Enter' | 'Leave') {
+function handleHoverEvent(state: MotionState, entry: IntersectionObserverEntry, lifecycle: "Enter" | "Leave") {
 	const props = state.options;
 	if (props.whileInView) {
-		state.setActive('whileInView', lifecycle === 'Enter');
+		state.setActive("whileInView", lifecycle === "Enter");
 	}
 
-	const eventName = `onViewport${lifecycle}` as 'onViewportEnter' | 'onViewportLeave';
+	const eventName = `onViewport${lifecycle}` as "onViewportEnter" | "onViewportLeave";
 
 	const callback = props[eventName];
 	if (callback) {
@@ -35,10 +35,10 @@ export class InViewGesture extends Feature {
 		this.unmount = inView(
 			element,
 			(_, entry) => {
-				handleHoverEvent(this.state, entry, 'Enter');
+				handleHoverEvent(this.state, entry, "Enter");
 				if (!once) {
 					return (endEvent) => {
-						handleHoverEvent(this.state, entry, 'Leave');
+						handleHoverEvent(this.state, entry, "Leave");
 					};
 				}
 			},
@@ -52,7 +52,7 @@ export class InViewGesture extends Feature {
 
 	update(): void {
 		const { props, prevProps } = this.state.visualElement;
-		const hasOptionsChanged = ['amount', 'margin', 'root'].some(
+		const hasOptionsChanged = ["amount", "margin", "root"].some(
 			hasViewportOptionChanged(props as any, prevProps as any)
 		);
 		if (hasOptionsChanged) {

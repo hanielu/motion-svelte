@@ -1,6 +1,6 @@
-import { pipe } from 'framer-motion/dom';
-import { addDomEvent } from '@/events/index.js';
-import { Feature } from '@/features/feature.js';
+import { pipe } from "framer-motion/dom";
+import { addDomEvent } from "@/events/index.js";
+import { Feature } from "@/features/feature.js";
 
 export class FocusGesture extends Feature {
 	private isActive = false;
@@ -14,25 +14,25 @@ export class FocusGesture extends Feature {
 		 * to the element by default and we want to match that behaviour with whileFocus.
 		 */
 		try {
-			isFocusVisible = this.state.element.matches(':focus-visible');
+			isFocusVisible = this.state.element.matches(":focus-visible");
 		} catch (e) {
 			isFocusVisible = true;
 		}
 		if (!isFocusVisible) return;
-		this.state.setActive('whileFocus', true);
+		this.state.setActive("whileFocus", true);
 		this.isActive = true;
 	}
 
 	onBlur() {
 		if (!this.isActive) return;
-		this.state.setActive('whileFocus', false);
+		this.state.setActive("whileFocus", false);
 		this.isActive = false;
 	}
 
 	mount() {
 		this.unmount = pipe(
-			addDomEvent(this.state.element!, 'focus', () => this.onFocus()),
-			addDomEvent(this.state.element!, 'blur', () => this.onBlur())
+			addDomEvent(this.state.element!, "focus", () => this.onFocus()),
+			addDomEvent(this.state.element!, "blur", () => this.onBlur())
 		) as VoidFunction;
 	}
 }

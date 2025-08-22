@@ -32,11 +32,11 @@ import { animationControls } from "./animation-controls.js";
  * @public
  */
 export function useAnimationControls(): LegacyAnimationControls {
-  const controls = animationControls();
+	const controls = animationControls();
 
-  onMount(controls.mount);
+	onMount(controls.mount);
 
-  return controls;
+	return controls;
 }
 
 export const useAnimation = useAnimationControls;

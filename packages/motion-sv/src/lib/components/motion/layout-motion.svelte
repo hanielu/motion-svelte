@@ -1,9 +1,9 @@
 <script lang="ts" module>
-	import Provider from './layout-motion.svelte';
-	import type { MotionCreateOptions, MotionNameSpace } from './utils.js';
-	import type { MotionState } from '@/state/motion-state.js';
-	import type { Snippet } from 'svelte';
-	import { Context, withProp } from 'runed';
+	import Provider from "./layout-motion.svelte";
+	import type { MotionCreateOptions, MotionNameSpace } from "./utils.js";
+	import type { MotionState } from "@/state/motion-state.js";
+	import type { Snippet } from "svelte";
+	import { Context, withProp } from "runed";
 
 	export interface LayoutMotionScope {
 		states: Set<MotionState>;
@@ -11,7 +11,7 @@
 		unregister: (state: MotionState) => void;
 	}
 
-	export const LayoutMotionScopeContext = new Context<LayoutMotionScope>('LayoutMotionScope');
+	export const LayoutMotionScopeContext = new Context<LayoutMotionScope>("LayoutMotionScope");
 
 	export type LayoutMotionNamespace = MotionNameSpace & {
 		/**
@@ -89,13 +89,13 @@
 
 		return new Proxy(base as LayoutMotionNamespace, {
 			get(target, key) {
-				if (key === 'update') return update;
-				if (key === 'create') {
+				if (key === "update") return update;
+				if (key === "create") {
 					return (component: any, options?: MotionCreateOptions) => {
 						const Component = target.create(component, options);
 						return (anchor: any, props: any) => {
 							return Provider(anchor, {
-								children: ((a: any) => Component(a, withProp(props, 'layout', true))) as Snippet,
+								children: ((a: any) => Component(a, withProp(props, "layout", true))) as Snippet,
 								scope,
 							});
 						};
@@ -105,7 +105,7 @@
 				const Component = target[key as keyof MotionNameSpace];
 				return (anchor: any, props: any) => {
 					return Provider(anchor, {
-						children: ((a: any) => Component(a, withProp(props, 'layout', true))) as Snippet,
+						children: ((a: any) => Component(a, withProp(props, "layout", true))) as Snippet,
 						scope,
 					});
 				};

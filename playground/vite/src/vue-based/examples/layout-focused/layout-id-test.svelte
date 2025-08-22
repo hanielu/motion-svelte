@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { motion, createLayoutMotion } from 'motion-sv';
+	import { motion, createLayoutMotion } from "motion-sv";
 
 	const allIngredients = [
-		{ icon: '🍅', label: 'Tomato' },
-		{ icon: '🥬', label: 'Lettuce' },
-		{ icon: '🧀', label: 'Cheese' },
-		{ icon: '🥕', label: 'Carrot' },
-		{ icon: '🍌', label: 'Banana' },
-		{ icon: '🫐', label: 'Blueberries' },
-		{ icon: '🥂', label: 'Champers?' },
+		{ icon: "🍅", label: "Tomato" },
+		{ icon: "🥬", label: "Lettuce" },
+		{ icon: "🧀", label: "Cheese" },
+		{ icon: "🥕", label: "Carrot" },
+		{ icon: "🍌", label: "Banana" },
+		{ icon: "🫐", label: "Blueberries" },
+		{ icon: "🥂", label: "Champers?" },
 	];
 
 	const [tomato, lettuce, cheese] = allIngredients;
@@ -26,7 +26,7 @@
 				<motion.li
 					class="tab"
 					initial={false}
-					animate={{ backgroundColor: item.label === selectedTab.label ? '#eee' : '#eee0' }}
+					animate={{ backgroundColor: item.label === selectedTab.label ? "#eee" : "#eee0" }}
 					onclick={layout.update.with(() => (selectedTab = item))}
 				>
 					{`${item.icon} ${item.label}`}

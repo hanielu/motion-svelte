@@ -5,7 +5,7 @@
  * down to a 0-1 scale.
  */
 export function normalizeTimes(times: number[], repeat: number): void {
-    for (let i = 0; i < times.length; i++) {
-        times[i] = times[i] / (repeat + 1)
-    }
+	for (let i = 0; i < times.length; i++) {
+		times[i] = times[i] / (repeat + 1);
+	}
 }

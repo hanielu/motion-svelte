@@ -1,4 +1,4 @@
-import type { MotionProps } from './types.js';
+import type { MotionProps } from "./types.js";
 
 /**
  * A list of all valid MotionProps.
@@ -7,41 +7,41 @@ import type { MotionProps } from './types.js';
  * This doesn't throw if a `MotionProp` name is missing - it should.
  */
 const validMotionProps = new Set<keyof MotionProps>([
-	'animate',
-	'exit',
-	'variants',
-	'initial',
-	'style',
+	"animate",
+	"exit",
+	"variants",
+	"initial",
+	"style",
 	// "values",
-	'variants',
-	'transition',
-	'transformTemplate',
-	'custom',
-	'inherit',
-	'onBeforeLayoutMeasure',
-	'onAnimationStart',
-	'onAnimationComplete',
-	'onUpdate',
-	'onDragStart',
-	'onDrag',
-	'onDragEnd',
-	'onMeasureDragConstraints',
-	'onDirectionLock',
-	'onDragTransitionEnd',
+	"variants",
+	"transition",
+	"transformTemplate",
+	"custom",
+	"inherit",
+	"onBeforeLayoutMeasure",
+	"onAnimationStart",
+	"onAnimationComplete",
+	"onUpdate",
+	"onDragStart",
+	"onDrag",
+	"onDragEnd",
+	"onMeasureDragConstraints",
+	"onDirectionLock",
+	"onDragTransitionEnd",
 	// "_dragX",
 	// "_dragY",
-	'onHoverStart',
-	'onHoverEnd',
-	'onViewportEnter',
-	'onViewportLeave',
+	"onHoverStart",
+	"onHoverEnd",
+	"onViewportEnter",
+	"onViewportLeave",
 	// "globalTapTarget",
-	'ignoreStrict',
+	"ignoreStrict",
 	// "viewport",
 
 	// just doing what the vue version does
-	'forwardMotionProps',
-	'as',
-	'ref',
+	"forwardMotionProps",
+	"as",
+	"ref",
 ]);
 
 /**
@@ -54,12 +54,12 @@ const validMotionProps = new Set<keyof MotionProps>([
  */
 export function isValidMotionProp(key: string) {
 	return (
-		key.startsWith('while') ||
-		(key.startsWith('drag') && key !== 'draggable') ||
-		key.startsWith('layout') ||
-		key.startsWith('onTap') ||
-		key.startsWith('onPan') ||
-		key.startsWith('onLayout') ||
+		key.startsWith("while") ||
+		(key.startsWith("drag") && key !== "draggable") ||
+		key.startsWith("layout") ||
+		key.startsWith("onTap") ||
+		key.startsWith("onPan") ||
+		key.startsWith("onLayout") ||
 		validMotionProps.has(key as keyof MotionProps)
 	);
 }

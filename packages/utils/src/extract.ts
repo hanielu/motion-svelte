@@ -17,13 +17,13 @@ export function extract<T>(value: MaybeGetter<T>): T;
 export function extract<T>(value: MaybeGetter<T | undefined>, defaultValue: T): T;
 
 export function extract(value: unknown, defaultValue?: unknown) {
-  if (isFunction(value)) {
-    const getter = value;
-    const gotten = getter();
-    if (gotten === undefined) return defaultValue;
-    return gotten;
-  }
+	if (isFunction(value)) {
+		const getter = value;
+		const gotten = getter();
+		if (gotten === undefined) return defaultValue;
+		return gotten;
+	}
 
-  if (value === undefined) return defaultValue;
-  return value;
+	if (value === undefined) return defaultValue;
+	return value;
 }

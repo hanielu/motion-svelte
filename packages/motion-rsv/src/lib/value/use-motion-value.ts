@@ -19,19 +19,19 @@ import { MotionConfigContext } from "../context/motion-config-context.js";
  * @public
  */
 export function useMotionValue<T>(initial: T): MotionValue<T> {
-  const value = motionValue(initial);
+	const value = motionValue(initial);
 
-  // TODO: (haniel) figure this out, components don't rerender in svelte
-  /**
-   * If this motion value is being used in static mode, like on
-   * the Framer canvas, force components to rerender when the motion
-   * value is updated.
-   */
-  // const { isStatic } = (MotionConfigContext.current)
-  // if (isStatic) {
-  //     const [, setLatest] = useState(initial)
-  //     useEffect(() => value.on("change", setLatest), [])
-  // }
+	// TODO: (haniel) figure this out, components don't rerender in svelte
+	/**
+	 * If this motion value is being used in static mode, like on
+	 * the Framer canvas, force components to rerender when the motion
+	 * value is updated.
+	 */
+	// const { isStatic } = (MotionConfigContext.current)
+	// if (isStatic) {
+	//     const [, setLatest] = useState(initial)
+	//     useEffect(() => value.on("change", setLatest), [])
+	// }
 
-  return value;
+	return value;
 }

@@ -1,15 +1,15 @@
-import type { $Transition, MotionStateContext, Options } from '@/types/index.js';
-import type { AnimateUpdates } from '@/features/animation/types.js';
-import type { DOMKeyframesDefinition, VisualElement } from 'framer-motion';
-import type { Feature, StateType } from '@/features/index.js';
-import type { LazyMotionContext } from '@/components/lazy-motion/context.js';
-import type { PresenceContext } from '@/components/animate-presence/presence.svelte.js';
-import { FeatureManager } from '@/features/index.js';
-import { cancelFrame, frame, noop } from 'framer-motion/dom';
-import { doneCallbacks } from '@/components/animate-presence/presence.svelte.js';
-import { invariant } from 'hey-listen';
-import { isSVGElement, resolveVariant } from '@/state/utils.js';
-import { isVariantLabels } from '@/state/utils/is-variant-labels.js';
+import type { $Transition, MotionStateContext, Options } from "@/types/index.js";
+import type { AnimateUpdates } from "@/features/animation/types.js";
+import type { DOMKeyframesDefinition, VisualElement } from "framer-motion";
+import type { Feature, StateType } from "@/features/index.js";
+import type { LazyMotionContext } from "@/components/lazy-motion/context.js";
+import type { PresenceContext } from "@/components/animate-presence/presence.svelte.js";
+import { FeatureManager } from "@/features/index.js";
+import { cancelFrame, frame, noop } from "framer-motion/dom";
+import { doneCallbacks } from "@/components/animate-presence/presence.svelte.js";
+import { invariant } from "hey-listen";
+import { isSVGElement, resolveVariant } from "@/state/utils.js";
+import { isVariantLabels } from "@/state/utils/is-variant-labels.js";
 
 // Map to track mounted motion states by element
 export const mountedStates = new WeakMap<Element, MotionState>();
@@ -24,7 +24,7 @@ const mountedLayoutIds = new Set<string>();
  */
 export class MotionState {
 	public readonly id: string;
-	public type: 'html' | 'svg';
+	public type: "html" | "svg";
 	public element: HTMLElement | SVGElement | null = null;
 	// Parent reference for handling component tree relationships
 	public parent?: MotionState;
@@ -76,10 +76,10 @@ export class MotionState {
 
 		// Initialize with either initial or animate variant
 		const initial = options.initial === undefined && options.variants ? this.context.initial : options.initial;
-		const initialVariantSource = initial === false ? ['initial', 'animate'] : ['initial'];
+		const initialVariantSource = initial === false ? ["initial", "animate"] : ["initial"];
 		this.initTarget(initialVariantSource);
 		this.featureManager = new FeatureManager(this);
-		this.type = isSVGElement(this.options.as as any) ? 'svg' : 'html';
+		this.type = isSVGElement(this.options.as as any) ? "svg" : "html";
 	}
 
 	private _context: MotionStateContext | null = null;
@@ -131,7 +131,7 @@ export class MotionState {
 
 	// Mount motion state to DOM element, handles parent-child relationships
 	mount(element: HTMLElement | SVGElement, options: Options, notAnimate = false) {
-		invariant(Boolean(element), 'Animation state must be mounted with valid Element');
+		invariant(Boolean(element), "Animation state must be mounted with valid Element");
 		this.element = element;
 		this.updateOptions(options);
 
@@ -222,7 +222,7 @@ export class MotionState {
 		});
 		if (isAnimate) {
 			this.animateUpdates({
-				isExit: name === 'exit' && this.activeStates.exit,
+				isExit: name === "exit" && this.activeStates.exit,
 			});
 		}
 	}

@@ -4,23 +4,21 @@ import { translateAxis } from "../geometry/delta-apply.js";
 import type { IProjectionNode } from "../node/types.js";
 
 export function measureViewportBox(instance: HTMLElement, transformPoint?: TransformPoint) {
-  return convertBoundingBoxToBox(
-    transformBoxPoints(instance.getBoundingClientRect(), transformPoint)
-  );
+	return convertBoundingBoxToBox(transformBoxPoints(instance.getBoundingClientRect(), transformPoint));
 }
 
 export function measurePageBox(
-  element: HTMLElement,
-  rootProjectionNode: IProjectionNode,
-  transformPagePoint?: TransformPoint
+	element: HTMLElement,
+	rootProjectionNode: IProjectionNode,
+	transformPagePoint?: TransformPoint
 ) {
-  const viewportBox = measureViewportBox(element, transformPagePoint);
-  const { scroll } = rootProjectionNode;
+	const viewportBox = measureViewportBox(element, transformPagePoint);
+	const { scroll } = rootProjectionNode;
 
-  if (scroll) {
-    translateAxis(viewportBox.x, scroll.offset.x);
-    translateAxis(viewportBox.y, scroll.offset.y);
-  }
+	if (scroll) {
+		translateAxis(viewportBox.x, scroll.offset.x);
+		translateAxis(viewportBox.y, scroll.offset.y);
+	}
 
-  return viewportBox;
+	return viewportBox;
 }

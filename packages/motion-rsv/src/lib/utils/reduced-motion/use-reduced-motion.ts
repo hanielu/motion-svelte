@@ -29,24 +29,24 @@ import { hasReducedMotionListener, prefersReducedMotion } from "./state.js";
  * @public
  */
 export function useReducedMotion() {
-  /**
-   * Lazy initialisation of prefersReducedMotion
-   */
-  !hasReducedMotionListener.current && initPrefersReducedMotion();
+	/**
+	 * Lazy initialisation of prefersReducedMotion
+	 */
+	!hasReducedMotionListener.current && initPrefersReducedMotion();
 
-  const shouldReduceMotion = prefersReducedMotion.current;
+	const shouldReduceMotion = prefersReducedMotion.current;
 
-  if (process.env.NODE_ENV !== "production") {
-    warnOnce(
-      shouldReduceMotion !== true,
-      "You have Reduced Motion enabled on your device. Animations may not appear as expected.",
-      "reduced-motion-disabled"
-    );
-  }
+	if (process.env.NODE_ENV !== "production") {
+		warnOnce(
+			shouldReduceMotion !== true,
+			"You have Reduced Motion enabled on your device. Animations may not appear as expected.",
+			"reduced-motion-disabled"
+		);
+	}
 
-  /**
-   * TODO See if people miss automatically updating shouldReduceMotion setting
-   */
+	/**
+	 * TODO See if people miss automatically updating shouldReduceMotion setting
+	 */
 
-  return shouldReduceMotion;
+	return shouldReduceMotion;
 }

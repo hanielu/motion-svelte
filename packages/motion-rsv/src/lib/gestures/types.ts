@@ -1,1 +1,1 @@
-export type RemoveEvent = () => void
+export type RemoveEvent = () => void;

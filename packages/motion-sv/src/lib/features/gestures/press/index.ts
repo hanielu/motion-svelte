@@ -1,7 +1,7 @@
-import type { MotionState } from '@/state/motion-state.js';
-import { Feature } from '@/features/index.js';
-import { frame, press } from 'framer-motion/dom';
-import type { EventInfo } from 'framer-motion';
+import type { MotionState } from "@/state/motion-state.js";
+import { Feature } from "@/features/index.js";
+import { frame, press } from "framer-motion/dom";
+import type { EventInfo } from "framer-motion";
 
 export function extractEventInfo(event: PointerEvent): EventInfo {
 	return {
@@ -12,13 +12,13 @@ export function extractEventInfo(event: PointerEvent): EventInfo {
 	};
 }
 
-function handlePressEvent(state: MotionState, event: PointerEvent, lifecycle: 'Start' | 'End' | 'Cancel') {
+function handlePressEvent(state: MotionState, event: PointerEvent, lifecycle: "Start" | "End" | "Cancel") {
 	const props = state.options;
 	if (props.whilePress) {
-		state.setActive('whilePress', lifecycle === 'Start');
+		state.setActive("whilePress", lifecycle === "Start");
 	}
 
-	const eventName = `onPress${lifecycle === 'End' ? '' : lifecycle}` as 'onPressStart' | 'onPress' | 'onPressCancel';
+	const eventName = `onPress${lifecycle === "End" ? "" : lifecycle}` as "onPressStart" | "onPress" | "onPressCancel";
 
 	const callback = props[eventName];
 	if (callback) {
@@ -56,9 +56,9 @@ export class PressGesture extends Feature {
 		this.unmount = press(
 			element,
 			(el, startEvent) => {
-				handlePressEvent(this.state, startEvent, 'Start');
+				handlePressEvent(this.state, startEvent, "Start");
 
-				return (endEvent, { success }) => handlePressEvent(this.state, endEvent, success ? 'End' : 'Cancel');
+				return (endEvent, { success }) => handlePressEvent(this.state, endEvent, success ? "End" : "Cancel");
 			},
 			{ useGlobalTarget: this.state.options.globalPressTarget }
 		);

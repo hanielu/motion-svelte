@@ -1,4 +1,4 @@
-import type { MotionState } from '@/state/motion-state.js';
+import type { MotionState } from "@/state/motion-state.js";
 
 export abstract class Feature {
 	state: MotionState;

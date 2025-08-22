@@ -1,5 +1,5 @@
-import type { VisualElement } from '$lib/render/VisualElement.js';
-import type { VisualState } from './use-visual-state.js';
+import type { VisualElement } from "$lib/render/VisualElement.js";
+import type { VisualState } from "./use-visual-state.js";
 
 /**
  * Svelte 5 helper to mirror React's useMotionRef semantics.

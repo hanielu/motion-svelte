@@ -1,5 +1,5 @@
-import type { MotionState } from '@/state/index.js';
-import type { Options } from '@/types/index.js';
+import type { MotionState } from "@/state/index.js";
+import type { Options } from "@/types/index.js";
 /**
  * @public
  */
@@ -33,7 +33,7 @@ export interface AnimationControls {
 	 *
 	 * @public
 	 */
-	start: (definition: Options['animate'], transitionOverride?: Options['transition']) => Promise<any>;
+	start: (definition: Options["animate"], transitionOverride?: Options["transition"]) => Promise<any>;
 
 	/**
 	 * Instantly set to a set of properties or a variant.
@@ -55,7 +55,7 @@ export interface AnimationControls {
 	 *
 	 * @public
 	 */
-	set: (definition: Options['animate']) => void;
+	set: (definition: Options["animate"]) => void;
 
 	/**
 	 * Stops animations on all linked components.

@@ -1,7 +1,7 @@
-import type { MotionValue } from 'framer-motion/dom';
-import type { Options } from './state.js';
-import type { AriaAttributes, DOMAttributes, SvelteHTMLElements, SVGAttributes } from 'svelte/elements';
-import type { ElementType } from '@/types/common.js';
+import type { MotionValue } from "framer-motion/dom";
+import type { Options } from "./state.js";
+import type { AriaAttributes, DOMAttributes, SvelteHTMLElements, SVGAttributes } from "svelte/elements";
+import type { ElementType } from "@/types/common.js";
 
 type EventHandlers<E> = {
 	[K in keyof E]?: E[K] extends (...args: any) => any ? E[K] : (payload: E[K]) => void;
@@ -103,5 +103,5 @@ type IntrinsicElementAttributesAsMotionValues = SetMotionValueType<
 >;
 export type MotionHTMLAttributes<C extends ElementType> = Omit<
 	IntrinsicElementAttributesAsMotionValues[C],
-	keyof Options | 'style' | 'as' | 'asChild'
+	keyof Options | "style" | "as" | "asChild"
 >;

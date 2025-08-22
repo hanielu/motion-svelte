@@ -1,21 +1,21 @@
 export const enableTouchEvents = () => {
-    const originalEvents = {
-        ontouchstart: window.ontouchstart,
-    }
-    window.ontouchstart = null
+	const originalEvents = {
+		ontouchstart: window.ontouchstart,
+	};
+	window.ontouchstart = null;
 
-    return () => {
-        window.ontouchstart = originalEvents.ontouchstart
-    }
-}
+	return () => {
+		window.ontouchstart = originalEvents.ontouchstart;
+	};
+};
 
 export const enablePointerEvents = () => {
-    const originalEvents = {
-        onpointerdown: window.onpointerdown,
-    }
-    window.onpointerdown = null
+	const originalEvents = {
+		onpointerdown: window.onpointerdown,
+	};
+	window.onpointerdown = null;
 
-    return () => {
-        window.onpointerdown = originalEvents.onpointerdown
-    }
-}
+	return () => {
+		window.onpointerdown = originalEvents.onpointerdown;
+	};
+};

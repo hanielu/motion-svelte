@@ -1,15 +1,15 @@
-import type { ScrapeMotionValuesFromProps } from '$lib/render/types.js';
-import type { AnyResolvedKeyframe, ResolvedValues } from 'motion-dom';
-import type { MotionProps } from '../types.js';
-import { isAnimationControls } from '$lib/animation/utils/is-animation-controls.js';
-import { MotionContext, type MotionContextProps } from '$lib/context/motion-context/index.js';
-import { PresenceContext, type PresenceContextProps } from '$lib/context/presence-context.js';
-import { resolveVariantFromProps } from '$lib/render/utils/resolve-variants.js';
-import { resolveMotionValue } from '$lib/value/utils/resolve-motion-value.js';
+import type { ScrapeMotionValuesFromProps } from "$lib/render/types.js";
+import type { AnyResolvedKeyframe, ResolvedValues } from "motion-dom";
+import type { MotionProps } from "../types.js";
+import { isAnimationControls } from "$lib/animation/utils/is-animation-controls.js";
+import { MotionContext, type MotionContextProps } from "$lib/context/motion-context/index.js";
+import { PresenceContext, type PresenceContextProps } from "$lib/context/presence-context.js";
+import { resolveVariantFromProps } from "$lib/render/utils/resolve-variants.js";
+import { resolveMotionValue } from "$lib/value/utils/resolve-motion-value.js";
 import {
 	isControllingVariants as checkIsControllingVariants,
 	isVariantNode as checkIsVariantNode,
-} from '../../render/utils/is-controlling-variants.js';
+} from "../../render/utils/is-controlling-variants.js";
 
 export interface VisualState<Instance, RenderState> {
 	renderState: RenderState;
@@ -79,7 +79,7 @@ function makeLatestValues(
 
 	const variantToSet = isInitialAnimationBlocked ? animate : initial;
 
-	if (variantToSet && typeof variantToSet !== 'boolean' && !isAnimationControls(variantToSet)) {
+	if (variantToSet && typeof variantToSet !== "boolean" && !isAnimationControls(variantToSet)) {
 		const list = Array.isArray(variantToSet) ? variantToSet : [variantToSet];
 		for (let i = 0; i < list.length; i++) {
 			const resolved = resolveVariantFromProps(props, list[i] as any);

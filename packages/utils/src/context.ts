@@ -1,5 +1,5 @@
-import { getContext, hasContext, setContext } from 'svelte';
-import { read, type ReadableBox } from './box.svelte.js';
+import { getContext, hasContext, setContext } from "svelte";
+import { read, type ReadableBox } from "./box.svelte.js";
 
 // Type utilities to reduce duplication
 type UnboxedType<T> = T extends ReadableBox<infer U> ? U : never;

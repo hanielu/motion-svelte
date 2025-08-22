@@ -1,6 +1,6 @@
-import { isObject } from '../is';
+import { isObject } from "../is";
 
-export const RefSymbol = Symbol('ref');
+export const RefSymbol = Symbol("ref");
 
 export type Ref<T = any, S = T> = {
 	[RefSymbol]: true;

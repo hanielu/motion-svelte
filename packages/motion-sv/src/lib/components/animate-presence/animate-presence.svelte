@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { mountedStates } from '@/state/index.js';
-	import { doneCallbacks, removeDoneCallback, useAnimatePresence } from './presence.svelte.js';
-	import type { AnimatePresenceProps } from './types.js';
-	import { usePopLayout } from './use-pop-layout.js';
-	import { delay } from '@/utils/delay.js';
-	import type { Snippet } from 'svelte';
+	import { mountedStates } from "@/state/index.js";
+	import { doneCallbacks, removeDoneCallback, useAnimatePresence } from "./presence.svelte.js";
+	import type { AnimatePresenceProps } from "./types.js";
+	import { usePopLayout } from "./use-pop-layout.js";
+	import { delay } from "@/utils/delay.js";
+	import type { Snippet } from "svelte";
 
 	let {
-		mode = 'sync',
+		mode = "sync",
 		initial = true,
-		anchorX = 'left',
+		anchorX = "left",
 		as,
 		custom,
 		onExitComplete,
@@ -62,7 +62,7 @@
 		 * This allows the animation system to capture updated values after component updates.
 		 */
 		delay(() => {
-			state.setActive('exit', false);
+			state.setActive("exit", false);
 		});
 	}
 
@@ -104,7 +104,7 @@
 					onExitComplete?.();
 				}
 				if (!styles.has(state)) {
-					state.willUpdate('done');
+					state.willUpdate("done");
 				} else {
 					removePopStyle(state);
 				}
@@ -116,20 +116,20 @@
 		}
 
 		delay(() => {
-			state.setActive('exit', true);
+			state.setActive("exit", true);
 			doneCallbacks.set(motionEl, doneCallback);
-			motionEl.addEventListener('motioncomplete', doneCallback);
+			motionEl.addEventListener("motioncomplete", doneCallback);
 		});
 	}
 
 	const transitionProps = $derived.by(() => {
-		if (mode !== 'wait') {
+		if (mode !== "wait") {
 			return {
 				tag: as,
 			};
 		}
 		return {
-			mode: mode === 'wait' ? 'out-in' : undefined,
+			mode: mode === "wait" ? "out-in" : undefined,
 		};
 	});
 </script>

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { Ref } from 'runed';
-	import type { Snippet } from 'svelte';
-	import { useLayoutGroupProvider, type LayoutGroupProps } from './use-layout-group.js';
+	import type { Ref } from "runed";
+	import type { Snippet } from "svelte";
+	import { useLayoutGroupProvider, type LayoutGroupProps } from "./use-layout-group.js";
 
 	let {
 		inherit = true,

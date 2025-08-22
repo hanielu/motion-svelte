@@ -40,7 +40,7 @@ export function onBeforeDisconnect(el: Element, fn: Listener, opts?: { once?: bo
 }
 
 function hasDOM() {
-	return typeof window !== 'undefined' && typeof document !== 'undefined';
+	return typeof window !== "undefined" && typeof document !== "undefined";
 }
 
 function ensurePatched() {
@@ -77,19 +77,19 @@ function ensurePatched() {
 		const index = parent ? Array.prototype.indexOf.call(parent.childNodes, el) : -1;
 
 		const isNodeConnected = (n: Node | null) =>
-			!!n && ('isConnected' in n ? (n as any).isConnected : document.contains(n));
+			!!n && ("isConnected" in n ? (n as any).isConnected : document.contains(n));
 
 		const mountFixed = () => {
 			document.body.appendChild(clone);
 			Object.assign(clone.style, {
-				position: 'fixed',
+				position: "fixed",
 				top: `${rect.top}px`,
 				left: `${rect.left}px`,
 				width: `${rect.width}px`,
 				height: `${rect.height}px`,
-				margin: '0',
-				pointerEvents: 'none',
-				zIndex: '2147483647',
+				margin: "0",
+				pointerEvents: "none",
+				zIndex: "2147483647",
 			} as Partial<CSSStyleDeclaration>);
 		};
 
@@ -145,10 +145,10 @@ function ensurePatched() {
 		queueMicrotask(() => seen.delete(el));
 	};
 
-	if (typeof Element !== 'undefined') {
+	if (typeof Element !== "undefined") {
 		patch(
 			Element.prototype,
-			'remove',
+			"remove",
 			(orig: Function) =>
 				function (this: Element) {
 					if (document.contains(this)) snapUnder(this);
@@ -157,7 +157,7 @@ function ensurePatched() {
 		);
 		patch(
 			Element.prototype,
-			'replaceWith',
+			"replaceWith",
 			(orig: Function) =>
 				function (this: Element, ...nodes: (Node | string)[]) {
 					if (document.contains(this)) snapUnder(this);
@@ -165,10 +165,10 @@ function ensurePatched() {
 				}
 		);
 	}
-	if (typeof Node !== 'undefined') {
+	if (typeof Node !== "undefined") {
 		patch(
 			Node.prototype,
-			'removeChild',
+			"removeChild",
 			(orig: Function) =>
 				function <T extends Node>(this: Node, child: T) {
 					if (document.contains(child)) snapUnder(child);
@@ -177,7 +177,7 @@ function ensurePatched() {
 		);
 		patch(
 			Node.prototype,
-			'replaceChild',
+			"replaceChild",
 			(orig: Function) =>
 				function <T extends Node>(this: Node, n: T, o: T) {
 					if (document.contains(o)) snapUnder(o);
@@ -186,12 +186,12 @@ function ensurePatched() {
 		);
 	}
 	try {
-		const desc = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+		const desc = Object.getOwnPropertyDescriptor(Element.prototype, "innerHTML");
 		if (desc?.set) {
-			Object.defineProperty(Element.prototype, 'innerHTML', {
+			Object.defineProperty(Element.prototype, "innerHTML", {
 				...desc,
 				set(this: Element, v: string) {
-					if ((v ?? '') === '') snapUnder(this);
+					if ((v ?? "") === "") snapUnder(this);
 					return desc.set!.call(this, v);
 				},
 			});
@@ -203,13 +203,13 @@ function inlineComputedStylesDeep(src: HTMLElement, dst: HTMLElement) {
 	const copy = (a: Element, b: Element) => {
 		const cs = getComputedStyle(a);
 		const st = (b as HTMLElement).style;
-		st.cssText = '';
+		st.cssText = "";
 		for (const prop of cs as any as Iterable<string>) {
 			st.setProperty(prop, cs.getPropertyValue(prop), cs.getPropertyPriority(prop));
 		}
 	};
 	copy(src, dst);
-	const A = src.querySelectorAll('*'),
-		B = dst.querySelectorAll('*');
+	const A = src.querySelectorAll("*"),
+		B = dst.querySelectorAll("*");
 	for (let i = 0; i < A.length; i++) copy(A[i], B[i]);
 }

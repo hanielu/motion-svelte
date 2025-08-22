@@ -1,6 +1,6 @@
-import type { TargetAndTransition, VariantLabels } from 'motion-dom';
+import type { TargetAndTransition, VariantLabels } from "motion-dom";
 
-type MarginValue = `${number}${'px' | '%'}`;
+type MarginValue = `${number}${"px" | "%"}`;
 
 type MarginType =
 	| MarginValue
@@ -11,7 +11,7 @@ type MarginType =
 export interface InViewOptions {
 	root?: Element | Document;
 	margin?: MarginType;
-	amount?: 'some' | 'all' | number;
+	amount?: "some" | "all" | number;
 }
 
 type ViewportEventHandler = (entry: IntersectionObserverEntry | null) => void;

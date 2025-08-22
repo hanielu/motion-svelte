@@ -1,4 +1,4 @@
-import type { PanInfo } from '@/features/gestures/pan/PanSession.js';
+import type { PanInfo } from "@/features/gestures/pan/PanSession.js";
 
 export interface PanProps {
 	onPanSessionStart?: (event: PointerEvent, info: PanInfo) => void;

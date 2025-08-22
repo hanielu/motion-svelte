@@ -1,4 +1,4 @@
 export type ViewportState = {
-    hasEnteredView: boolean
-    isInView: boolean
-}
+	hasEnteredView: boolean;
+	isInView: boolean;
+};

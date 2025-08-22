@@ -1,1 +1,1 @@
-export * from './is-primary-pointer.js';
+export * from "./is-primary-pointer.js";

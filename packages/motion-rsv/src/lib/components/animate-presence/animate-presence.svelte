@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { AnimatePresenceProps } from './types.js';
-	import { usePresence } from './use-presence.svelte.js';
-	import { PresenceCollectorContext, type ComponentKey, type PresenceEntry } from './presence-collector.svelte';
-	import { getChildKey } from './utils.js';
-	import { watch } from 'runed';
-	import { LayoutGroupContext } from '$lib/context/layout-group-context.js';
-	import PresenceChild from './presence-child.svelte';
-	import { flushSync } from 'svelte';
+	import type { AnimatePresenceProps } from "./types.js";
+	import { usePresence } from "./use-presence.svelte.js";
+	import { PresenceCollectorContext, type ComponentKey, type PresenceEntry } from "./presence-collector.svelte";
+	import { getChildKey } from "./utils.js";
+	import { watch } from "runed";
+	import { LayoutGroupContext } from "$lib/context/layout-group-context.js";
+	import PresenceChild from "./presence-child.svelte";
+	import { flushSync } from "svelte";
 
 	let {
 		children,
@@ -14,9 +14,9 @@
 		initial = true,
 		onExitComplete,
 		presenceAffectsLayout = true,
-		mode = 'sync',
+		mode = "sync",
 		propagate = false,
-		anchorX = 'left',
+		anchorX = "left",
 		root,
 	}: AnimatePresenceProps = $props();
 
@@ -89,11 +89,11 @@
 			if (!presentKeys.includes(key)) {
 				if (exitComplete.get(key) !== true) {
 					exitComplete.set(key, false);
-					console.log('[haniel] animate presence collector exitComplete set', interest);
+					console.log("[haniel] animate presence collector exitComplete set", interest);
 				}
 			} else {
 				exitComplete.delete(key);
-				console.log('[haniel] animate presence collector exitComplete delete', interest);
+				console.log("[haniel] animate presence collector exitComplete delete", interest);
 			}
 		}
 	});
@@ -124,7 +124,7 @@
 				 * If we're in "wait" mode, and we have exiting children, we want to
 				 * only render these until they've all exited.
 				 */
-				if (mode === 'wait' && exitingChildren.length) {
+				if (mode === "wait" && exitingChildren.length) {
 					nextChildren = exitingChildren;
 				}
 
@@ -141,7 +141,7 @@
 	);
 
 	$effect(() => {
-		if (process.env.NODE_ENV !== 'production' && mode === 'wait' && renderedChildren.length > 1) {
+		if (process.env.NODE_ENV !== "production" && mode === "wait" && renderedChildren.length > 1) {
 			console.warn(
 				`You're attempting to animate multiple children within AnimatePresence, but its mode is set to "wait". This will lead to odd visual behaviour.`
 			);
@@ -167,11 +167,11 @@
 
 	$effect(() => {
 		const interest = $state.snapshot(renderedChildren);
-		console.log('[haniel] animate presence collector', JSON.stringify(interest, null, 2));
+		console.log("[haniel] animate presence collector", JSON.stringify(interest, null, 2));
 	});
 
 	$effect(() => {
-		console.log('[haniel] animate presence collector presentKeys', presentKeys);
+		console.log("[haniel] animate presence collector presentKeys", presentKeys);
 	});
 
 	function arraysShallowEqual(a: PresenceEntry[], b: PresenceEntry[]) {
@@ -189,7 +189,7 @@
 
 	{@const onExit = () => {
 		// flushSync();
-		console.log('[haniel] animate presence collector onExit', exitComplete);
+		console.log("[haniel] animate presence collector onExit", exitComplete);
 		if (exitComplete.has(key)) {
 			exitComplete.set(key, true);
 		} else {
@@ -208,7 +208,7 @@
 			propagate && safeToRemove?.();
 
 			onExitComplete && onExitComplete();
-			console.log('[haniel] animate presence collector onExit complete');
+			console.log("[haniel] animate presence collector onExit complete");
 		}
 	}}
 

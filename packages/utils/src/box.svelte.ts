@@ -1,10 +1,10 @@
-import {isFunction, isObject} from './is.js';
-import type {Expand, Getter} from './types.js';
+import { isFunction, isObject } from "./is.js";
+import type { Expand, Getter } from "./types.js";
 
 export type MaybeBoxOrGetter<T> = T | Getter<T> | ReadableBox<T>;
 
-const BoxSymbol = Symbol('box');
-const isWritableSymbol = Symbol('is-writable');
+const BoxSymbol = Symbol("box");
+const isWritableSymbol = Symbol("is-writable");
 
 export type ReadableBox<T> = {
 	readonly [BoxSymbol]: true;
@@ -174,7 +174,7 @@ type BoxFlatten<R extends Record<string, unknown>> = Expand<
 function boxFlatten<R extends Record<string, unknown>>(boxes: R): BoxFlatten<R> {
 	return Object.entries(boxes).reduce<BoxFlatten<R>>((acc, [key, b]) => {
 		if (!box.isBox(b)) {
-			return Object.assign(acc, {[key]: b});
+			return Object.assign(acc, { [key]: b });
 		}
 
 		if (box.isWritableBox(b)) {

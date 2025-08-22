@@ -2,13 +2,13 @@ import { px } from "motion-dom";
 import type { ResolvedValues } from "../../types.js";
 
 const dashKeys = {
-  offset: "stroke-dashoffset",
-  array: "stroke-dasharray",
+	offset: "stroke-dashoffset",
+	array: "stroke-dasharray",
 };
 
 const camelKeys = {
-  offset: "strokeDashoffset",
-  array: "strokeDasharray",
+	offset: "strokeDashoffset",
+	array: "strokeDasharray",
 };
 
 /**
@@ -19,24 +19,24 @@ const camelKeys = {
  * This function is mutative to reduce per-frame GC.
  */
 export function buildSVGPath(
-  attrs: ResolvedValues,
-  length: number,
-  spacing = 1,
-  offset = 0,
-  useDashCase: boolean = true
+	attrs: ResolvedValues,
+	length: number,
+	spacing = 1,
+	offset = 0,
+	useDashCase: boolean = true
 ): void {
-  // Normalise path length by setting SVG attribute pathLength to 1
-  attrs.pathLength = 1;
+	// Normalise path length by setting SVG attribute pathLength to 1
+	attrs.pathLength = 1;
 
-  // We use dash case when setting attributes directly to the DOM node and camel case
-  // when defining props on a React component.
-  const keys = useDashCase ? dashKeys : camelKeys;
+	// We use dash case when setting attributes directly to the DOM node and camel case
+	// when defining props on a React component.
+	const keys = useDashCase ? dashKeys : camelKeys;
 
-  // Build the dash offset
-  attrs[keys.offset] = px.transform!(-offset);
+	// Build the dash offset
+	attrs[keys.offset] = px.transform!(-offset);
 
-  // Build the dash array
-  const pathLength = px.transform!(length);
-  const pathSpacing = px.transform!(spacing);
-  attrs[keys.array] = `${pathLength} ${pathSpacing}`;
+	// Build the dash array
+	const pathLength = px.transform!(length);
+	const pathSpacing = px.transform!(spacing);
+	attrs[keys.array] = `${pathLength} ${pathSpacing}`;
 }

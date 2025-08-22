@@ -1,17 +1,17 @@
 import type { VisualElement } from "../../render/VisualElement.js";
 
 export abstract class Feature<T extends any = any> {
-  isMounted = false;
+	isMounted = false;
 
-  node: VisualElement<T>;
+	node: VisualElement<T>;
 
-  constructor(node: VisualElement<T>) {
-    this.node = node;
-  }
+	constructor(node: VisualElement<T>) {
+		this.node = node;
+	}
 
-  abstract mount(): void;
+	abstract mount(): void;
 
-  abstract unmount(): void;
+	abstract unmount(): void;
 
-  update(): void {}
+	update(): void {}
 }

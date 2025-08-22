@@ -1,6 +1,6 @@
 // import { useCallback, useContext, useEffect, useId } from "react";
-import { read, watch, type ReadableBox } from 'runed';
-import { PresenceContext, type PresenceContextProps } from '../../context/presence-context.js';
+import { read, watch, type ReadableBox } from "runed";
+import { PresenceContext, type PresenceContextProps } from "../../context/presence-context.js";
 
 export type SafeToRemove = () => void;
 

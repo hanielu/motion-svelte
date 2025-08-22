@@ -1,6 +1,6 @@
-import { px } from 'motion-dom';
-import type { ScaleCorrectorDefinition } from './types.js';
-import type { Axis } from 'framer-motion/dom';
+import { px } from "motion-dom";
+import type { ScaleCorrectorDefinition } from "./types.js";
+import type { Axis } from "framer-motion/dom";
 
 export function pixelsToPercent(pixels: number, axis: Axis): number {
 	if (axis.max === axis.min) return 0;
@@ -22,7 +22,7 @@ export const correctBorderRadius: ScaleCorrectorDefinition = {
 		 * If latest is a string, if it's a percentage we can return immediately as it's
 		 * going to be stretched appropriately. Otherwise, if it's a pixel, convert it to a number.
 		 */
-		if (typeof latest === 'string') {
+		if (typeof latest === "string") {
 			if (px.test(latest)) {
 				latest = parseFloat(latest);
 			} else {

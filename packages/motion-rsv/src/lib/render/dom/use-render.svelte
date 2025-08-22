@@ -2,26 +2,26 @@
 	lang="ts"
 	generics="Props extends Record<string, any>, TagName extends keyof DOMMotionComponents | string = 'div'"
 >
-	import { isMotionValue } from 'motion-dom';
-	import type { MotionProps } from '../../motion/types.js';
-	import type { VisualState } from '../../motion/utils/use-visual-state.js';
-	import type { HTMLRenderState } from '../html/types.js';
-	import { useHTMLProps } from '../html/use-props.svelte.js';
-	import type { SVGRenderState } from '../svg/types.js';
-	import { useSVGProps } from '../svg/use-props.svelte.js';
-	import type { DOMMotionComponents } from './types.js';
-	import { filterProps } from './utils/filter-props.js';
-	import { isSVGComponent } from './utils/is-svg-component.js';
-	import { untrack, type Component as SvelteComponent } from 'svelte';
-	import { read } from 'runed';
-	import { type Attachment } from 'svelte/attachments';
-	import { PresenceContext } from '$lib/context/presence-context.js';
+	import { isMotionValue } from "motion-dom";
+	import type { MotionProps } from "../../motion/types.js";
+	import type { VisualState } from "../../motion/utils/use-visual-state.js";
+	import type { HTMLRenderState } from "../html/types.js";
+	import { useHTMLProps } from "../html/use-props.svelte.js";
+	import type { SVGRenderState } from "../svg/types.js";
+	import { useSVGProps } from "../svg/use-props.svelte.js";
+	import type { DOMMotionComponents } from "./types.js";
+	import { filterProps } from "./utils/filter-props.js";
+	import { isSVGComponent } from "./utils/is-svg-component.js";
+	import { untrack, type Component as SvelteComponent } from "svelte";
+	import { read } from "runed";
+	import { type Attachment } from "svelte/attachments";
+	import { PresenceContext } from "$lib/context/presence-context.js";
 
 	type UseRenderProps = {
 		Component: TagName | string | SvelteComponent<Props>;
 		props: MotionProps;
 		ref: (node: HTMLElement | SVGElement) => () => void;
-		latestValues: VisualState<HTMLElement | SVGElement, HTMLRenderState | SVGRenderState>['latestValues'];
+		latestValues: VisualState<HTMLElement | SVGElement, HTMLRenderState | SVGRenderState>["latestValues"];
 		isStatic: boolean;
 		forwardMotionProps?: boolean;
 	};
@@ -36,7 +36,7 @@
 		isStatic,
 		Component as any
 	);
-	const filteredProps = $derived(filterProps(props, typeof Component === 'string', forwardMotionProps));
+	const filteredProps = $derived(filterProps(props, typeof Component === "string", forwardMotionProps));
 	const elementProps = $derived({
 		...filteredProps,
 		...visualProps.current,
@@ -67,7 +67,7 @@
 	};
 </script>
 
-{#if typeof Component === 'string'}
+{#if typeof Component === "string"}
 	<svelte:element this={Component} {...elementProps} {@attach attach}>
 		{@render props
 			// @ts-expect-error TODO: (haniel) figure ts out

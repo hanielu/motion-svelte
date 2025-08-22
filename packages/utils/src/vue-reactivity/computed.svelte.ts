@@ -1,6 +1,6 @@
-import { type Ref, RefSymbol } from './ref.svelte';
+import { type Ref, RefSymbol } from "./ref.svelte";
 
-const WritableComputedSymbol = Symbol('is-writable-computed');
+const WritableComputedSymbol = Symbol("is-writable-computed");
 
 // Types
 export type ComputedGetter<T> = (oldValue?: T) => T;
@@ -26,8 +26,8 @@ export function computed<T, S = T>(
 ): ComputedRef<T> | WritableComputedRef<T> {
 	let prev: T | undefined;
 
-	const get: ComputedGetter<T> = typeof arg === 'function' ? arg : arg.get;
-	const set: ComputedSetter<S> | undefined = typeof arg === 'function' ? undefined : arg.set;
+	const get: ComputedGetter<T> = typeof arg === "function" ? arg : arg.get;
+	const set: ComputedSetter<S> | undefined = typeof arg === "function" ? undefined : arg.set;
 
 	const derived = $derived.by(() => {
 		const next = get(prev);

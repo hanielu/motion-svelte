@@ -1,4 +1,4 @@
-import type { DragControlOptions, VisualElementDragControls } from './VisualElementDragControls.js';
+import type { DragControlOptions, VisualElementDragControls } from "./VisualElementDragControls.js";
 
 /**
  * Can manually trigger a drag gesture on one or more `drag`-enabled `motion` components.

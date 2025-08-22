@@ -1,5 +1,5 @@
-import type { Getter } from 'runed';
-import { watch } from 'runed';
+import type { Getter } from "runed";
+import { watch } from "runed";
 
 /**
  * Holds the previous value of a getter.

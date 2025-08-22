@@ -1,7 +1,7 @@
-import type { LayoutGroupState } from './context.js';
-import { LayoutGroupContext } from './context.js';
-import { useForceUpdate } from './use-force-update.js';
-import { nodeGroup } from './group.js';
+import type { LayoutGroupState } from "./context.js";
+import { LayoutGroupContext } from "./context.js";
+import { useForceUpdate } from "./use-force-update.js";
+import { nodeGroup } from "./group.js";
 
 /**
  * Props for configuring layout group behavior
@@ -15,7 +15,7 @@ export interface LayoutGroupProps {
 	 * - 'id': Only inherit id
 	 * - 'group': Only inherit group
 	 */
-	inherit?: boolean | 'id' | 'group';
+	inherit?: boolean | "id" | "group";
 }
 
 /**
@@ -48,7 +48,7 @@ export function useLayoutGroup() {
  * Determines the group ID based on inheritance rules
  */
 function getGroupId(props: LayoutGroupProps, parentGroup: LayoutGroupState | null) {
-	const shouldInherit = props.inherit === true || props.inherit === 'id';
+	const shouldInherit = props.inherit === true || props.inherit === "id";
 	const parentId = parentGroup?.id;
 
 	if (shouldInherit && parentId) {
@@ -61,6 +61,6 @@ function getGroupId(props: LayoutGroupProps, parentGroup: LayoutGroupState | nul
  * Creates or inherits a node group based on inheritance rules
  */
 function getGroup(props: LayoutGroupProps, parentGroup: LayoutGroupState | null) {
-	const shouldInherit = props.inherit === true || props.inherit === 'group';
+	const shouldInherit = props.inherit === true || props.inherit === "group";
 	return shouldInherit ? parentGroup?.group || nodeGroup() : nodeGroup();
 }

@@ -19,15 +19,13 @@ export type AnyMotionValue = MotionValueNumber | MotionValueString | MotionValue
 
 type MotionValueHelper<T> = T | AnyMotionValue;
 type MakeMotionHelper<T> = {
-  [K in keyof T]: MotionValueHelper<T[K]>;
+	[K in keyof T]: MotionValueHelper<T[K]>;
 };
 
 type MakeCustomValueTypeHelper<T> = MakeMotionHelper<T>;
 export type MakeMotion<T> = MakeCustomValueTypeHelper<T>;
 
-export type MotionCSS = MakeMotion<
-  Omit<CSSProperties<number, number>, "rotate" | "scale" | "perspective">
->;
+export type MotionCSS = MakeMotion<Omit<CSSProperties<number, number>, "rotate" | "scale" | "perspective">>;
 
 /**
  * @public
@@ -41,7 +39,7 @@ type MotionCSSVariable = MotionValueNumber | MotionValueString | AnyResolvedKeyf
  * to still accept React.CSSProperties.
  */
 export interface MotionCSSVariables {
-  [key: `--${string}`]: MotionCSSVariable;
+	[key: `--${string}`]: MotionCSSVariable;
 }
 
 type MotionSVGProps = MakeMotion<SVGPathProperties>;
@@ -57,20 +55,20 @@ export interface MotionStyle extends MotionCSS, MotionTransform, MotionSVGProps 
  * @public
  */
 export interface MotionProps extends MotionNodeOptions {
-  /**
-   *
-   * The React DOM `style` prop, enhanced with support for `MotionValue`s and separate `transform` values.
-   *
-   * ```jsx
-   * export const MyComponent = () => {
-   *   const x = useMotionValue(0)
-   *
-   *   return <motion.div style={{ x, opacity: 1, scale: 0.5 }} />
-   * }
-   * ```
-   */
-  style?: MotionStyle | Record<string, any> | string;
+	/**
+	 *
+	 * The React DOM `style` prop, enhanced with support for `MotionValue`s and separate `transform` values.
+	 *
+	 * ```jsx
+	 * export const MyComponent = () => {
+	 *   const x = useMotionValue(0)
+	 *
+	 *   return <motion.div style={{ x, opacity: 1, scale: 0.5 }} />
+	 * }
+	 * ```
+	 */
+	style?: MotionStyle | Record<string, any> | string;
 
-  children?: Snippet | MotionValueNumber | MotionValueString;
-  key?: ComponentKey;
+	children?: Snippet | MotionValueNumber | MotionValueString;
+	key?: ComponentKey;
 }

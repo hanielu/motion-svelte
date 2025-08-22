@@ -5,12 +5,12 @@ import type { VariantLabels } from "../motion/types.js";
  * @public
  */
 export interface PresenceContextProps {
-  id: string;
-  isPresent: ReadableBox<boolean>;
-  register: (id: string | number) => () => void;
-  onExitComplete?: (id: string | number) => void;
-  initial?: false | VariantLabels;
-  custom?: any;
+	id: string;
+	isPresent: ReadableBox<boolean>;
+	register: (id: string | number) => () => void;
+	onExitComplete?: (id: string | number) => void;
+	initial?: false | VariantLabels;
+	custom?: any;
 }
 
 /**

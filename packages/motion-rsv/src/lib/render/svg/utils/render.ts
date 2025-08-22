@@ -6,17 +6,14 @@ import type { SVGRenderState } from "../types.js";
 import { camelCaseAttributes } from "./camel-case-attrs.js";
 
 export function renderSVG(
-  element: SVGElement,
-  renderState: SVGRenderState,
-  _styleProp?: MotionStyle,
-  projection?: IProjectionNode
+	element: SVGElement,
+	renderState: SVGRenderState,
+	_styleProp?: MotionStyle,
+	projection?: IProjectionNode
 ) {
-  renderHTML(element as any, renderState, undefined, projection);
+	renderHTML(element as any, renderState, undefined, projection);
 
-  for (const key in renderState.attrs) {
-    element.setAttribute(
-      !camelCaseAttributes.has(key) ? camelToDash(key) : key,
-      renderState.attrs[key] as string
-    );
-  }
+	for (const key in renderState.attrs) {
+		element.setAttribute(!camelCaseAttributes.has(key) ? camelToDash(key) : key, renderState.attrs[key] as string);
+	}
 }

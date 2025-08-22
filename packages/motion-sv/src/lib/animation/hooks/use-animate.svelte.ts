@@ -1,4 +1,4 @@
-import { createScopedAnimate, type AnimationScope } from 'framer-motion/dom';
+import { createScopedAnimate, type AnimationScope } from "framer-motion/dom";
 
 export function useAnimate<T extends Element = Element>() {
 	const scope: AnimationScope<T> = {

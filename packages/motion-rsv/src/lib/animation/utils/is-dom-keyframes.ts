@@ -1,7 +1,5 @@
-import { DOMKeyframesDefinition } from "motion-dom"
+import { DOMKeyframesDefinition } from "motion-dom";
 
-export function isDOMKeyframes(
-    keyframes: unknown
-): keyframes is DOMKeyframesDefinition {
-    return typeof keyframes === "object" && !Array.isArray(keyframes)
+export function isDOMKeyframes(keyframes: unknown): keyframes is DOMKeyframesDefinition {
+	return typeof keyframes === "object" && !Array.isArray(keyframes);
 }

@@ -1,9 +1,9 @@
-import { isPrimaryPointer } from '@/events/index.js';
-import type { EventInfo } from './types.js';
+import { isPrimaryPointer } from "@/events/index.js";
+import type { EventInfo } from "./types.js";
 
 export type EventListenerWithPointInfo = (e: PointerEvent, info: EventInfo) => void;
 
-export function extractEventInfo(event: PointerEvent, pointType: 'page' | 'client' = 'page'): EventInfo {
+export function extractEventInfo(event: PointerEvent, pointType: "page" | "client" = "page"): EventInfo {
 	return {
 		point: {
 			x: event[`${pointType}X`],

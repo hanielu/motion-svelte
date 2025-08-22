@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { Feature } from '@/features/index.js';
-	import type { Snippet } from 'svelte';
-	import { ref } from 'runed';
-	import { LazyMotionContext } from './context.js';
+	import type { Feature } from "@/features/index.js";
+	import type { Snippet } from "svelte";
+	import { ref } from "runed";
+	import { LazyMotionContext } from "./context.js";
 
 	type MaybePromise<T> = T | Promise<T> | (() => Promise<T>);
 
@@ -17,7 +17,7 @@
 	const features = ref<any[]>(Array.isArray(featuresProp) ? featuresProp : []);
 
 	if (!Array.isArray(featuresProp)) {
-		const featuresPromise = typeof featuresProp === 'function' ? featuresProp() : featuresProp;
+		const featuresPromise = typeof featuresProp === "function" ? featuresProp() : featuresProp;
 		featuresPromise.then((feats) => {
 			features.value = feats;
 		});

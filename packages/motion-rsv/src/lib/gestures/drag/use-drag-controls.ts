@@ -21,69 +21,69 @@ import { type DragControlOptions, VisualElementDragControls } from "./VisualElem
  * @public
  */
 export class DragControls {
-  private componentControls = new Set<VisualElementDragControls>();
+	private componentControls = new Set<VisualElementDragControls>();
 
-  /**
-   * Subscribe a component's internal `VisualElementDragControls` to the user-facing API.
-   *
-   * @internal
-   */
-  subscribe(controls: VisualElementDragControls): () => void {
-    this.componentControls.add(controls);
+	/**
+	 * Subscribe a component's internal `VisualElementDragControls` to the user-facing API.
+	 *
+	 * @internal
+	 */
+	subscribe(controls: VisualElementDragControls): () => void {
+		this.componentControls.add(controls);
 
-    return () => this.componentControls.delete(controls);
-  }
+		return () => this.componentControls.delete(controls);
+	}
 
-  /**
-   * Start a drag gesture on every `motion` component that has this set of drag controls
-   * passed into it via the `dragControls` prop.
-   *
-   * ```jsx
-   * dragControls.start(e, {
-   *   snapToCursor: true
-   * })
-   * ```
-   *
-   * @param event - PointerEvent
-   * @param options - Options
-   *
-   * @public
-   */
-  start(event: PointerEvent, options?: DragControlOptions) {
-    this.componentControls.forEach(controls => {
-      controls.start(event, options);
-    });
-  }
+	/**
+	 * Start a drag gesture on every `motion` component that has this set of drag controls
+	 * passed into it via the `dragControls` prop.
+	 *
+	 * ```jsx
+	 * dragControls.start(e, {
+	 *   snapToCursor: true
+	 * })
+	 * ```
+	 *
+	 * @param event - PointerEvent
+	 * @param options - Options
+	 *
+	 * @public
+	 */
+	start(event: PointerEvent, options?: DragControlOptions) {
+		this.componentControls.forEach((controls) => {
+			controls.start(event, options);
+		});
+	}
 
-  /**
-   * Cancels a drag gesture.
-   *
-   * ```jsx
-   * dragControls.cancel()
-   * ```
-   *
-   * @public
-   */
-  cancel() {
-    this.componentControls.forEach(controls => {
-      controls.cancel();
-    });
-  }
+	/**
+	 * Cancels a drag gesture.
+	 *
+	 * ```jsx
+	 * dragControls.cancel()
+	 * ```
+	 *
+	 * @public
+	 */
+	cancel() {
+		this.componentControls.forEach((controls) => {
+			controls.cancel();
+		});
+	}
 
-  /**
-   * Stops a drag gesture.
-   *
-   * ```jsx
-   * dragControls.stop()
-   * ```
-   *
-   * @public
-   */
-  stop() {
-    this.componentControls.forEach(controls => {
-      controls.stop();
-    });
-  }
+	/**
+	 * Stops a drag gesture.
+	 *
+	 * ```jsx
+	 * dragControls.stop()
+	 * ```
+	 *
+	 * @public
+	 */
+	stop() {
+		this.componentControls.forEach((controls) => {
+			controls.stop();
+		});
+	}
 }
 
 const createDragControls = () => new DragControls();
@@ -115,5 +115,5 @@ const createDragControls = () => new DragControls();
  * @public
  */
 export function useDragControls() {
-  return createDragControls();
+	return createDragControls();
 }

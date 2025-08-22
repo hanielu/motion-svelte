@@ -5,40 +5,39 @@ import type { SvelteHTMLElements } from "svelte/elements";
 import type { Component } from "svelte";
 
 export interface TransformOrigin {
-  originX?: number | string;
-  originY?: number | string;
-  originZ?: number | string;
+	originX?: number | string;
+	originY?: number | string;
+	originZ?: number | string;
 }
 
 export interface HTMLRenderState {
-  /**
-   * A mutable record of transforms we want to apply directly to the rendered Element
-   * every frame. We use a mutable data structure to reduce GC during animations.
-   */
-  transform: ResolvedValues;
+	/**
+	 * A mutable record of transforms we want to apply directly to the rendered Element
+	 * every frame. We use a mutable data structure to reduce GC during animations.
+	 */
+	transform: ResolvedValues;
 
-  /**
-   * A mutable record of transform origins we want to apply directly to the rendered Element
-   * every frame. We use a mutable data structure to reduce GC during animations.
-   */
-  transformOrigin: TransformOrigin;
+	/**
+	 * A mutable record of transform origins we want to apply directly to the rendered Element
+	 * every frame. We use a mutable data structure to reduce GC during animations.
+	 */
+	transformOrigin: TransformOrigin;
 
-  /**
-   * A mutable record of styles we want to apply directly to the rendered Element
-   * every frame. We use a mutable data structure to reduce GC during animations.
-   */
-  style: ResolvedValues;
+	/**
+	 * A mutable record of styles we want to apply directly to the rendered Element
+	 * every frame. We use a mutable data structure to reduce GC during animations.
+	 */
+	style: ResolvedValues;
 
-  /**
-   * A mutable record of CSS variables we want to apply directly to the rendered Element
-   * every frame. We use a mutable data structure to reduce GC during animations.
-   */
-  vars: ResolvedValues;
+	/**
+	 * A mutable record of CSS variables we want to apply directly to the rendered Element
+	 * every frame. We use a mutable data structure to reduce GC during animations.
+	 */
+	vars: ResolvedValues;
 }
 
 // TODO: (haniel) this is a hack to get the types to work, there has to be a better way
-type CommonHTMLProps = Omit<SvelteHTMLElements["div"], "style"> &
-  Omit<SvelteHTMLElements["button"], "style">;
+type CommonHTMLProps = Omit<SvelteHTMLElements["div"], "style"> & Omit<SvelteHTMLElements["button"], "style">;
 
 export type HTMLMotionProps<Tag extends keyof HTMLElements> = MotionProps & CommonHTMLProps;
 
@@ -51,5 +50,5 @@ export type HTMLMotionProps<Tag extends keyof HTMLElements> = MotionProps & Comm
  * @public
  */
 export type HTMLMotionComponents = {
-  [K in keyof HTMLElements]: Component<HTMLMotionProps<K>>;
+	[K in keyof HTMLElements]: Component<HTMLMotionProps<K>>;
 };

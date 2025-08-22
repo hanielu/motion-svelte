@@ -1,5 +1,5 @@
-import { isMotionValue, MotionValue } from "motion-dom"
-import { useCombineMotionValues } from "./use-combine-values"
+import { isMotionValue, MotionValue } from "motion-dom";
+import { useCombineMotionValues } from "./use-combine-values";
 
 /**
  * Combine multiple motion values into a new one using a string template literal.
@@ -23,28 +23,25 @@ import { useCombineMotionValues } from "./use-combine-values"
  *
  * @public
  */
-export function useMotionTemplate(
-    fragments: TemplateStringsArray,
-    ...values: Array<MotionValue | number | string>
-) {
-    /**
-     * Create a function that will build a string from the latest motion values.
-     */
-    const numFragments = fragments.length
+export function useMotionTemplate(fragments: TemplateStringsArray, ...values: Array<MotionValue | number | string>) {
+	/**
+	 * Create a function that will build a string from the latest motion values.
+	 */
+	const numFragments = fragments.length;
 
-    function buildValue() {
-        let output = ``
+	function buildValue() {
+		let output = ``;
 
-        for (let i = 0; i < numFragments; i++) {
-            output += fragments[i]
-            const value = values[i]
-            if (value) {
-                output += isMotionValue(value) ? value.get() : value
-            }
-        }
+		for (let i = 0; i < numFragments; i++) {
+			output += fragments[i];
+			const value = values[i];
+			if (value) {
+				output += isMotionValue(value) ? value.get() : value;
+			}
+		}
 
-        return output
-    }
+		return output;
+	}
 
-    return useCombineMotionValues(values.filter(isMotionValue), buildValue)
+	return useCombineMotionValues(values.filter(isMotionValue), buildValue);
 }

@@ -1,6 +1,6 @@
-import type { DragControls } from '@/features/gestures/drag/use-drag-controls.js';
-import type { Axis, BoundingBox, DragElastic, InertiaOptions, PanInfo } from 'framer-motion';
-import type { TargetAndTransition, VariantLabels } from 'motion-dom';
+import type { DragControls } from "@/features/gestures/drag/use-drag-controls.js";
+import type { Axis, BoundingBox, DragElastic, InertiaOptions, PanInfo } from "framer-motion";
+import type { TargetAndTransition, VariantLabels } from "motion-dom";
 
 export interface ResolvedConstraints {
 	x: Partial<Axis>;
@@ -72,7 +72,7 @@ export interface DragHandlers {
 	 *
 	 * @public
 	 */
-	onDirectionLock?: (axis: 'x' | 'y') => void;
+	onDirectionLock?: (axis: "x" | "y") => void;
 
 	/**
 	 * Callback function that fires when drag momentum/bounce transition finishes.
@@ -105,7 +105,7 @@ export interface DragProps extends DragHandlers {
 	 * <motion.div drag="x" />
 	 * ```
 	 */
-	drag?: boolean | 'x' | 'y';
+	drag?: boolean | "x" | "y";
 	/**
 	 * If true, element will snap back to its origin when dragging ends.
 	 *

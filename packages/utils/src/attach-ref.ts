@@ -26,29 +26,29 @@ type RefSetter<T> = (v: T) => void;
  * <div {...attachRef(ref, (node) => console.log(node))}>Content</div>
  */
 export function attachRef<T extends EventTarget = Element>(
-  ref: WritableBox<T | null> | RefSetter<T | null>,
-  onChange?: (v: T | null) => void
+	ref: WritableBox<T | null> | RefSetter<T | null>,
+	onChange?: (v: T | null) => void
 ) {
-  return {
-    [createAttachmentKey()]: (node: T) => {
-      if (box.isBox(ref)) {
-        ref.current = node;
-        untrack(() => onChange?.(node));
-        return () => {
-          // we don't want to detach the node if it's still connected
-          if ("isConnected" in node && node.isConnected) return;
-          ref.current = null;
-          onChange?.(null);
-        };
-      }
-      ref(node);
-      untrack(() => onChange?.(node));
-      return () => {
-        // we don't want to detach the node if it's still connected
-        if ("isConnected" in node && node.isConnected) return;
-        ref(null);
-        onChange?.(null);
-      };
-    },
-  };
+	return {
+		[createAttachmentKey()]: (node: T) => {
+			if (box.isBox(ref)) {
+				ref.current = node;
+				untrack(() => onChange?.(node));
+				return () => {
+					// we don't want to detach the node if it's still connected
+					if ("isConnected" in node && node.isConnected) return;
+					ref.current = null;
+					onChange?.(null);
+				};
+			}
+			ref(node);
+			untrack(() => onChange?.(node));
+			return () => {
+				// we don't want to detach the node if it's still connected
+				if ("isConnected" in node && node.isConnected) return;
+				ref(null);
+				onChange?.(null);
+			};
+		},
+	};
 }

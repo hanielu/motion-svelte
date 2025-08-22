@@ -1,8 +1,8 @@
 interface ReducedMotionState {
-    current: boolean | null
+	current: boolean | null;
 }
 
 // Does this device prefer reduced motion? Returns `null` server-side.
-export const prefersReducedMotion: ReducedMotionState = { current: null }
+export const prefersReducedMotion: ReducedMotionState = { current: null };
 
-export const hasReducedMotionListener = { current: false }
+export const hasReducedMotionListener = { current: false };

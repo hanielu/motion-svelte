@@ -1,17 +1,17 @@
-import type { DOMKeyframesDefinition, ResolvedValues } from 'framer-motion';
-import { isCssVar, isNumber } from './utils.js';
-import { buildTransformTemplate, isTransform, transformAlias, transformDefinitions } from './transform.js';
-import { isMotionValue, px } from 'framer-motion/dom';
-import type { MotionStyle } from '@/types/index.js';
+import type { DOMKeyframesDefinition, ResolvedValues } from "framer-motion";
+import { isCssVar, isNumber } from "./utils.js";
+import { buildTransformTemplate, isTransform, transformAlias, transformDefinitions } from "./transform.js";
+import { isMotionValue, px } from "framer-motion/dom";
+import type { MotionStyle } from "@/types/index.js";
 
-type MotionStyleKey = Exclude<keyof CSSStyleDeclaration, 'length' | 'parentRule'>;
+type MotionStyleKey = Exclude<keyof CSSStyleDeclaration, "length" | "parentRule">;
 
 export const style = {
 	get: (element: Element, name: string): string | undefined => {
 		let value = isCssVar(name)
 			? (element as HTMLElement).style.getPropertyValue(name)
 			: getComputedStyle(element)[name as MotionStyleKey];
-		if (!value && value !== '0') {
+		if (!value && value !== "0") {
 			const definition = transformDefinitions.get(name);
 			if (definition) value = definition.initialValue as any;
 		}
@@ -67,13 +67,13 @@ const SVG_STYLE_TO_ATTRIBUTES = {
 	fill: true,
 	stroke: true,
 	opacity: true,
-	'stroke-width': true,
-	'fill-opacity': true,
-	'stroke-opacity': true,
-	'stroke-linecap': true,
-	'stroke-linejoin': true,
-	'stroke-dasharray': true,
-	'stroke-dashoffset': true,
+	"stroke-width": true,
+	"fill-opacity": true,
+	"stroke-opacity": true,
+	"stroke-linecap": true,
+	"stroke-linejoin": true,
+	"stroke-dasharray": true,
+	"stroke-dashoffset": true,
 	cx: true,
 	cy: true,
 	r: true,
@@ -83,45 +83,45 @@ const SVG_STYLE_TO_ATTRIBUTES = {
 	x2: true,
 	y2: true,
 	points: true,
-	'path-length': true,
+	"path-length": true,
 	viewBox: true,
 	width: true,
 	height: true,
-	'preserve-aspect-ratio': true,
-	'clip-path': true,
+	"preserve-aspect-ratio": true,
+	"clip-path": true,
 	filter: true,
 	mask: true,
-	'stop-color': true,
-	'stop-opacity': true,
-	'gradient-transform': true,
-	'gradient-units': true,
-	'spread-method': true,
-	'marker-end': true,
-	'marker-mid': true,
-	'marker-start': true,
-	'text-anchor': true,
-	'dominant-baseline': true,
-	'font-family': true,
-	'font-size': true,
-	'font-weight': true,
-	'letter-spacing': true,
-	'vector-effect': true,
+	"stop-color": true,
+	"stop-opacity": true,
+	"gradient-transform": true,
+	"gradient-units": true,
+	"spread-method": true,
+	"marker-end": true,
+	"marker-mid": true,
+	"marker-start": true,
+	"text-anchor": true,
+	"dominant-baseline": true,
+	"font-family": true,
+	"font-size": true,
+	"font-weight": true,
+	"letter-spacing": true,
+	"vector-effect": true,
 } as const;
 
 function camelToKebab(str: string): string {
-	return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+	return str.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
 }
 
 function buildSVGPath(attrs: ResolvedValues, length: number, spacing = 1, offset = 0) {
 	attrs.pathLength = 1;
-	delete attrs['path-length'];
+	delete attrs["path-length"];
 	// Build the dash offset
-	attrs['stroke-dashoffset'] = px.transform(-offset);
+	attrs["stroke-dashoffset"] = px.transform(-offset);
 
 	// Build the dash array
 	const pathLength = px.transform!(length);
 	const pathSpacing = px.transform!(spacing);
-	attrs['stroke-dasharray'] = `${pathLength} ${pathSpacing}`;
+	attrs["stroke-dasharray"] = `${pathLength} ${pathSpacing}`;
 }
 
 export function convertSvgStyleToAttributes(keyframes?: MotionStyle | DOMKeyframesDefinition) {
@@ -136,8 +136,8 @@ export function convertSvgStyleToAttributes(keyframes?: MotionStyle | DOMKeyfram
 			styleProps[key] = keyframes[key];
 		}
 	}
-	if (attrs['path-length'] !== undefined) {
-		buildSVGPath(attrs, attrs['path-length'], attrs['path-spacing'], attrs['path-offset']);
+	if (attrs["path-length"] !== undefined) {
+		buildSVGPath(attrs, attrs["path-length"], attrs["path-spacing"], attrs["path-offset"]);
 	}
 	return {
 		attrs,

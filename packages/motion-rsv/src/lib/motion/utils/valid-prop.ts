@@ -7,36 +7,36 @@ import type { MotionProps } from "../types.js";
  * This doesn't throw if a `MotionProp` name is missing - it should.
  */
 const validMotionProps = new Set<keyof MotionProps>([
-  "animate",
-  "exit",
-  "variants",
-  "initial",
-  "style",
-  "values",
-  "variants",
-  "transition",
-  "transformTemplate",
-  "custom",
-  "inherit",
-  "onBeforeLayoutMeasure",
-  "onAnimationStart",
-  "onAnimationComplete",
-  "onUpdate",
-  "onDragStart",
-  "onDrag",
-  "onDragEnd",
-  "onMeasureDragConstraints",
-  "onDirectionLock",
-  "onDragTransitionEnd",
-  "_dragX",
-  "_dragY",
-  "onHoverStart",
-  "onHoverEnd",
-  "onViewportEnter",
-  "onViewportLeave",
-  "globalTapTarget",
-  "ignoreStrict",
-  "viewport",
+	"animate",
+	"exit",
+	"variants",
+	"initial",
+	"style",
+	"values",
+	"variants",
+	"transition",
+	"transformTemplate",
+	"custom",
+	"inherit",
+	"onBeforeLayoutMeasure",
+	"onAnimationStart",
+	"onAnimationComplete",
+	"onUpdate",
+	"onDragStart",
+	"onDrag",
+	"onDragEnd",
+	"onMeasureDragConstraints",
+	"onDirectionLock",
+	"onDragTransitionEnd",
+	"_dragX",
+	"_dragY",
+	"onHoverStart",
+	"onHoverEnd",
+	"onViewportEnter",
+	"onViewportLeave",
+	"globalTapTarget",
+	"ignoreStrict",
+	"viewport",
 ]);
 
 /**
@@ -48,13 +48,13 @@ const validMotionProps = new Set<keyof MotionProps>([
  * @public
  */
 export function isValidMotionProp(key: string) {
-  return (
-    key.startsWith("while") ||
-    (key.startsWith("drag") && key !== "draggable") ||
-    key.startsWith("layout") ||
-    key.startsWith("onTap") ||
-    key.startsWith("onPan") ||
-    key.startsWith("onLayout") ||
-    validMotionProps.has(key as keyof MotionProps)
-  );
+	return (
+		key.startsWith("while") ||
+		(key.startsWith("drag") && key !== "draggable") ||
+		key.startsWith("layout") ||
+		key.startsWith("onTap") ||
+		key.startsWith("onPan") ||
+		key.startsWith("onLayout") ||
+		validMotionProps.has(key as keyof MotionProps)
+	);
 }

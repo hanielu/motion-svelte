@@ -1,7 +1,7 @@
-import type { ResolvedConstraints } from '@/features/gestures/drag/types.js';
-import { calcLength } from '@/projection/geometry/delta-calc.js';
-import { progress as calcProgress, clamp, mixNumber } from 'framer-motion/dom';
-import type { Axis, BoundingBox, Box, DragElastic } from 'framer-motion';
+import type { ResolvedConstraints } from "@/features/gestures/drag/types.js";
+import { calcLength } from "@/projection/geometry/delta-calc.js";
+import { progress as calcProgress, clamp, mixNumber } from "framer-motion/dom";
+import type { Axis, BoundingBox, Box, DragElastic } from "framer-motion";
 
 /**
  * Apply constraints to a point. These constraints are both physical along an
@@ -59,8 +59,8 @@ export function resolveDragElastic(dragElastic: DragElastic = defaultElastic): B
 	}
 
 	return {
-		x: resolveAxisElastic(dragElastic, 'left', 'right'),
-		y: resolveAxisElastic(dragElastic, 'top', 'bottom'),
+		x: resolveAxisElastic(dragElastic, "left", "right"),
+		y: resolveAxisElastic(dragElastic, "top", "bottom"),
 	};
 }
 
@@ -72,7 +72,7 @@ export function resolveAxisElastic(dragElastic: DragElastic, minLabel: string, m
 }
 
 export function resolvePointElastic(dragElastic: DragElastic, label: string): number {
-	return typeof dragElastic === 'number' ? dragElastic : dragElastic[label as keyof typeof dragElastic] || 0;
+	return typeof dragElastic === "number" ? dragElastic : dragElastic[label as keyof typeof dragElastic] || 0;
 }
 
 /**

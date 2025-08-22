@@ -1,5 +1,5 @@
-import { complex, mixNumber } from 'motion-dom';
-import type { ScaleCorrectorDefinition } from './types.js';
+import { complex, mixNumber } from "motion-dom";
+import type { ScaleCorrectorDefinition } from "./types.js";
 
 export const correctBoxShadow: ScaleCorrectorDefinition = {
 	correct: (latest: string, { treeScale, projectionDelta }) => {
@@ -10,7 +10,7 @@ export const correctBoxShadow: ScaleCorrectorDefinition = {
 		if (shadow.length > 5) return original;
 
 		const template = complex.createTransformer(latest);
-		const offset = typeof shadow[0] !== 'number' ? 1 : 0;
+		const offset = typeof shadow[0] !== "number" ? 1 : 0;
 
 		// Calculate the overall context scale
 		const xScale = projectionDelta!.x.scale * treeScale!.x;
@@ -29,10 +29,10 @@ export const correctBoxShadow: ScaleCorrectorDefinition = {
 		const averageScale = mixNumber(xScale, yScale, 0.5);
 
 		// Blur
-		if (typeof shadow[2 + offset] === 'number') (shadow[2 + offset] as number) /= averageScale;
+		if (typeof shadow[2 + offset] === "number") (shadow[2 + offset] as number) /= averageScale;
 
 		// Spread
-		if (typeof shadow[3 + offset] === 'number') (shadow[3 + offset] as number) /= averageScale;
+		if (typeof shadow[3 + offset] === "number") (shadow[3 + offset] as number) /= averageScale;
 
 		return template(shadow);
 	},

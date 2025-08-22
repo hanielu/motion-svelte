@@ -1,44 +1,44 @@
 <script lang="ts" module>
-	import type { DOMKeyframesDefinition } from 'framer-motion';
-	import { AnimatePresenceContext } from '../animate-presence/presence.svelte.js';
-	import { LayoutGroupContext, MotionStateContext } from '../context.js';
-	import { LazyMotionContext } from '../lazy-motion/context.js';
-	import { invariant, warning } from 'hey-listen';
-	import { isMotionValue } from 'framer-motion/dom';
-	import { css, ref, watch } from 'runed';
-	import { useMotionConfig } from '../motion-config/index.js';
-	import { untrack, type Component } from 'svelte';
-	import type { MotionProps } from './types.js';
-	import type { Feature } from '@/features/feature.js';
-	import { MotionState } from '@/state/motion-state.js';
-	import type { Options } from '@/types/state.js';
-	import { isValidMotionProp } from './valid-prop.js';
-	import { convertSvgStyleToAttributes, createStyles } from '@/state/style.js';
-	import type { Attachment } from 'svelte/attachments';
-	import { LayoutMotionScopeContext } from './layout-motion.svelte';
+	import type { DOMKeyframesDefinition } from "framer-motion";
+	import { AnimatePresenceContext } from "../animate-presence/presence.svelte.js";
+	import { LayoutGroupContext, MotionStateContext } from "../context.js";
+	import { LazyMotionContext } from "../lazy-motion/context.js";
+	import { invariant, warning } from "hey-listen";
+	import { isMotionValue } from "framer-motion/dom";
+	import { css, ref, watch } from "runed";
+	import { useMotionConfig } from "../motion-config/index.js";
+	import { untrack, type Component } from "svelte";
+	import type { MotionProps } from "./types.js";
+	import type { Feature } from "@/features/feature.js";
+	import { MotionState } from "@/state/motion-state.js";
+	import type { Options } from "@/types/state.js";
+	import { isValidMotionProp } from "./valid-prop.js";
+	import { convertSvgStyleToAttributes, createStyles } from "@/state/style.js";
+	import type { Attachment } from "svelte/attachments";
+	import { LayoutMotionScopeContext } from "./layout-motion.svelte";
 
 	const INTERNAL_MOTION_KEYS = [
-		'as',
-		'layout',
-		'layoutId',
-		'layoutScroll',
-		'layoutRoot',
-		'crossfade',
-		'transition',
-		'variants',
-		'initial',
-		'animate',
-		'exit',
-		'whileHover',
-		'whilePress',
-		'whileFocus',
-		'whileInView',
-		'drag',
-		'dragListener',
-		'dragConstraints',
-		'inViewOptions',
-		'custom',
-		'motionConfig',
+		"as",
+		"layout",
+		"layoutId",
+		"layoutScroll",
+		"layoutRoot",
+		"crossfade",
+		"transition",
+		"variants",
+		"initial",
+		"animate",
+		"exit",
+		"whileHover",
+		"whilePress",
+		"whileFocus",
+		"whileInView",
+		"drag",
+		"dragListener",
+		"dragConstraints",
+		"inViewOptions",
+		"custom",
+		"motionConfig",
 	] as const satisfies readonly (keyof Options)[];
 
 	type InternalMotionKey = (typeof INTERNAL_MOTION_KEYS)[number];
@@ -103,13 +103,13 @@
 	 * as a child of LazyMotion, as this will break the file-size benefits of using it.
 	 */
 	if (
-		process.env.NODE_ENV !== 'production' &&
+		process.env.NODE_ENV !== "production" &&
 		// @ts-expect-error
 		features?.length &&
 		lazyMotionContext.strict
 	) {
 		const strictMessage =
-			'You have rendered a `motion` component within a `LazyMotion` component. This will break tree shaking. Import and render a `m` component instead.';
+			"You have rendered a `motion` component within a `LazyMotion` component. This will break tree shaking. Import and render a `m` component instead.";
 		props.ignoreStrict ? warning(false, strictMessage) : invariant(false, strictMessage);
 	}
 
@@ -148,12 +148,12 @@
 	layoutMotionScope?.register(state);
 
 	const getAttrs = $derived.by(() => {
-		const isSVG = state.type === 'svg';
+		const isSVG = state.type === "svg";
 		const attrsProps: Record<string | symbol, any> = {};
 
 		// 1) Start from DOM-facing attributes, unwrap MotionValues
 		for (const key of Reflect.ownKeys(props)) {
-			if (typeof key === 'string') {
+			if (typeof key === "string") {
 				if (isValidMotionProp(key)) continue;
 				const value = props[key];
 				attrsProps[key] = isMotionValue(value) ? value.get() : value;
@@ -176,11 +176,11 @@
 			} as DOMKeyframesDefinition);
 
 			if (style.transform || attrs.transformOrigin) {
-				style.transformOrigin = attrs.transformOrigin ?? '50% 50%';
+				style.transformOrigin = attrs.transformOrigin ?? "50% 50%";
 				delete attrs.transformOrigin;
 			}
 			if (style.transform) {
-				style.transformBox = style.transformBox ?? 'fill-box';
+				style.transformBox = style.transformBox ?? "fill-box";
 				delete attrs.transformBox;
 			}
 
@@ -191,10 +191,10 @@
 		// 4) Drag safety styles
 		if (props.drag && props.dragListener !== false) {
 			Object.assign(styleProps, {
-				userSelect: 'none',
-				WebkitUserSelect: 'none',
-				WebkitTouchCallout: 'none',
-				touchAction: props.drag === true ? 'none' : `pan-${props.drag === 'x' ? 'y' : 'x'}`,
+				userSelect: "none",
+				WebkitUserSelect: "none",
+				WebkitTouchCallout: "none",
+				touchAction: props.drag === true ? "none" : `pan-${props.drag === "x" ? "y" : "x"}`,
 			});
 		}
 
@@ -262,7 +262,7 @@
 	};
 </script>
 
-{#if typeof AsComponent === 'string'}
+{#if typeof AsComponent === "string"}
 	<svelte:element this={AsComponent} {...getAttrs} {@attach attachRef}>
 		{@render props.children?.()}
 	</svelte:element>

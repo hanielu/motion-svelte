@@ -1,9 +1,4 @@
-import {
-  type AnyResolvedKeyframe,
-  MotionValue,
-  transform,
-  type TransformOptions,
-} from "motion-dom";
+import { type AnyResolvedKeyframe, MotionValue, transform, type TransformOptions } from "motion-dom";
 import { useCombineMotionValues } from "./use-combine-values.svelte.js";
 import { useComputed } from "./use-computed.js";
 
@@ -11,13 +6,13 @@ export type InputRange = number[];
 type SingleTransformer<I, O> = (input: I) => O;
 type MultiTransformer<I, O> = (input: I[]) => O;
 type Transformer<I, O> =
-  | SingleTransformer<I, O>
-  /**
-   * Ideally, this would be typed <I, O> in all instances, but to type this
-   * more accurately requires the tuple support in TypeScript 4:
-   * https://gist.github.com/InventingWithMonster/c4d23752a0fae7888596c4ff6d92733a
-   */
-  | MultiTransformer<AnyResolvedKeyframe, O>;
+	| SingleTransformer<I, O>
+	/**
+	 * Ideally, this would be typed <I, O> in all instances, but to type this
+	 * more accurately requires the tuple support in TypeScript 4:
+	 * https://gist.github.com/InventingWithMonster/c4d23752a0fae7888596c4ff6d92733a
+	 */
+	| MultiTransformer<AnyResolvedKeyframe, O>;
 
 /**
  * Create a `MotionValue` that transforms the output of another `MotionValue` by mapping it from one range of values into another.
@@ -66,10 +61,10 @@ type Transformer<I, O> =
  * @public
  */
 export function useTransform<I, O>(
-  value: MotionValue<number>,
-  inputRange: InputRange,
-  outputRange: O[],
-  options?: TransformOptions<O>
+	value: MotionValue<number>,
+	inputRange: InputRange,
+	outputRange: O[],
+	options?: TransformOptions<O>
 ): MotionValue<O>;
 
 /**
@@ -91,10 +86,7 @@ export function useTransform<I, O>(
  *
  * @public
  */
-export function useTransform<I, O>(
-  input: MotionValue<I>,
-  transformer: SingleTransformer<I, O>
-): MotionValue<O>;
+export function useTransform<I, O>(input: MotionValue<I>, transformer: SingleTransformer<I, O>): MotionValue<O>;
 
 /**
  * Pass an array of `MotionValue`s and a function to combine them. In this example, `z` will be the `x` multiplied by `y`.
@@ -116,48 +108,45 @@ export function useTransform<I, O>(
  * @public
  */
 export function useTransform<I, O>(
-  input: MotionValue<string>[] | MotionValue<number>[] | MotionValue<AnyResolvedKeyframe>[],
-  transformer: MultiTransformer<I, O>
+	input: MotionValue<string>[] | MotionValue<number>[] | MotionValue<AnyResolvedKeyframe>[],
+	transformer: MultiTransformer<I, O>
 ): MotionValue<O>;
 export function useTransform<I, O>(transformer: () => O): MotionValue<O>;
 export function useTransform<I, O>(
-  input:
-    | MotionValue<I>
-    | MotionValue<string>[]
-    | MotionValue<number>[]
-    | MotionValue<AnyResolvedKeyframe>[]
-    | (() => O),
-  inputRangeOrTransformer?: InputRange | Transformer<I, O>,
-  outputRange?: O[],
-  options?: TransformOptions<O>
+	input:
+		| MotionValue<I>
+		| MotionValue<string>[]
+		| MotionValue<number>[]
+		| MotionValue<AnyResolvedKeyframe>[]
+		| (() => O),
+	inputRangeOrTransformer?: InputRange | Transformer<I, O>,
+	outputRange?: O[],
+	options?: TransformOptions<O>
 ): MotionValue<O> {
-  if (typeof input === "function") {
-    return useComputed(input);
-  }
+	if (typeof input === "function") {
+		return useComputed(input);
+	}
 
-  const transformer =
-    typeof inputRangeOrTransformer === "function"
-      ? inputRangeOrTransformer
-      : transform(inputRangeOrTransformer!, outputRange!, options);
+	const transformer =
+		typeof inputRangeOrTransformer === "function"
+			? inputRangeOrTransformer
+			: transform(inputRangeOrTransformer!, outputRange!, options);
 
-  return Array.isArray(input)
-    ? useListTransform(input, transformer as MultiTransformer<AnyResolvedKeyframe, O>)
-    : useListTransform([input], ([latest]) => (transformer as SingleTransformer<I, O>)(latest));
+	return Array.isArray(input)
+		? useListTransform(input, transformer as MultiTransformer<AnyResolvedKeyframe, O>)
+		: useListTransform([input], ([latest]) => (transformer as SingleTransformer<I, O>)(latest));
 }
 
-function useListTransform<I, O>(
-  values: MotionValue<I>[],
-  transformer: MultiTransformer<I, O>
-): MotionValue<O> {
-  const latest = [] as I[];
+function useListTransform<I, O>(values: MotionValue<I>[], transformer: MultiTransformer<I, O>): MotionValue<O> {
+	const latest = [] as I[];
 
-  return useCombineMotionValues(values, () => {
-    latest.length = 0;
-    const numValues = values.length;
-    for (let i = 0; i < numValues; i++) {
-      latest[i] = values[i].get();
-    }
+	return useCombineMotionValues(values, () => {
+		latest.length = 0;
+		const numValues = values.length;
+		for (let i = 0; i < numValues; i++) {
+			latest[i] = values[i].get();
+		}
 
-    return transformer(latest);
-  });
+		return transformer(latest);
+	});
 }

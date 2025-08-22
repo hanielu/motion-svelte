@@ -1,6 +1,6 @@
-import { Feature } from '@/features/feature.js';
-import { VisualElementDragControls } from '@/features/gestures/drag/VisualElementDragControls.js';
-import { noop } from 'framer-motion/dom';
+import { Feature } from "@/features/feature.js";
+import { VisualElementDragControls } from "@/features/gestures/drag/VisualElementDragControls.js";
+import { noop } from "framer-motion/dom";
 
 export class DragGesture extends Feature {
 	controls: VisualElementDragControls;

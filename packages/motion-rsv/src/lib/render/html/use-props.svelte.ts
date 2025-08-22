@@ -1,12 +1,12 @@
-import { isMotionValue, type AnyResolvedKeyframe, type MotionValue } from 'motion-dom';
-import type { MotionProps } from '../../motion/types.js';
-import { isForcedMotionValue } from '../../motion/utils/is-forced-motion-value.js';
-import type { ResolvedValues } from '../types.js';
-import { buildHTMLStyles } from './utils/build-styles.js';
-import { createHtmlRenderState } from './utils/create-render-state.js';
-import { read, type ReadableBox } from 'runed';
-import type { HTMLAttributes } from 'svelte/elements';
-import { toStyleString } from './utils/style-string.js';
+import { isMotionValue, type AnyResolvedKeyframe, type MotionValue } from "motion-dom";
+import type { MotionProps } from "../../motion/types.js";
+import { isForcedMotionValue } from "../../motion/utils/is-forced-motion-value.js";
+import type { ResolvedValues } from "../types.js";
+import { buildHTMLStyles } from "./utils/build-styles.js";
+import { createHtmlRenderState } from "./utils/create-render-state.js";
+import { read, type ReadableBox } from "runed";
+import type { HTMLAttributes } from "svelte/elements";
+import { toStyleString } from "./utils/style-string.js";
 
 export function copyRawValuesOnly(
 	target: ResolvedValues,
@@ -35,7 +35,7 @@ function useStyle(props: MotionProps, visualState: ResolvedValues): ResolvedValu
 	/**
 	 * Copy non-Motion Values straight into style
 	 */
-	if (styleProp && typeof styleProp === 'object') {
+	if (styleProp && typeof styleProp === "object") {
 		copyRawValuesOnly(style, styleProp as any, props);
 	}
 
@@ -58,10 +58,10 @@ export function useHTMLProps(
 			htmlProps.draggable = false;
 
 			// Disable text selection
-			style.userSelect = style.WebkitUserSelect = style.WebkitTouchCallout = 'none';
+			style.userSelect = style.WebkitUserSelect = style.WebkitTouchCallout = "none";
 
 			// Disable scrolling on the draggable direction
-			style.touchAction = props.current.drag === true ? 'none' : `pan-${props.current.drag === 'x' ? 'y' : 'x'}`;
+			style.touchAction = props.current.drag === true ? "none" : `pan-${props.current.drag === "x" ? "y" : "x"}`;
 		}
 
 		if (
@@ -71,10 +71,10 @@ export function useHTMLProps(
 			htmlProps.tabIndex = 0;
 		}
 
-		const baseStyleString = typeof props.current.style === 'string' ? (props.current.style as string) : '';
+		const baseStyleString = typeof props.current.style === "string" ? (props.current.style as string) : "";
 		const computedStyleString = toStyleString(style);
 		htmlProps.style = baseStyleString
-			? baseStyleString.replace(/;\s*$/u, '') + ';' + computedStyleString
+			? baseStyleString.replace(/;\s*$/u, "") + ";" + computedStyleString
 			: computedStyleString;
 
 		return htmlProps;

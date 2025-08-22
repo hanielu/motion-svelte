@@ -1,25 +1,25 @@
-import type { DOMKeyframesDefinition, ResolvedValues, VariantLabels } from 'framer-motion';
-import type { MotionValue, TransformProperties, animate } from 'framer-motion/dom';
-import type { LayoutOptions } from '@/features/layout/types.js';
-import type { DragProps } from '@/features/gestures/drag/types.js';
-import type { PressProps } from '@/features/gestures/press/types.js';
-import type { HoverProps } from '@/features/gestures/hover/types.js';
-import type { InViewProps } from '@/features/gestures/in-view/types.js';
-import type { LayoutGroupState } from '@/components/context.js';
-import type { PanProps } from '@/features/gestures/pan/types.js';
-import type { MotionConfigState } from '@/components/motion-config/types.js';
-import type { $Transition } from './framer-motion.js';
-import type { FocusProps } from '@/features/gestures/focus/types.js';
-import type { AnimationControls } from '@/animation/types.js';
-import type { AsTag } from './common.js';
-import type { Snippet } from 'svelte';
+import type { DOMKeyframesDefinition, ResolvedValues, VariantLabels } from "framer-motion";
+import type { MotionValue, TransformProperties, animate } from "framer-motion/dom";
+import type { LayoutOptions } from "@/features/layout/types.js";
+import type { DragProps } from "@/features/gestures/drag/types.js";
+import type { PressProps } from "@/features/gestures/press/types.js";
+import type { HoverProps } from "@/features/gestures/hover/types.js";
+import type { InViewProps } from "@/features/gestures/in-view/types.js";
+import type { LayoutGroupState } from "@/components/context.js";
+import type { PanProps } from "@/features/gestures/pan/types.js";
+import type { MotionConfigState } from "@/components/motion-config/types.js";
+import type { $Transition } from "./framer-motion.js";
+import type { FocusProps } from "@/features/gestures/focus/types.js";
+import type { AnimationControls } from "@/animation/types.js";
+import type { AsTag } from "./common.js";
+import type { Snippet } from "svelte";
 
 type AnimationPlaybackControls = ReturnType<typeof animate>;
 export interface VariantType extends DOMKeyframesDefinition {
-	transition?: Options['transition'];
-	attrX?: DOMKeyframesDefinition['x'];
-	attrY?: DOMKeyframesDefinition['y'];
-	attrScale?: DOMKeyframesDefinition['scale'];
+	transition?: Options["transition"];
+	attrX?: DOMKeyframesDefinition["x"];
+	attrY?: DOMKeyframesDefinition["y"];
+	attrScale?: DOMKeyframesDefinition["scale"];
 }
 
 interface BoundingBox {
@@ -33,9 +33,9 @@ export interface DragOptions {
 	dragSnapToOrigin?: boolean;
 }
 
-type TransformPropertiesWithoutTransition = Omit<TransformProperties, 'transition'>;
+type TransformPropertiesWithoutTransition = Omit<TransformProperties, "transition">;
 export type MotionStyle = Partial<{
-	[K in keyof Omit<VariantType & TransformPropertiesWithoutTransition, 'attrX' | 'attrY' | 'attrScale'>]:
+	[K in keyof Omit<VariantType & TransformPropertiesWithoutTransition, "attrX" | "attrY" | "attrScale">]:
 		| string
 		| number
 		| undefined
@@ -66,9 +66,9 @@ export interface Options<T = any>
 	};
 	layoutGroup?: LayoutGroupState;
 	motionConfig?: MotionConfigState;
-	onAnimationComplete?: (definition: Options['animate']) => void;
+	onAnimationComplete?: (definition: Options["animate"]) => void;
 	onUpdate?: (latest: ResolvedValues) => void;
-	onAnimationStart?: (definition: Options['animate']) => void;
+	onAnimationStart?: (definition: Options["animate"]) => void;
 
 	// Svelte specific
 	children?: Snippet;

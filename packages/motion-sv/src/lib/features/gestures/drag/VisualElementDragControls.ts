@@ -1,7 +1,7 @@
-import { addDomEvent, addPointerEvent, extractEventInfo } from '@/events/index.js';
-import type { Lock } from '@/features/gestures/drag/lock.js';
-import { getGlobalLock } from '@/features/gestures/drag/lock.js';
-import type { ResolvedConstraints } from '@/features/gestures/drag/types.js';
+import { addDomEvent, addPointerEvent, extractEventInfo } from "@/events/index.js";
+import type { Lock } from "@/features/gestures/drag/lock.js";
+import { getGlobalLock } from "@/features/gestures/drag/lock.js";
+import type { ResolvedConstraints } from "@/features/gestures/drag/types.js";
 import {
 	applyConstraints,
 	calcOrigin,
@@ -10,26 +10,26 @@ import {
 	defaultElastic,
 	rebaseAxisConstraints,
 	resolveDragElastic,
-} from '@/features/gestures/drag/utils/constraints.js';
-import { isHTMLElement } from '@/features/gestures/drag/utils/is.js';
-import type { PanInfo } from '@/features/gestures/pan/PanSession.js';
-import { PanSession } from '@/features/gestures/pan/PanSession.js';
-import { calcLength } from '@/projection/geometry/delta-calc.js';
-import { createBox } from '@/projection/geometry/models.js';
-import { eachAxis } from '@/projection/utils/each-axis.js';
-import type { Options } from '@/types/index.js';
-import { getContextWindow } from '@/utils/index.js';
-import { addValueToWillChange } from '@/value/use-will-change/add-will-change.js';
-import type { AnimationGeneratorType, Axis, BoundingBox, Point, Transition, VisualElement } from 'framer-motion';
-import { frame, mixNumber, percent } from 'framer-motion/dom';
-import { measurePageBox } from '@/projection/utils/measure.js';
-import { convertBoundingBoxToBox, convertBoxToBoundingBox } from '@/projection/conversion.js';
-import { animateMotionValue } from 'framer-motion/dist/es/animation/interfaces/motion-value.mjs';
-import type { LayoutUpdateData } from '@/projection/node/types.js';
-import { invariant } from 'hey-listen';
-import { isPresent } from '@/state/utils/is-present.js';
-import type { MotionState } from '@/state/index.js';
-import type { MotionProps } from '@/components/index.js';
+} from "@/features/gestures/drag/utils/constraints.js";
+import { isHTMLElement } from "@/features/gestures/drag/utils/is.js";
+import type { PanInfo } from "@/features/gestures/pan/PanSession.js";
+import { PanSession } from "@/features/gestures/pan/PanSession.js";
+import { calcLength } from "@/projection/geometry/delta-calc.js";
+import { createBox } from "@/projection/geometry/models.js";
+import { eachAxis } from "@/projection/utils/each-axis.js";
+import type { Options } from "@/types/index.js";
+import { getContextWindow } from "@/utils/index.js";
+import { addValueToWillChange } from "@/value/use-will-change/add-will-change.js";
+import type { AnimationGeneratorType, Axis, BoundingBox, Point, Transition, VisualElement } from "framer-motion";
+import { frame, mixNumber, percent } from "framer-motion/dom";
+import { measurePageBox } from "@/projection/utils/measure.js";
+import { convertBoundingBoxToBox, convertBoxToBoundingBox } from "@/projection/conversion.js";
+import { animateMotionValue } from "framer-motion/dist/es/animation/interfaces/motion-value.mjs";
+import type { LayoutUpdateData } from "@/projection/node/types.js";
+import { invariant } from "hey-listen";
+import { isPresent } from "@/state/utils/is-present.js";
+import type { MotionState } from "@/state/index.js";
+import type { MotionProps } from "@/components/index.js";
 
 export const elementDragControls = new WeakMap<VisualElement, VisualElementDragControls>();
 
@@ -38,7 +38,7 @@ export interface DragControlOptions {
 	cursorProgress?: Point;
 }
 
-type DragDirection = 'x' | 'y';
+type DragDirection = "x" | "y";
 
 /**
  *
@@ -91,7 +91,7 @@ export class VisualElementDragControls {
 			dragSnapToOrigin ? this.pauseAnimation() : this.stopAnimation();
 
 			if (snapToCursor) {
-				this.snapToCursor(extractEventInfo(event, 'page').point);
+				this.snapToCursor(extractEventInfo(event, "page").point);
 			}
 		};
 
@@ -149,10 +149,10 @@ export class VisualElementDragControls {
 				frame.postRender(() => onDragStart(event, info));
 			}
 
-			addValueToWillChange(this.visualElement, 'transform');
+			addValueToWillChange(this.visualElement, "transform");
 
 			const state = (this.visualElement as any).state as MotionState;
-			state.setActive('whileDrag', true);
+			state.setActive("whileDrag", true);
 		};
 
 		const onMove = (event: PointerEvent, info: PanInfo) => {
@@ -174,8 +174,8 @@ export class VisualElementDragControls {
 				return;
 			}
 			// Update each point with the latest position
-			this.updateAxis('x', info.point, offset);
-			this.updateAxis('y', info.point, offset);
+			this.updateAxis("x", info.point, offset);
+			this.updateAxis("y", info.point, offset);
 
 			/**
 			 * Ideally we would leave the renderer to fire naturally at the end of
@@ -195,7 +195,7 @@ export class VisualElementDragControls {
 		const onSessionEnd = (event: PointerEvent, info: PanInfo) => this.stop(event, info);
 
 		const resumeAnimation = () =>
-			eachAxis((axis) => this.getAnimationState(axis) === 'paused' && this.getAxisMotionValue(axis).animation?.play());
+			eachAxis((axis) => this.getAnimationState(axis) === "paused" && this.getAxisMotionValue(axis).animation?.play());
 
 		const { dragSnapToOrigin } = this.getProps();
 
@@ -246,7 +246,7 @@ export class VisualElementDragControls {
 		}
 
 		const state = (this.visualElement as any).state as MotionState;
-		state.setActive('whileDrag', false);
+		state.setActive("whileDrag", false);
 	}
 
 	private updateAxis(axis: DragDirection, _point: Point, offset?: Point) {
@@ -368,7 +368,7 @@ export class VisualElementDragControls {
 			const bounceDamping = dragElastic ? 40 : 10000000;
 
 			const inertia = {
-				type: 'inertia' as AnimationGeneratorType,
+				type: "inertia" as AnimationGeneratorType,
 				velocity: dragMomentum ? velocity[axis] : 0,
 				bounceStiffness,
 				bounceDamping,
@@ -485,7 +485,7 @@ export class VisualElementDragControls {
 		 * Update the layout of this element and resolve the latest drag constraints
 		 */
 		const { transformTemplate } = this.visualElement.getProps();
-		this.visualElement.current.style.transform = transformTemplate ? transformTemplate({}, '') : 'none';
+		this.visualElement.current.style.transform = transformTemplate ? transformTemplate({}, "") : "none";
 		projection.root && projection.root.updateScroll();
 		projection.updateLayout();
 		this.resolveConstraints();
@@ -514,7 +514,7 @@ export class VisualElementDragControls {
 		/**
 		 * Attach a pointerdown event listener on this DOM element to initiate drag tracking.
 		 */
-		const stopPointerListener = addPointerEvent(element, 'pointerdown', (event) => {
+		const stopPointerListener = addPointerEvent(element, "pointerdown", (event) => {
 			const { drag, dragListener = true } = this.getProps();
 			drag && dragListener && this.start(event);
 		});
@@ -528,7 +528,7 @@ export class VisualElementDragControls {
 
 		const { projection } = this.visualElement;
 
-		const stopMeasureLayoutListener = projection!.addEventListener('measure', measureDragConstraints);
+		const stopMeasureLayoutListener = projection!.addEventListener("measure", measureDragConstraints);
 
 		if (projection && !projection!.layout) {
 			projection.root && projection.root.updateScroll();
@@ -541,13 +541,13 @@ export class VisualElementDragControls {
 		 * Attach a window resize listener to scale the draggable target within its defined
 		 * constraints as the window resizes.
 		 */
-		const stopResizeListener = addDomEvent(window, 'resize', () => this.scalePositionWithinConstraints());
+		const stopResizeListener = addDomEvent(window, "resize", () => this.scalePositionWithinConstraints());
 
 		/**
 		 * If the element's layout changes, calculate the delta and apply that to
 		 * the drag gesture's origin point.
 		 */
-		const stopLayoutUpdateListener = projection!.addEventListener('didUpdate', (({
+		const stopLayoutUpdateListener = projection!.addEventListener("didUpdate", (({
 			delta,
 			hasLayoutChanged,
 		}: LayoutUpdateData) => {
@@ -612,9 +612,9 @@ function getCurrentDirection(offset: Point, lockThreshold = 10): DragDirection |
 	let direction: DragDirection | null = null;
 
 	if (Math.abs(offset.y) > lockThreshold) {
-		direction = 'y';
+		direction = "y";
 	} else if (Math.abs(offset.x) > lockThreshold) {
-		direction = 'x';
+		direction = "x";
 	}
 
 	return direction;

@@ -1,5 +1,5 @@
-import type { EventInfo } from 'framer-motion';
-import type { TargetAndTransition, VariantLabels } from 'motion-dom';
+import type { EventInfo } from "framer-motion";
+import type { TargetAndTransition, VariantLabels } from "motion-dom";
 
 export type HoverEvent = (event: MouseEvent, info: EventInfo) => void;
 

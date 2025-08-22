@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
-	import type { MotionConfigProps } from './types.js';
-	import { MotionConfigContext, useMotionConfig } from './context.js';
-	import { computed } from 'runed';
+	import type { Snippet } from "svelte";
+	import type { MotionConfigProps } from "./types.js";
+	import { MotionConfigContext, useMotionConfig } from "./context.js";
+	import { computed } from "runed";
 
 	let { children, transition, reducedMotion, nonce, inViewOptions }: MotionConfigProps & { children: Snippet } =
 		$props();

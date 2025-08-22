@@ -1,6 +1,6 @@
-import type { EventInfo, Point, TransformPoint } from 'framer-motion';
-import { addPointerEvent, isPrimaryPointer } from '@/events/index.js';
-import { extractEventInfo } from '@/events/event-info.js';
+import type { EventInfo, Point, TransformPoint } from "framer-motion";
+import { addPointerEvent, isPrimaryPointer } from "@/events/index.js";
+import { extractEventInfo } from "@/events/event-info.js";
 import {
 	cancelFrame,
 	distance2D,
@@ -9,7 +9,7 @@ import {
 	millisecondsToSeconds,
 	pipe,
 	secondsToMilliseconds,
-} from 'framer-motion/dom';
+} from "framer-motion/dom";
 
 /**
  * Passed in to pan event handlers like `onPan` the `PanInfo` object contains
@@ -155,7 +155,7 @@ export class PanSession {
 	/**
 	 * @internal
 	 */
-	private contextWindow: PanSessionOptions['contextWindow'] = window;
+	private contextWindow: PanSessionOptions["contextWindow"] = window;
 
 	constructor(
 		event: PointerEvent,
@@ -182,9 +182,9 @@ export class PanSession {
 		onSessionStart && onSessionStart(event, getPanInfo(initialInfo, this.history));
 
 		this.removeListeners = pipe(
-			addPointerEvent(this.contextWindow, 'pointermove', this.handlePointerMove),
-			addPointerEvent(this.contextWindow, 'pointerup', this.handlePointerUp),
-			addPointerEvent(this.contextWindow, 'pointercancel', this.handlePointerUp)
+			addPointerEvent(this.contextWindow, "pointermove", this.handlePointerMove),
+			addPointerEvent(this.contextWindow, "pointerup", this.handlePointerUp),
+			addPointerEvent(this.contextWindow, "pointercancel", this.handlePointerUp)
 		);
 	}
 
@@ -230,7 +230,7 @@ export class PanSession {
 		if (!(this.lastMoveEvent && this.lastMoveEventInfo)) return;
 
 		const panInfo = getPanInfo(
-			event.type === 'pointercancel' ? this.lastMoveEventInfo : transformPoint(info, this.transformPagePoint),
+			event.type === "pointercancel" ? this.lastMoveEventInfo : transformPoint(info, this.transformPagePoint),
 			this.history
 		);
 
