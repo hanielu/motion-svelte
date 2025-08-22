@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "packages/motion-rsv",
+			"name": "react-motion-sv",
+		},
+		{
+			"path": "playground/vite",
+			"name": "playground",
+		},
+		{
+			"path": "packages/utils/src",
+			"name": "runed",
+		},
+		{
+			"path": ".",
+			"name": "root",
+		},
+	],
+}
