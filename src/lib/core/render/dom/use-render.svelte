@@ -4,7 +4,7 @@
 >
   import { isMotionValue } from "motion-dom";
   import type { MotionProps } from "../../motion/types.js";
-  import type { VisualState } from "../../motion/utils/use-visual-state.svelte.js";
+  import type { VisualState } from "../../motion/utils/use-visual-state.js";
   import type { HTMLRenderState } from "../html/types.js";
   import { useHTMLProps } from "../html/use-props.svelte.js";
   import type { SVGRenderState } from "../svg/types.js";
@@ -67,7 +67,7 @@
   const children = props.children;
   const renderedChildren = isMotionValue(children) ? children.get() : children;
 
-  const presenceBox = PresenceContext.get(); // ReadableBox<PresenceContextProps | null>
+  const presenceBox = PresenceContext.get(); // PresenceContextProps | null
 
   const attach: Attachment<HTMLElement | SVGElement> = node => {
     const cleanup = untrack(() => ref(node));

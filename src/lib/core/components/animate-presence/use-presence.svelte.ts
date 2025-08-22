@@ -39,12 +39,12 @@ export function usePresence(
   id: string, // we need to pass in the component id because `$props.id()` is only available in the component
   subscribe: () => boolean = () => true
 ): AlwaysPresent | Present | NotPresent {
-  const parentContext = PresenceContext.get();
+  const parentPresenceContext = PresenceContext.get();
   // console.log("[haniel] usePresence collect parentContext", parentContext.current);
 
-  if (parentContext.current === null) return [read(() => true), null] as AlwaysPresent;
+  if (parentPresenceContext === null) return [read(() => true), null] as AlwaysPresent;
 
-  const { isPresent, onExitComplete, register } = $derived(parentContext.current);
+  const { isPresent, onExitComplete, register } = parentPresenceContext;
 
   watch(subscribe, subscribe => {
     // console.log("[haniel] usePresence collect subscribe", register);
@@ -54,7 +54,7 @@ export function usePresence(
   const safeToRemove: SafeToRemove | undefined =
     !subscribe || !onExitComplete ? undefined : () => onExitComplete(id);
 
-  return [read(() => isPresent), safeToRemove] as AlwaysPresent | Present | NotPresent;
+  return [isPresent, safeToRemove] as AlwaysPresent | Present | NotPresent;
 }
 
 /**
@@ -75,9 +75,9 @@ export function usePresence(
  */
 export function useIsPresent() {
   const parentContext = PresenceContext.get();
-  return read(() => isPresent(parentContext.current));
+  return read(() => isPresent(parentContext));
 }
 
 export function isPresent(context: PresenceContextProps | null) {
-  return context === null ? true : context.isPresent;
+  return context === null ? true : context.isPresent.current;
 }

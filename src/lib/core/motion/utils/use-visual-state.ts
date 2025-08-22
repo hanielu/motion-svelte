@@ -10,7 +10,6 @@ import {
   isControllingVariants as checkIsControllingVariants,
   isVariantNode as checkIsVariantNode,
 } from "../../render/utils/is-controlling-variants.js";
-import { box, type ReadableBox } from "runed";
 
 export interface VisualState<Instance, RenderState> {
   renderState: RenderState;
@@ -19,9 +18,9 @@ export interface VisualState<Instance, RenderState> {
 }
 
 export type UseVisualState<Instance, RenderState> = (
-  props: ReadableBox<MotionProps>,
+  props: MotionProps,
   isStatic: boolean
-) => ReadableBox<VisualState<Instance, RenderState>>;
+) => VisualState<Instance, RenderState>;
 
 export interface UseVisualStateConfig<RenderState> {
   scrapeMotionValuesFromProps: ScrapeMotionValuesFromProps;
@@ -30,13 +29,12 @@ export interface UseVisualStateConfig<RenderState> {
 
 export const makeUseVisualState =
   <I, RS>(config: UseVisualStateConfig<RS>): UseVisualState<I, RS> =>
-  (props: ReadableBox<MotionProps>, isStatic: boolean): ReadableBox<VisualState<I, RS>> => {
-    const context = $derived(MotionContext.current);
-    const presenceContext = $derived(PresenceContext.current);
-    const make = () => makeState(config, props.current, context, presenceContext);
-    const state = $derived(make());
+  (props: MotionProps, isStatic: boolean): VisualState<I, RS> => {
+    const context = MotionContext.get();
+    const presenceContext = PresenceContext.get();
 
-    return box.from(isStatic ? make() : () => state) as ReadableBox<VisualState<I, RS>>;
+    // Component function runs once in Svelte; compute once and keep a stable object.
+    return makeState(config, props, context, presenceContext);
   };
 
 function makeState<I, RS>(
@@ -67,7 +65,7 @@ function makeLatestValues(
   }
 
   let { initial, animate } = props;
-  console.log("[haniel] initial", initial);
+  // console.log("[haniel] initial", initial);
   const isControllingVariants = checkIsControllingVariants(props);
   const isVariantNode = checkIsVariantNode(props);
 

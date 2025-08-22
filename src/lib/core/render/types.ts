@@ -4,7 +4,7 @@ import type { Axis, Box } from "motion-utils";
 import type { ReducedMotionConfig } from "../context/motion-config-context.js";
 import type { PresenceContextProps } from "../context/presence-context.js";
 import type { MotionProps } from "../motion/types.js";
-import type { VisualState } from "../motion/utils/use-visual-state.svelte.js";
+import type { VisualState } from "../motion/utils/use-visual-state.js";
 import type { DOMMotionComponents } from "./dom/types.js";
 import type { VisualElement } from "./VisualElement.js";
 import type { Component } from "svelte";

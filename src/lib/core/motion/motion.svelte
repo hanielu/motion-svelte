@@ -195,17 +195,14 @@
   const context = useCreateMotionContext<HTMLElement | SVGElement>(read(() => props));
 
   const useVisualState = isSVGComponent(Component) ? useSVGVisualState : useHTMLVisualState;
-  const visualState = useVisualState(
-    read(() => props),
-    isStatic
-  );
+  const visualState = useVisualState(props, isStatic);
 
   if (!isStatic && isBrowser) {
     useStrictMode(configAndProps, preloadedFeatures);
 
     const layoutProjection = $derived(getProjectionFunctionality(configAndProps));
 
-    $effect(() => {
+    $effect.pre(() => {
       MeasureLayout = layoutProjection.MeasureLayout;
     });
 
@@ -215,7 +212,7 @@
      * providing a way of rendering to these APIs outside of the React render loop
      * for more performant animations and interactions
      */
-    context.current.visualElement = useVisualElement(
+    context.visualElement = useVisualElement(
       Component,
       visualState,
       read(() => configAndProps),
@@ -228,32 +225,25 @@
    * If we need to measure the element we load this functionality in a
    * separate class component in order to gain access to getSnapshotBeforeUpdate.
    */
-  // const MeasureLayout = $derived.by(() => {
-  //   if (!isStatic && isBrowser) {
-  //     const layoutProjection = getProjectionFunctionality(configAndProps);
-  //     return layoutProjection.MeasureLayout;
-  //   }
-  // });
-
   MotionContext.set(context);
 
   // Create a ref callback to hand to UseRender so it mounts VE on attach
-  const renderedRef = useMotionRef<HTMLElement | SVGElement, HTMLRenderState | SVGRenderState>(
+  const setRef = useMotionRef<HTMLElement | SVGElement, HTMLRenderState | SVGRenderState>(
     visualState,
-    read(() => context.current.visualElement),
+    context.visualElement,
     node => (externalRef = node)
   );
 </script>
 
-{#if MeasureLayout && context.current.visualElement}
-  <MeasureLayout visualElement={context.current.visualElement} {...configAndProps} />
+{#if MeasureLayout && context.visualElement}
+  <MeasureLayout visualElement={context.visualElement} {...configAndProps} />
 {/if}
 
 <UseRender
   {Component}
   {props}
-  ref={renderedRef}
-  latestValues={visualState.current.latestValues}
+  ref={setRef}
+  latestValues={visualState.latestValues}
   {isStatic}
   {forwardMotionProps}
 />

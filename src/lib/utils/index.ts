@@ -7,6 +7,7 @@ export * from "./extract.js";
 export * from "./attach-ref.js";
 export * from "./unbox.js";
 export * from "./previous.svelte.js";
+export * from "./is-mounted.svelte.js";
 
 export function styleToStr(styleObj: Record<string, string | number | undefined>) {
   return Object.entries(styleObj)
@@ -28,3 +29,4 @@ export function styleToStr(styleObj: Record<string, string | number | undefined>
     })
     .join(";");
 }
+export const css = styleToStr;

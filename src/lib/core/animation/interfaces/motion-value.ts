@@ -126,8 +126,6 @@ export const animateMotionValue =
       }
     }
 
-    console.log("[haniel] animateMotionValue-2", options);
-
     return valueTransition.isSync
       ? new JSAnimation(options)
       : new AsyncMotionValueAnimation(options);

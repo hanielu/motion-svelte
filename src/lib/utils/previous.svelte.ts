@@ -12,6 +12,9 @@ export class Previous<T> {
   constructor(getter: Getter<T>, initialValue?: T) {
     if (initialValue !== undefined) this.#previous = initialValue;
 
+    // using pre instead because ideally previous values are updated before the DOM updates
+    // well at least that's the case for the current uses of this class, for now
+    // I suppose we could also create a new class that does this, but I'm not sure if it's worth it
     watch.pre(
       () => getter(),
       (_, v) => {

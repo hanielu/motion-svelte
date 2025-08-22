@@ -7,4 +7,4 @@ export interface MotionContextProps<Instance = unknown> {
   animate?: string | string[];
 }
 
-export const MotionContext = /* @__PURE__ */ Context.boxed<MotionContextProps>("MotionContext", {});
+export const MotionContext = new Context<MotionContextProps>("MotionContext", {});

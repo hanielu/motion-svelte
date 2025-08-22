@@ -1,4 +1,4 @@
-import { Context } from "runed";
+import { Context, type ReadableBox } from "runed";
 import type { VariantLabels } from "../motion/types.js";
 
 /**
@@ -6,7 +6,7 @@ import type { VariantLabels } from "../motion/types.js";
  */
 export interface PresenceContextProps {
   id: string;
-  isPresent: boolean;
+  isPresent: ReadableBox<boolean>;
   register: (id: string | number) => () => void;
   onExitComplete?: (id: string | number) => void;
   initial?: false | VariantLabels;
@@ -16,4 +16,4 @@ export interface PresenceContextProps {
 /**
  * @public
  */
-export const PresenceContext = Context.boxed<PresenceContextProps | null>("PresenceContext", null);
+export const PresenceContext = new Context<PresenceContextProps | null>("PresenceContext", null);

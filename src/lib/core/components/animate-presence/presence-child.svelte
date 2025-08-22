@@ -6,6 +6,7 @@
     type PresenceContextProps,
   } from "$lib/core/context/presence-context.js";
   import { PresenceCollectorContext } from "./presence-collector.svelte";
+  import { read } from "runed";
 
   interface PresenceChildProps {
     children: Snippet;
@@ -34,16 +35,14 @@
   const presenceChildren = new Map<string, boolean>();
   const id = $props.id();
 
-  const context = $derived({
+  const context = {
     id,
     initial,
-    isPresent,
+    isPresent: read(() => isPresent),
     onExitComplete: (childId: string) => {
-      console.log("[haniel] collector onExitComplete", childId, onExitComplete);
       presenceChildren.set(childId, true);
 
       for (const isComplete of presenceChildren.values()) {
-        console.log("[haniel] collector onExitComplete isComplete", isComplete);
         if (!isComplete) return; // can stop searching when any is incomplete
       }
 
@@ -51,21 +50,13 @@
     },
     register: (childId: string) => {
       presenceChildren.set(childId, false);
-      // console.log("[haniel] collector register", childId);
-      return () => {
-        // console.log("[haniel] collector unregister", childId);
-        presenceChildren.delete(childId);
-      };
+      return () => presenceChildren.delete(childId);
     },
-  } as PresenceContextProps);
+  } as PresenceContextProps;
 
   $effect.pre(() => {
     const _ = isPresent;
     presenceChildren.forEach((_, key) => presenceChildren.set(key, false));
-  });
-
-  $effect(() => {
-    // console.log("[haniel] collector isPresent", isPresent);
   });
 
   /**
@@ -73,24 +64,13 @@
    * component immediately.
    */
   $effect(() => {
-    console.log("[haniel] collector i ran o", isPresent, presenceChildren.size, onExitComplete);
     if (!isPresent && presenceChildren.size === 0) {
       onExitComplete?.();
     }
   });
 
-  $effect(() => {
-    console.log("collector presenceChildren", presenceChildren);
-
-    return () => {
-      console.log("collector presenceChildren unregistering", id);
-    };
-  });
-
-  PresenceContext.setWith(() => context);
+  PresenceContext.set(context);
   PresenceCollectorContext.set({ hasParent: true });
-
-  console.log("[haniel] collector children", children);
 </script>
 
 {@render children?.()}

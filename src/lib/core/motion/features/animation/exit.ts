@@ -11,13 +11,13 @@ export class ExitAnimationFeature extends Feature<unknown> {
     const { isPresent, onExitComplete } = this.node.presenceContext;
     const { isPresent: prevIsPresent } = this.node.prevPresenceContext || {};
 
-    if (!this.node.animationState || isPresent === prevIsPresent) {
+    if (!this.node.animationState || isPresent.current === prevIsPresent?.current) {
       return;
     }
 
-    const exitAnimation = this.node.animationState.setActive("exit", !isPresent);
+    const exitAnimation = this.node.animationState.setActive("exit", !isPresent.current);
 
-    if (onExitComplete && !isPresent) {
+    if (onExitComplete && !isPresent.current) {
       exitAnimation.then(() => {
         onExitComplete(this.id);
       });

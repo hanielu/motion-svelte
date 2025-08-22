@@ -13,7 +13,7 @@ import type { SVGRenderState } from "$lib/core/render/svg/types.js";
 import type { CreateVisualElement } from "$lib/core/render/types.js";
 import type { VisualElement } from "$lib/core/render/VisualElement.js";
 import type { MotionProps } from "../types.js";
-import type { VisualState } from "./use-visual-state.svelte.js";
+import type { VisualState } from "./use-visual-state.js";
 import type { Component } from "svelte";
 import { optimizedAppearDataAttribute } from "$lib/core/animation/optimized-appear/data-id.js";
 import type { ReadableBox } from "runed";
@@ -23,9 +23,7 @@ export function useVisualElement<
   TagName extends keyof DOMMotionComponents | string
 >(
   Component: TagName | string | Component<Props>,
-  visualState: ReadableBox<
-    VisualState<SVGElement, SVGRenderState> | VisualState<HTMLElement, HTMLRenderState>
-  >,
+  visualState: VisualState<SVGElement, SVGRenderState> | VisualState<HTMLElement, HTMLRenderState>,
   props: ReadableBox<MotionProps & Partial<MotionConfigContext>>,
   createVisualElement?: CreateVisualElement<Props, TagName>,
   ProjectionNodeConstructor?: () => any | undefined
@@ -34,9 +32,9 @@ export function useVisualElement<
 
   // TODO: (haniel) if something breaks maybe we need to be deriving state in here
 
-  const parent = $derived(MotionContext.current.visualElement);
+  const parent = $derived(MotionContext.get().visualElement);
   const lazyContext = LazyContext.current;
-  const presenceContext = $derived(PresenceContext.current);
+  const presenceContext = PresenceContext.get();
   const reducedMotionConfig = MotionConfigContext.current.reducedMotion;
 
   /**
@@ -47,17 +45,10 @@ export function useVisualElement<
 
   const visualElement = createVisualElement
     ? createVisualElement(Component, {
-        get visualState() {
-          // TODO: (haniel) fix this if possible
-          return visualState.current as any;
-        },
+        visualState: visualState as any,
         parent,
-        get props() {
-          return props.current;
-        },
-        get presenceContext() {
-          return presenceContext;
-        },
+        props: props.current,
+        presenceContext,
         blockInitialAnimation: presenceContext ? presenceContext.initial === false : false,
         reducedMotionConfig,
       })

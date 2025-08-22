@@ -1,6 +1,5 @@
 import type { VisualElement } from "$lib/core/render/VisualElement.js";
-import type { ReadableBox } from "runed";
-import type { VisualState } from "./use-visual-state.svelte.js";
+import type { VisualState } from "./use-visual-state.js";
 
 /**
  * Svelte 5 helper to mirror React's useMotionRef semantics.
@@ -17,24 +16,24 @@ type ExternalRef<Instance> = (node: Instance | null) => void;
  * Pass this directly to UseRender via `ref={useMotionRef(...)}.`
  */
 export function useMotionRef<Instance, RenderState>(
-  visualState: ReadableBox<VisualState<Instance, RenderState>>,
-  visualElement?: ReadableBox<VisualElement<Instance> | undefined>,
+  visualState: VisualState<Instance, RenderState>,
+  visualElement?: VisualElement<Instance> | undefined,
   externalRef?: ExternalRef<Instance>
 ) {
   return (node: Instance) => {
     if (node) {
-      visualState.current.onMount?.(node);
+      visualState.onMount?.(node);
     }
-    console.log("[haniel] useMotionRef", visualState.current);
+    // console.log("[haniel] useMotionRef", visualState.current);
 
-    if (visualElement?.current) {
-      console.log("[haniel] useMotionRef mount", visualElement.current.mount);
-      visualElement.current.mount(node);
+    if (visualElement) {
+      // console.log("[haniel] useMotionRef mount", visualElement.current.mount);
+      visualElement.mount(node);
     }
     externalRef?.(node);
 
     return () => {
-      visualElement?.current?.unmount();
+      visualElement?.unmount();
       externalRef?.(null);
     };
 
