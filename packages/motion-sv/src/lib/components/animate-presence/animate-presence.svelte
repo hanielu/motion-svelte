@@ -134,10 +134,4 @@
 	});
 </script>
 
-{#if transitionProps.tag}
-	<svelte:element this={transitionProps.tag}>
-		{@render children?.()}
-	</svelte:element>
-{:else}
-	{@render children()}
-{/if}
+{@render children()}
