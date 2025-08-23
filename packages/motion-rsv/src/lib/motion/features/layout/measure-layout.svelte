@@ -14,6 +14,7 @@
 	import { VisualElement } from "../../../render/VisualElement.js";
 	import type { MotionProps } from "../../types.js";
 	import { onMount } from "svelte";
+	import { LayoutMotionScopeContext } from "./layout-motion-context.js";
 
 	let { visualElement, layoutId, layoutDependency, drag = false }: MeasureProps = $props();
 
@@ -21,6 +22,7 @@
 	const [isPresent, _safeToRemove] = usePresence(id);
 	const layoutGroup = $derived(LayoutGroupContext.current);
 	const switchLayoutGroup = $derived(SwitchLayoutGroupContext.current);
+	const layoutMotionScope = LayoutMotionScopeContext.getOr(null);
 
 	let prevProps = { layoutDependency: undefined, isPresent: { current: undefined } as any };
 
@@ -71,6 +73,7 @@
 
 		// componentWillUnmount
 		return () => {
+			layoutMotionScope?.unregister?.(snapshotBeforeUpdate);
 			const promoteContext = switchLayoutGroup;
 			const { projection } = visualElement;
 
@@ -82,45 +85,17 @@
 		};
 	});
 
-	$effect.pre(() => {
+	// Needs to be in the body of the component to ensure it's unregistered
+	// from parent-first order, as opposed to using a `$effect` ($effect is child-first)
+	layoutMotionScope?.register?.(snapshotBeforeUpdate);
+
+	// This exists because svelte does not have a similar concept to
+	// React's getSnapshotBeforeUpdate
+	function snapshotBeforeUpdate() {
 		const { projection } = visualElement;
 		if (!projection) return;
 
-		// If this component is a layout root, ensure we pre-snapshot its subtree
-		// before any DOM mutations. This avoids affecting siblings outside this root.
-		if (projection.options?.layoutRoot) {
-			if (!projection.root?.isUpdating) {
-				projection.root?.startUpdate();
-			}
-
-			const stack = [projection];
-			while (stack.length) {
-				const node = stack.pop();
-				const opts = node?.options;
-				if (opts?.layout || opts?.layoutId || opts?.layoutRoot) {
-					node?.willUpdate(false);
-				}
-				if (node?.children) {
-					node.children.forEach((child) => stack.push(child));
-				}
-			}
-		}
-	});
-
-	$effect.pre(() => {
-		const { projection } = visualElement;
-
-		if (!projection) return;
-
-		/**
-		 * TODO: We use this data in relegate to determine whether to
-		 * promote a previous element. There's no guarantee its presence data
-		 * will have updated by this point - if a bug like this arises it will
-		 * have to be that we markForRelegation and then find a new lead some other way,
-		 * perhaps in didUpdate
-		 */
 		projection.isPresent = isPresent.current;
-
 		hasTakenAnySnapshot = true;
 
 		if (
@@ -130,9 +105,7 @@
 			prevProps.isPresent !== isPresent.current
 		) {
 			projection.willUpdate();
-			console.log("[haniel] measure layout willUpdate");
 		} else {
-			console.log("[haniel] measure layout safeToRemove");
 			safeToRemove();
 		}
 
@@ -140,11 +113,6 @@
 			if (isPresent.current) {
 				projection.promote();
 			} else if (!projection.relegate()) {
-				/**
-				 * If there's another stack member taking over from this one,
-				 * it's in charge of the exit animation and therefore should
-				 * be in charge of the safe to remove. Otherwise we call it here.
-				 */
 				frame.postRender(() => {
 					const stack = projection.getStack();
 					if (!stack || !stack.members.length) {
@@ -153,7 +121,7 @@
 				});
 			}
 		}
-	});
+	}
 
 	// componentDidUpdate
 	$effect(() => {

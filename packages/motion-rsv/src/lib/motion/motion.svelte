@@ -116,7 +116,7 @@
 	}
 
 	function useStrictMode(configAndProps: MotionProps, preloadedFeatures?: FeaturePackages) {
-		const isStrict = LazyContext.current.strict;
+		const isStrict = LazyContext.getOr().strict;
 
 		/**
 		 * If we're in development mode, check to make sure we're not rendering a motion component

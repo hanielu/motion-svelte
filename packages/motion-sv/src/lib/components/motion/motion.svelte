@@ -17,33 +17,33 @@
 	import type { Attachment } from "svelte/attachments";
 	import { LayoutMotionScopeContext } from "./layout-motion.svelte";
 
-	const INTERNAL_MOTION_KEYS = [
-		"as",
-		"layout",
-		"layoutId",
-		"layoutScroll",
-		"layoutRoot",
-		"crossfade",
-		"transition",
-		"variants",
-		"initial",
-		"animate",
-		"exit",
-		"whileHover",
-		"whilePress",
-		"whileFocus",
-		"whileInView",
-		"drag",
-		"dragListener",
-		"dragConstraints",
-		"inViewOptions",
-		"custom",
-		"motionConfig",
-	] as const satisfies readonly (keyof Options)[];
+	// const INTERNAL_MOTION_KEYS = [
+	// 	"as",
+	// 	"layout",
+	// 	"layoutId",
+	// 	"layoutScroll",
+	// 	"layoutRoot",
+	// 	"crossfade",
+	// 	"transition",
+	// 	"variants",
+	// 	"initial",
+	// 	"animate",
+	// 	"exit",
+	// 	"whileHover",
+	// 	"whilePress",
+	// 	"whileFocus",
+	// 	"whileInView",
+	// 	"drag",
+	// 	"dragListener",
+	// 	"dragConstraints",
+	// 	"inViewOptions",
+	// 	"custom",
+	// 	"motionConfig",
+	// ] as const satisfies readonly (keyof Options)[];
 
-	type InternalMotionKey = (typeof INTERNAL_MOTION_KEYS)[number];
+	// type InternalMotionKey = (typeof INTERNAL_MOTION_KEYS)[number];
 
-	const INTERNAL_MOTION_SET: ReadonlySet<InternalMotionKey> = new Set(INTERNAL_MOTION_KEYS);
+	// const INTERNAL_MOTION_SET: ReadonlySet<InternalMotionKey> = new Set(INTERNAL_MOTION_KEYS);
 </script>
 
 <script lang="ts">
@@ -235,6 +235,8 @@
 	// unless I set `crossfade={false}` on the handle(s) with the `layoutId` prop.
 	// Nothing I tried would fix it. (setting `layoutRoot` on the button, or using `LayoutGroup` or both)
 	// so we're using a watch instead.
+	//
+	// This bug(?) exists in vue too, so this is kinda an advantage the svelte version has over the vue version.
 	//
 	// TBD if we'll run into other issues with this.
 	watch(

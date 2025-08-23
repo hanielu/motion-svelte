@@ -26,8 +26,8 @@ export function useVisualElement<Props extends Record<string, any>, TagName exte
 
 	// TODO: (haniel) if something breaks maybe we need to be deriving state in here
 
-	const parent = $derived(MotionContext.getOr().visualElement);
-	const lazyContext = LazyContext.current;
+	const parent = MotionContext.getOr().visualElement;
+	const lazyContext = LazyContext.getOr();
 	const presenceContext = PresenceContext.getOr();
 	const reducedMotionConfig = MotionConfigContext.current.reducedMotion;
 
@@ -70,7 +70,7 @@ export function useVisualElement<Props extends Record<string, any>, TagName exte
 		 * `update` unnecessarily. This ensures we skip the initial update.
 		 */
 		if (visualElement && isMounted) {
-			console.log("[haniel] update", props.current);
+			// console.log("[haniel] update", props.current);
 			visualElement.update(props.current, presenceContext);
 		}
 	});
@@ -90,9 +90,6 @@ export function useVisualElement<Props extends Record<string, any>, TagName exte
 
 		isMounted = true;
 		window.MotionIsMounted = true;
-
-		void presenceContext;
-		void parent;
 
 		// console.log("[haniel] updateFeatures");
 		visualElement.updateFeatures();

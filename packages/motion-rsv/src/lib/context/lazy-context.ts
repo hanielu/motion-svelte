@@ -6,4 +6,4 @@ export interface LazyContextProps {
 	strict: boolean;
 }
 
-export const LazyContext = Context.boxed<LazyContextProps>("LazyContext", { strict: false });
+export const LazyContext = new Context<LazyContextProps>("LazyContext", { strict: false });
