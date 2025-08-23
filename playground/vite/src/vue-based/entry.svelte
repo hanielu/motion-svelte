@@ -5,12 +5,15 @@
 	import BasicLayoutToggle from "./examples/layout-focused/basic-layout-toggle.svelte";
 	import LayoutIdTest from "./examples/layout-focused/layout-id-test.svelte";
 	import RollingBox from "./examples/rolling-box.svelte";
+	import WhenVariant from "./examples/variants/when-variant.svelte";
 </script>
 
-<RollingBox />
+<!-- <RollingBox />
 <BasicLayoutToggle />
 <BasicLayoutList />
-<LayoutIdTest />
+<LayoutIdTest /> -->
 
-<!-- <EnterExitBasic /> -->
+<EnterExitBasic />
 <!-- <EnterExitList /> -->
+
+<!-- <WhenVariant /> -->
