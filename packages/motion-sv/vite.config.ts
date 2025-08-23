@@ -1,8 +1,16 @@
 import { sveltekit } from "@sveltejs/kit/vite";
 import { defineConfig } from "vite";
+import inlineSveltePlugin from "@hvniel/vite-plugin-svelte-inline-component/plugin";
 
-export default defineConfig({
-	plugins: [sveltekit()],
+export default defineConfig(({ mode }) => ({
+	plugins: [
+		sveltekit(),
+		mode === "test" &&
+			inlineSveltePlugin({
+				fenceStart: "// svelte:defs",
+				fenceEnd: "// sd",
+			}),
+	],
 	test: {
 		expect: { requireAssertions: true },
 		projects: [
@@ -32,4 +40,4 @@ export default defineConfig({
 			},
 		],
 	},
-});
+}));

@@ -16,6 +16,8 @@
 	import { convertSvgStyleToAttributes, createStyles } from "@/state/style.js";
 	import type { Attachment } from "svelte/attachments";
 	import { LayoutMotionScopeContext } from "./layout-motion.svelte";
+	import { motionExit } from "@/animation/transition.svelte.js";
+	import { resolveVariant } from "@/state/utils.js";
 
 	// const INTERNAL_MOTION_KEYS = [
 	// 	"as",
@@ -205,6 +207,17 @@
 		return attrsProps;
 	});
 
+	// Resolve exit variant to use as a Svelte out transition
+	const exitDefinition = $derived.by(() => {
+		const customValue = props.custom ?? animatePresenceContext.custom;
+		return resolveVariant(props.exit as any, props.variants, customValue);
+	});
+
+	// Provide current values to transition adapter so transforms/opacity etc animate from live state
+	const exitFrom = $derived.by(() => {
+		return (state.visualElement?.latestValues as Record<string, any>) ?? {};
+	});
+
 	// onBeforeMount
 	$effect.pre(() => {
 		state.beforeMount();
@@ -262,10 +275,28 @@
 			state.unmount();
 		};
 	};
+
+	let allowIntro = false;
 </script>
 
 {#if typeof AsComponent === "string"}
-	<svelte:element this={AsComponent} {...getAttrs} {@attach attachRef}>
+	<svelte:element
+		this={AsComponent}
+		{...getAttrs}
+		{@attach attachRef}
+		transition:motionExit|global={{
+			definition: exitDefinition,
+			get from() {
+				return state.visualElement?.latestValues;
+			},
+			get allowIntro() {
+				return allowIntro;
+			},
+			set allowIntro(value) {
+				allowIntro = value;
+			},
+		}}
+	>
 		{@render props.children?.()}
 	</svelte:element>
 {:else}

@@ -18,6 +18,7 @@ const config = {
 		alias: {
 			"@": "./src/lib",
 			"framer-motion/dist/es": "./src/lib/framer-motion/dist/es",
+			"test-utils": "./src/test-utils.js",
 		},
 	},
 };

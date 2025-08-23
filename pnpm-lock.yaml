@@ -118,6 +118,9 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@hvniel/vite-plugin-svelte-inline-component':
+        specifier: ^0.0.16
+        version: 0.0.16(svelte@5.38.1)
       '@playwright/test':
         specifier: ^1.49.1
         version: 1.55.0
@@ -539,6 +542,11 @@ packages:
 
   '@hvniel/svelte-router@0.0.2':
     resolution: {integrity: sha512-fSHCHh/Lwe+PFH40zoqTjDtryhwTj9gtyi3NY808IlglUkKV8MUOQKol+AVFfg22JL+9mjy99+lE9iQy1xLylg==}
+    peerDependencies:
+      svelte: ^5.0.0
+
+  '@hvniel/vite-plugin-svelte-inline-component@0.0.16':
+    resolution: {integrity: sha512-UBCALxW++isuczSF0tdJF2wy529zpPweC2O/Ll0NTMl8wZcYgm6TbSXHMQVfNm7ZCMLVuDK30HBsOT/z7RqP8w==}
     peerDependencies:
       svelte: ^5.0.0
 
@@ -2580,6 +2588,11 @@ snapshots:
 
   '@hvniel/svelte-router@0.0.2(svelte@5.38.1)':
     dependencies:
+      svelte: 5.38.1
+
+  '@hvniel/vite-plugin-svelte-inline-component@0.0.16(svelte@5.38.1)':
+    dependencies:
+      magic-string: 0.30.17
       svelte: 5.38.1
 
   '@iconify/json@2.2.377':

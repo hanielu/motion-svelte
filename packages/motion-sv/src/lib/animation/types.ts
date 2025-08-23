@@ -1,5 +1,22 @@
 import type { MotionState } from "@/state/index.js";
 import type { Options } from "@/types/index.js";
+import type { DOMKeyframesDefinition } from "framer-motion";
+
+export interface MotionExitDefinition extends DOMKeyframesDefinition {
+	transition?: {
+		duration?: number;
+		delay?: number;
+		ease?: any;
+	};
+}
+
+export interface MotionTransitionParamsShape {
+	definition: MotionExitDefinition | undefined;
+	get from(): Record<string, any>;
+	get allowIntro(): boolean;
+	set allowIntro(value: boolean);
+}
+
 /**
  * @public
  */

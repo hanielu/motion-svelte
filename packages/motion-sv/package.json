@@ -34,6 +34,7 @@
 		"svelte": "^5.0.0"
 	},
 	"devDependencies": {
+		"@hvniel/vite-plugin-svelte-inline-component": "^0.0.16",
 		"@playwright/test": "^1.49.1",
 		"@sveltejs/adapter-auto": "^6.0.0",
 		"@sveltejs/kit": "^2.22.0",
