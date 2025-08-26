@@ -1,114 +1,220 @@
 import type { MotionExitDefinition, MotionTransitionParamsShape } from "./types.js";
-import { toMs, mapEasing } from "./utils.js";
-import { findValueType, complex } from "motion-dom";
+import { findValueType, spring, calcGeneratorDuration } from "motion-dom";
 import { style as styleUtils } from "@/state/style.js";
-import { buildTransformTemplate, transformAlias, transformDefinitions } from "@/state/transform.js";
+import { transformAlias, transformDefinitions } from "@/state/transform.js";
+import { resolveVariant } from "@/state/utils.js";
+// Use FM internals for parity
+import { getValueTransition as fmGetValueTransition } from "framer-motion/dist/es/animation/sequence/create.mjs";
+import { getDefaultTransition as fmGetDefaultTransition } from "framer-motion/dist/es/animation/utils/default-transitions.mjs";
+import { animateTarget } from "framer-motion/dist/es/animation/interfaces/visual-element-target.mjs";
 
-export function motionExit(node: Element, params?: MotionTransitionParamsShape) {
-	const def: MotionExitDefinition = params?.definition || {};
-	const { transition, ...target } = def as unknown as Record<string, unknown> & {
-		transition?: MotionExitDefinition["transition"];
-	};
+function toMs(seconds?: number): number | undefined {
+	if (seconds == null) return undefined;
+	return seconds * 1000;
+}
 
-	const baseDuration = toMs(transition?.duration) ?? 200;
-	const delay = toMs(transition?.delay) ?? 0;
-	const easing = mapEasing(transition?.ease);
+export function motionExit(node: Element, params: MotionTransitionParamsShape) {
+	const def: MotionExitDefinition = params.definition;
+	const { transition: baseTransition, ...target } = def;
+
+	const baseDuration = toMs(baseTransition?.duration) ?? 200;
+	const baseDelay = toMs(baseTransition?.delay) ?? 0;
 
 	const seen = (motionExit as any)._seen || new WeakSet<Element>();
 	(motionExit as any)._seen = seen;
 	const isIntroCall = !seen.has(node);
 	if (isIntroCall) {
 		seen.add(node);
-		node.addEventListener(
-			"outroend",
-			() => {
-				params!.allowIntro = true;
-			},
-			{ once: true }
+		node.addEventListener("outroend", () => params.setAllowIntro(true), { once: true });
+	}
+
+	// If this is the initial intro and we haven't been allowed to run, skip the transition entirely
+	if (isIntroCall && !params.allowIntro) {
+		const easing = (x: number) => x;
+		const css = () => "";
+		return { delay: 0, duration: 0, easing, css } as const;
+	}
+
+	const state = params.state;
+	const ve = state?.visualElement;
+
+	// Helpers to (re)start FM animations in either direction
+	function stopFM() {
+		ve?.values?.forEach((mv) => mv?.stop?.());
+		state?.clearAnimation?.();
+	}
+	function startExitFM() {
+		if (!ve) return;
+		stopFM();
+		// Use provided definition (with its transition) for exact parity
+		animateTarget(ve, def);
+	}
+	function startEnterFM() {
+		if (!ve) return;
+		stopFM();
+		const { animate, variants, custom } = state?.options;
+		const animateDef = resolveVariant(animate, variants, custom);
+		// Respect per-animate transition on reversal
+		if (animateDef) animateTarget(ve, animateDef);
+	}
+
+	// On outro start: kick off exit
+	if (!isIntroCall && ve) {
+		startExitFM();
+	}
+
+	let overallDurationMs = 0;
+	let lastU = -1;
+	let dir: "none" | "exit" | "enter" = !isIntroCall ? "exit" : "none";
+
+	function mergeValueTransition(base: any, key: string): any {
+		// Prefer FM's merge semantics when available
+		try {
+			return fmGetValueTransition(base || {}, key);
+		} catch {
+			return base || {};
+		}
+	}
+
+	function applyDefaultTransition(key: string, vt: any, fromValue: any, toValue: any) {
+		try {
+			const opts: any = { keyframes: [fromValue, toValue] };
+			const defaults = fmGetDefaultTransition(key, opts);
+			return { ...defaults, ...vt };
+		} catch {
+			return vt;
+		}
+	}
+
+	function hasExplicitTransition(t: any): boolean {
+		if (!t) return false;
+		return (
+			"type" in t ||
+			"stiffness" in t ||
+			"damping" in t ||
+			"duration" in t ||
+			"ease" in t ||
+			"velocity" in t ||
+			"repeat" in t ||
+			"repeatType" in t ||
+			"repeatDelay" in t
 		);
 	}
 
-	const duration = isIntroCall && !params?.allowIntro ? 0 : baseDuration;
-
-	type Mixer = (p: number) => string;
-	const styleMixers: Array<[string, Mixer]> = [];
-	const transformMixers: Array<[string, Mixer]> = [];
-
+	// Compute hold duration based on exit targets
 	for (const rawKey in target) {
 		let key = rawKey;
-		if (rawKey in transformAlias) key = (transformAlias as Record<string, string>)[rawKey];
+		if (rawKey in transformAlias) key = transformAlias[rawKey];
 
-		const to = (target as Record<string, unknown>)[rawKey];
+		const to = target[rawKey];
+		let vt = mergeValueTransition(baseTransition, rawKey) || {};
 		const transformDef = transformDefinitions.get(key);
+		const fromValueRaw =
+			state.visualElement?.latestValues?.[rawKey] ??
+			(transformDef ? transformDef.initialValue : styleUtils.get(node, key));
+		const fromValueStr = String(fromValueRaw ?? "");
+		const toValueStr = String(to);
+
+		if (!hasExplicitTransition(vt)) {
+			vt = applyDefaultTransition(
+				key,
+				vt,
+				transformDef ? (typeof fromValueRaw === "number" ? fromValueRaw : parseFloat(fromValueStr) || 0) : fromValueStr,
+				transformDef ? (typeof to === "number" ? to : parseFloat(toValueStr) || 0) : toValueStr
+			);
+		}
+
+		const delayMs = toMs(vt?.delay) ?? baseDelay;
+
 		if (transformDef) {
-			const fromOverride = params?.from?.[rawKey] as unknown;
-			const fromRaw = fromOverride ?? (transformDef.initialValue as unknown);
-			const fromNum = typeof fromRaw === "number" ? (fromRaw as number) : parseFloat(String(fromRaw)) || 0;
-			const toNum = typeof to === "number" ? (to as number) : parseFloat(String(to)) || 0;
-			const unit = transformDef.toDefaultUnit
-				? (v: number) => String(transformDef.toDefaultUnit(v))
-				: (v: number) => String(v);
-			const mix: Mixer = (p) => unit(fromNum + (toNum - fromNum) * p);
-			transformMixers.push([key, mix]);
+			const fromNum = typeof fromValueRaw === "number" ? fromValueRaw : parseFloat(String(fromValueRaw)) || 0;
+			const toNum = typeof to === "number" ? to : parseFloat(String(to)) || 0;
+			const preferSpring =
+				vt?.type === "spring" || vt?.stiffness !== undefined || vt?.damping !== undefined || !hasExplicitTransition(vt);
+			const vel = ((): number => {
+				try {
+					return ve?.getValue?.(key)?.getVelocity?.() ?? 0;
+				} catch {
+					return 0;
+				}
+			})();
+			const durMs = ((): number => {
+				const specified = toMs(vt?.duration);
+				if (specified != null) return specified;
+				if (preferSpring) {
+					try {
+						const gen = spring({ from: fromNum, to: toNum, velocity: vel, ...vt });
+						const approx = calcGeneratorDuration(gen);
+						if (approx != null && isFinite(approx)) return approx;
+						return 300;
+					} catch {
+						return 300;
+					}
+				}
+				return baseDuration;
+			})();
+			overallDurationMs = Math.max(overallDurationMs, delayMs + durMs);
 			continue;
 		}
 
-		const fromStr = String(params?.from?.[key] ?? styleUtils.get(node, key) ?? "");
-		const toStr = String(to);
-
-		// Direct numeric properties like opacity
-		if (key === "opacity") {
-			const fromNum = parseFloat(fromStr || "1");
-			const toNum = parseFloat(toStr || "0");
-			const mix: Mixer = (p) => String(fromNum + (toNum - fromNum) * p);
-			styleMixers.push([key, mix]);
-			continue;
-		}
+		const fromStr = fromValueStr;
+		const toStr = toValueStr;
 
 		const valueType = findValueType(toStr) || findValueType(fromStr);
 		if (valueType) {
-			const parse = (valueType as any).parse ?? ((v: unknown) => v as number);
-			const toOut: (v: unknown) => string = (valueType as any).transform ?? ((v: unknown) => String(v));
+			const parse = valueType.parse ?? ((v: unknown) => v as number);
 			const fromParsed = parse(fromStr) as number;
 			const toParsed = parse(toStr) as number;
-			const mix: Mixer = (p) => String(toOut(fromParsed + (toParsed - fromParsed) * p));
-			styleMixers.push([key, mix]);
-		} else {
-			// Robust complex interpolation using motion-dom complex helpers
-			const toTransformer = complex.createTransformer(toStr) as ((values: unknown) => string) | undefined;
-			if (toTransformer) {
-				let fromVals = complex.parse(fromStr) as number[];
-				let toVals = complex.parse(toStr) as number[];
-				if (!Array.isArray(fromVals) || fromVals.length !== toVals.length) {
-					const none = complex.getAnimatableNone(toStr) as string;
-					fromVals = complex.parse(none) as number[];
+			const preferSpring =
+				vt?.type === "spring" || vt?.stiffness !== undefined || vt?.damping !== undefined || !hasExplicitTransition(vt);
+			const vel = ((): number => {
+				try {
+					return ve?.getValue?.(key)?.getVelocity?.() ?? 0;
+				} catch {
+					return 0;
 				}
-				const mix: Mixer = (p) => {
-					const mixed = toVals.map((tv: number, i: number) => {
-						const fv = fromVals[i] ?? 0;
-						return fv + (tv - fv) * p;
-					});
-					return toTransformer(mixed);
-				};
-				styleMixers.push([key, mix]);
-			} else {
-				styleMixers.push([key, (_p) => toStr]);
+			})();
+			const durMs =
+				toMs(vt?.duration) ??
+				(preferSpring
+					? (() => {
+							try {
+								const gen = spring({ from: fromParsed, to: toParsed, velocity: vel, ...vt });
+								const approx = calcGeneratorDuration ? calcGeneratorDuration(gen) : undefined;
+								return approx != null && isFinite(approx as number) ? approx : 300;
+							} catch {
+								return 300;
+							}
+						})()
+					: baseDuration);
+			overallDurationMs = Math.max(overallDurationMs, delayMs + durMs);
+		} else {
+			const durMs = toMs(vt?.duration) ?? baseDuration;
+			overallDurationMs = Math.max(overallDurationMs, delayMs + durMs);
+		}
+	}
+
+	function tick(_t: number, u: number) {
+		const EPS = 1e-4;
+		if (lastU >= 0 && state?.visualElement) {
+			if (u > lastU + EPS) {
+				// moving towards exit
+				if (dir !== "exit") {
+					dir = "exit";
+					startExitFM();
+				}
+			} else if (u < lastU - EPS) {
+				// moving towards enter (reverse exit)
+				if (dir !== "enter") {
+					dir = "enter";
+					startEnterFM();
+				}
 			}
 		}
+		lastU = u;
 	}
 
-	function toCss(_t: number, u: number) {
-		const p = u;
-		const parts: string[] = [];
-		for (const [prop, mix] of styleMixers) {
-			parts.push(`${prop}:${mix(p)};`);
-		}
-		if (transformMixers.length) {
-			const transforms: [string, string][] = transformMixers.map(([name, mix]) => [name, mix(p)]);
-			parts.push(`transform:${buildTransformTemplate(transforms)};`);
-		}
-		return parts.join("");
-	}
-
-	return { delay, duration, easing, css: toCss } as const;
+	const delay = 0;
+	const easing = (x: number) => x;
+	return { delay, duration: overallDurationMs, easing, css: () => "", tick } as const;
 }

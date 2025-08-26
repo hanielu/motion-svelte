@@ -37,7 +37,7 @@
 			<motion.div
 				initial={{ opacity: 0, scale: 0, rotate: 0 }}
 				animate={{ opacity: 1, scale: 1, rotate: 45 }}
-				exit={{ opacity: 0, scale: 0, rotate: 90 }}
+				exit={{ opacity: 0, scale: 0, rotate: 0 }}
 				style={box}
 				whileHover={{ scale: 1.5 }}
 				key="box"

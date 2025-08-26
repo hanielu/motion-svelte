@@ -32,15 +32,17 @@
 </script>
 
 <div style={css(container)}>
-	{#if isVisible}
-		<motion.div
-			initial={{ opacity: 0, scale: 0, rotate: 0 }}
-			animate={{ opacity: 1, scale: 1, rotate: 45 }}
-			exit={{ opacity: 0, scale: 0, rotate: 0 }}
-			style={box}
-			whileHover={{ scale: 1.1 }}
-		/>
-	{/if}
+	<AnimatePresence initial={false}>
+		{#if isVisible}
+			<motion.div
+				initial={{ opacity: 0, scale: 0, rotate: 0 }}
+				animate={{ opacity: 1, scale: 1, rotate: 45 }}
+				exit={{ opacity: 0, scale: 0, rotate: 0 }}
+				style={box}
+				whileHover={{ scale: 1.1 }}
+			/>
+		{/if}
+	</AnimatePresence>
 	<motion.button style={button} onclick={() => (isVisible = !isVisible)} whilePress={{ y: 1 }}>
 		{isVisible ? "Hide" : "Show"}
 	</motion.button>

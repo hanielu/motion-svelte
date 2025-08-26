@@ -1,40 +1,35 @@
 <script lang="ts">
-	import { motion, AnimatePresence } from "motion-sv";
-	import { css } from "runed";
 	import AnimatedList from "../shared/animated-list.svelte";
+	import { css } from "runed";
+	import { motion, createLayoutMotion, AnimatePresence } from "motion-sv";
+
+	const layout = createLayoutMotion(motion);
+	const update = layout.update;
 </script>
 
-<AnimatedList title="Basic Layout List">
-	{#snippet children({ key, items: filtered, styles, actions: { removeById } })}
+<AnimatedList title="Enter Exit List" {update}>
+	{#snippet children({ filtered, styles, content })}
 		<ul style={css(styles.list)}>
-			<!-- <AnimatePresence initial={false}> -->
-			{#each filtered as item (item.id)}
-				<motion.li
-					style={styles.item}
-					initial={{ opacity: 0, y: -8, scale: 0.98 }}
-					animate={{
-						opacity: 1,
-						y: 0,
-						scale: 1,
-						transition: { type: "spring", stiffness: 500, damping: 30 },
-					}}
-					exit={{ opacity: 0, y: 8, scale: 0.98, transition: { duration: 0.18 } }}
-					layout
-					layoutDependency={key}
-				>
-					<div style={css(styles.left)}>
-						<div style={css(styles.handle)}></div>
-						<div>
-							<p style={css(styles.title)}>{item.text}</p>
-							<span style={css(styles.small)}>id: {item.id}</span>
-						</div>
-					</div>
-					<button style={css({ ...styles.ghostBtn, ...styles.danger })} onclick={() => removeById(item.id)}>
-						Remove
-					</button>
-				</motion.li>
-			{/each}
-			<!-- </AnimatePresence> -->
+			<AnimatePresence initial={false} mode="wait" onExitComplete={() => console.log("exit complete")}>
+				{#each filtered as item, index (item.id)}
+					<layout.li
+						style={styles.item}
+						initial={{ opacity: 0, y: -8, scale: 0.98 }}
+						animate={{
+							opacity: 1,
+							y: 0,
+							scale: 1,
+							transition: { type: "spring", stiffness: 500, damping: 30 },
+						}}
+						exit={{ opacity: 0, y: 8, scale: 0.98, transition: { duration: 0.18 } }}
+						data-title={item.text}
+						data-length={filtered.length}
+						layoutDependency={filtered.length}
+					>
+						{@render content(item)}
+					</layout.li>
+				{/each}
+			</AnimatePresence>
 		</ul>
 
 		<AnimatePresence>

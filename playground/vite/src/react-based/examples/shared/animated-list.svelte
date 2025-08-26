@@ -11,11 +11,7 @@
 				props: {
 					filtered: { id: number; text: string }[];
 					styles: Record<string, any>;
-					actions: {
-						removeById: (id: number) => void;
-						shuffle: () => void;
-						clear: () => void;
-					};
+					content: Snippet<[item: { id: number; text: string }]>;
 				},
 			]
 		>;
@@ -150,5 +146,16 @@
 		<button style={css(styles.button)} onclick={clear}>Clear</button>
 	</div>
 
-	{@render children({ filtered, styles, actions: { removeById, shuffle, clear } })}
+	{@render children({ filtered, styles, content })}
 </div>
+
+{#snippet content(item: { id: number; text: string })}
+	<div style={css(styles.left)}>
+		<div style={css(styles.handle)}></div>
+		<div>
+			<p style={css(styles.title)}>{item.text}</p>
+			<span style={css(styles.small)}>id: {item.id}</span>
+		</div>
+	</div>
+	<button style={css({ ...styles.ghostBtn, ...styles.danger })} onclick={() => removeById(item.id)}> Remove </button>
+{/snippet}

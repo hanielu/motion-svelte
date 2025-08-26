@@ -18,6 +18,7 @@
 	import { LayoutMotionScopeContext } from "./layout-motion.svelte";
 	import { motionExit } from "@/animation/transition.svelte.js";
 	import { resolveVariant } from "@/state/utils.js";
+	import { PopLayoutContext } from "../animate-presence/context.js";
 
 	// const INTERNAL_MOTION_KEYS = [
 	// 	"as",
@@ -92,6 +93,7 @@
 	const config = useMotionConfig();
 	// animate presence context
 	const animatePresenceContext = AnimatePresenceContext.getOr({});
+	const popLayout = PopLayoutContext.getOr({});
 	// lazy motion context
 	const lazyMotionContext = LazyMotionContext.getOr({
 		features: ref([]),
@@ -213,11 +215,6 @@
 		return resolveVariant(props.exit as any, props.variants, customValue);
 	});
 
-	// Provide current values to transition adapter so transforms/opacity etc animate from live state
-	const exitFrom = $derived.by(() => {
-		return (state.visualElement?.latestValues as Record<string, any>) ?? {};
-	});
-
 	// onBeforeMount
 	$effect.pre(() => {
 		state.beforeMount();
@@ -242,7 +239,7 @@
 	// but I noticed something odd when i tried it:
 	// for the basic layout toggle example, it would not work as expected.
 	// More specifically, if the first button's handle had a `layoutDependency` prop,
-	// e.g. `<motion.div layoutDependency={isOn} />`,
+	// e.g. `<layout.div layoutDependency={isOn} />`,
 	// then each subsequent button's handle with a `layoutId` prop would not work as expected.
 	// they'd kinda flicker when toggling (I guess going from opacity 0->1?)
 	// unless I set `crossfade={false}` on the handle(s) with the `layoutId` prop.
@@ -277,6 +274,41 @@
 	};
 
 	let allowIntro = false;
+
+	function allowExit(node: Element) {
+		if (!props.exit) return null;
+		return motionExit(node, {
+			definition: exitDefinition,
+			state,
+			allowIntro,
+			setAllowIntro: (v) => (allowIntro = v),
+		});
+	}
+
+	function onIntroStart() {
+		// Clear popLayout and reset exit state
+		if (popLayout.removePopStyle) popLayout.removePopStyle(state);
+		state.isVShow = true;
+		// Reset exit active on intro
+		state.setActive("exit", false, false);
+	}
+
+	function onOutroStart() {
+		// Mark as exiting, add popLayout
+		if (popLayout.addPopStyle) popLayout.addPopStyle(state);
+		state.isVShow = false;
+		popLayout.notifyExitStart?.(state.element!);
+	}
+
+	function onOutroEnd() {
+		// Cleanup popLayout and notify
+		popLayout.notifyExitEnd?.(state.element!);
+		if (!popLayout.styles || !popLayout.styles.has(state)) {
+			state.willUpdate("done");
+		} else if (popLayout.removePopStyle) {
+			popLayout.removePopStyle(state);
+		}
+	}
 </script>
 
 {#if typeof AsComponent === "string"}
@@ -284,21 +316,19 @@
 		this={AsComponent}
 		{...getAttrs}
 		{@attach attachRef}
-		transition:motionExit|global={{
-			definition: exitDefinition,
-			get from() {
-				return state.visualElement?.latestValues;
-			},
-			get allowIntro() {
-				return allowIntro;
-			},
-			set allowIntro(value) {
-				allowIntro = value;
-			},
-		}}
+		transition:allowExit|global
+		onintrostart={onIntroStart}
+		onoutrostart={onOutroStart}
+		onoutroend={onOutroEnd}
 	>
 		{@render props.children?.()}
 	</svelte:element>
 {:else}
-	<AsComponent {...getAttrs} {@attach attachRef} />
+	<AsComponent
+		{...getAttrs}
+		{@attach attachRef}
+		onintrostart={onIntroStart}
+		onoutrostart={onOutroStart}
+		onoutroend={onOutroEnd}
+	/>
 {/if}

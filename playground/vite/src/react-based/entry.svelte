@@ -7,9 +7,9 @@
 	import RollingBox from "./examples/rolling-box.svelte";
 </script>
 
-<RollingBox />
-<BasicLayoutToggle />
-<BasicLayoutList />
-<LayoutIdTest />
-<EnterExitBasic />
-<!-- <EnterExitList /> -->
+<!-- <RollingBox /> -->
+<!-- <BasicLayoutToggle /> -->
+<!-- <BasicLayoutList /> -->
+<!-- <LayoutIdTest /> -->
+<!-- <EnterExitBasic /> -->
+<EnterExitList />

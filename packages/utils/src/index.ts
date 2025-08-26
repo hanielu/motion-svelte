@@ -9,6 +9,7 @@ export * from "./unbox.js";
 export * from "./previous.svelte.js";
 export * from "./is-mounted.svelte.js";
 export * from "./vue-reactivity/index.js";
+export * from "./rala-log.js";
 
 export const isDef = <T = any>(val?: T): val is T => typeof val !== "undefined";
 

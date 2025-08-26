@@ -8,8 +8,8 @@
 </script>
 
 <AnimatedList title="Basic Layout List" {update}>
-	{#snippet children({ filtered, styles, actions: { removeById } })}
-		<motion.ul style={styles.list}>
+	{#snippet children({ filtered, styles, content })}
+		<ul style={css(styles.list)}>
 			{#each filtered as item (item.id)}
 				<layout.li
 					style={styles.item}
@@ -21,22 +21,10 @@
 						transition: { type: "spring", stiffness: 500, damping: 30 },
 					}}
 				>
-					<div style={css(styles.left)}>
-						<div style={css(styles.handle)}></div>
-						<div>
-							<p style={css(styles.title)}>{item.text}</p>
-							<span style={css(styles.small)}>id: {item.id}</span>
-						</div>
-					</div>
-					<button
-						style={css({ ...styles.ghostBtn, ...styles.danger })}
-						onclick={update.with(() => removeById(item.id))}
-					>
-						Remove
-					</button>
+					{@render content(item)}
 				</layout.li>
 			{/each}
-		</motion.ul>
+		</ul>
 
 		{#if filtered.length === 0}
 			<motion.div style={styles.empty} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>

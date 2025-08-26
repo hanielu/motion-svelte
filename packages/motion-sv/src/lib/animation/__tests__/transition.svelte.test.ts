@@ -21,11 +21,9 @@ describe("motionExit transition adapter", () => {
 		const node = createNode();
 		const t = motionExit(node, {
 			definition: { rotate: 0, transition: { duration: 0.2 } },
-			from: { rotate: 45 },
-			get allowIntro() {
-				return true;
-			},
-			set allowIntro(_v: boolean) {},
+			state: { visualElement: { latestValues: { rotate: 45 } } },
+			allowIntro: () => true,
+			setAllowIntro: (_v: boolean) => {},
 		});
 		const css = (t as any).css as (t: number, u: number) => string;
 		// outro path uses u for progress; u=0 => from, u=1 => to
@@ -42,11 +40,9 @@ describe("motionExit transition adapter", () => {
 		const node = createNode();
 		const t = motionExit(node, {
 			definition: { scale: 0.5, x: 20, transition: { duration: 0.2 } },
-			from: { scale: 1, x: 0 },
-			get allowIntro() {
-				return true;
-			},
-			set allowIntro(_v: boolean) {},
+			state: { visualElement: { latestValues: { scale: 1, x: 0 } } },
+			allowIntro: () => true,
+			setAllowIntro: (_v: boolean) => {},
 		});
 		const css = (t as any).css as (t: number, u: number) => string;
 		const mid = css(0, 0.5);
