@@ -13,7 +13,7 @@
 <BasicLayoutList />
 <LayoutIdTest /> -->
 
-<!-- <EnterExitBasic /> -->
+<EnterExitBasic />
 <EnterExitList />
 
 <!-- <WhenVariant /> -->

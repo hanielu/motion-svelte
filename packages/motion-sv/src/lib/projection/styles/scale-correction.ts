@@ -1,4 +1,4 @@
-import { isCSSVariableName } from "motion-dom";
+import { isCSSVariableName } from "framer-motion/dom";
 import type { ScaleCorrectorMap } from "./types.js";
 
 export const scaleCorrectors: ScaleCorrectorMap = {};

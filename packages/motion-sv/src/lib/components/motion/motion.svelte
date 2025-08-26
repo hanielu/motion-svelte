@@ -1,4 +1,4 @@
-<script lang="ts" module>
+<script lang="ts">
 	import type { DOMKeyframesDefinition } from "framer-motion";
 	import { AnimatePresenceContext } from "../animate-presence/presence.svelte.js";
 	import { LayoutGroupContext, MotionStateContext } from "../context.js";
@@ -11,7 +11,6 @@
 	import type { MotionProps } from "./types.js";
 	import type { Feature } from "@/features/feature.js";
 	import { MotionState } from "@/state/motion-state.js";
-	import type { Options } from "@/types/state.js";
 	import { isValidMotionProp } from "./valid-prop.js";
 	import { convertSvgStyleToAttributes, createStyles } from "@/state/style.js";
 	import type { Attachment } from "svelte/attachments";
@@ -20,36 +19,6 @@
 	import { resolveVariant } from "@/state/utils.js";
 	import { PopLayoutContext } from "../animate-presence/context.js";
 
-	// const INTERNAL_MOTION_KEYS = [
-	// 	"as",
-	// 	"layout",
-	// 	"layoutId",
-	// 	"layoutScroll",
-	// 	"layoutRoot",
-	// 	"crossfade",
-	// 	"transition",
-	// 	"variants",
-	// 	"initial",
-	// 	"animate",
-	// 	"exit",
-	// 	"whileHover",
-	// 	"whilePress",
-	// 	"whileFocus",
-	// 	"whileInView",
-	// 	"drag",
-	// 	"dragListener",
-	// 	"dragConstraints",
-	// 	"inViewOptions",
-	// 	"custom",
-	// 	"motionConfig",
-	// ] as const satisfies readonly (keyof Options)[];
-
-	// type InternalMotionKey = (typeof INTERNAL_MOTION_KEYS)[number];
-
-	// const INTERNAL_MOTION_SET: ReadonlySet<InternalMotionKey> = new Set(INTERNAL_MOTION_KEYS);
-</script>
-
-<script lang="ts">
 	type MaybePromise<T> = T | Promise<T> | (() => Promise<T>);
 
 	interface MotionComponentProps {
@@ -64,26 +33,9 @@
 		features = [],
 		as: AsComponent,
 		props,
-		// props: actualProps,
 		ref: externalRef = $bindable(),
 		forwardMotionProps = false,
 	}: MotionComponentProps = $props();
-
-	// let { as, style, layout, layoutId, transition, drag, dragListener, initial, ignoreStrict }: MotionProps = $props();
-
-	// const {
-	// 	style: styleProp,
-	// 	layout,
-	// 	layoutId,
-	// 	transition,
-	// 	drag,
-	// 	dragListener,
-	// 	initial,
-	// 	ignoreStrict,
-	// 	inViewOptions,
-	// 	children,
-	// 	...rest
-	// } = $derived(actualProps);
 
 	// motion context
 	const parentState = MotionStateContext.getOr(null);
@@ -221,7 +173,7 @@
 
 		// onBeforeUnmount
 		return () => {
-			if (layoutMotionScope) layoutMotionScope.unregister(state);
+			layoutMotionScope?.unregister(state);
 			state.beforeUnmount();
 		};
 	});

@@ -1,4 +1,4 @@
-import { px } from "motion-dom";
+import { px } from "framer-motion/dom";
 import type { ScaleCorrectorDefinition } from "./types.js";
 import type { Axis } from "framer-motion/dom";
 

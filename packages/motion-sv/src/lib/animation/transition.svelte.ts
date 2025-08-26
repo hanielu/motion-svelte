@@ -1,11 +1,12 @@
 import type { MotionExitDefinition, MotionTransitionParamsShape } from "./types.js";
-import { findValueType, spring, calcGeneratorDuration } from "motion-dom";
+import type { TransitionConfig } from "svelte/transition";
+import { findValueType, spring, calcGeneratorDuration } from "framer-motion/dom";
 import { style as styleUtils } from "@/state/style.js";
 import { transformAlias, transformDefinitions } from "@/state/transform.js";
 import { resolveVariant } from "@/state/utils.js";
 // Use FM internals for parity
-import { getValueTransition as fmGetValueTransition } from "framer-motion/dist/es/animation/sequence/create.mjs";
-import { getDefaultTransition as fmGetDefaultTransition } from "framer-motion/dist/es/animation/utils/default-transitions.mjs";
+import { getValueTransition } from "framer-motion/dist/es/animation/sequence/create.mjs";
+import { getDefaultTransition } from "framer-motion/dist/es/animation/utils/default-transitions.mjs";
 import { animateTarget } from "framer-motion/dist/es/animation/interfaces/visual-element-target.mjs";
 
 function toMs(seconds?: number): number | undefined {
@@ -13,7 +14,7 @@ function toMs(seconds?: number): number | undefined {
 	return seconds * 1000;
 }
 
-export function motionExit(node: Element, params: MotionTransitionParamsShape) {
+export function motionExit(node: Element, params: MotionTransitionParamsShape): TransitionConfig | null {
 	const def: MotionExitDefinition = params.definition;
 	const { transition: baseTransition, ...target } = def;
 
@@ -66,7 +67,7 @@ export function motionExit(node: Element, params: MotionTransitionParamsShape) {
 	function mergeValueTransition(base: any, key: string): any {
 		// Prefer FM's merge semantics when available
 		try {
-			return fmGetValueTransition(base || {}, key);
+			return getValueTransition(base || {}, key);
 		} catch {
 			return base || {};
 		}
@@ -75,7 +76,7 @@ export function motionExit(node: Element, params: MotionTransitionParamsShape) {
 	function applyDefaultTransition(key: string, vt: any, fromValue: any, toValue: any) {
 		try {
 			const opts: any = { keyframes: [fromValue, toValue] };
-			const defaults = fmGetDefaultTransition(key, opts);
+			const defaults = getDefaultTransition(key, opts);
 			return { ...defaults, ...vt };
 		} catch {
 			return vt;
@@ -127,13 +128,7 @@ export function motionExit(node: Element, params: MotionTransitionParamsShape) {
 			const toNum = typeof to === "number" ? to : parseFloat(String(to)) || 0;
 			const preferSpring =
 				vt?.type === "spring" || vt?.stiffness !== undefined || vt?.damping !== undefined || !hasExplicitTransition(vt);
-			const vel = ((): number => {
-				try {
-					return ve?.getValue?.(key)?.getVelocity?.() ?? 0;
-				} catch {
-					return 0;
-				}
-			})();
+			const vel = ve?.getValue?.(key)?.getVelocity?.() ?? 0;
 			const durMs = ((): number => {
 				const specified = toMs(vt?.duration);
 				if (specified != null) return specified;
@@ -163,20 +158,14 @@ export function motionExit(node: Element, params: MotionTransitionParamsShape) {
 			const toParsed = parse(toStr) as number;
 			const preferSpring =
 				vt?.type === "spring" || vt?.stiffness !== undefined || vt?.damping !== undefined || !hasExplicitTransition(vt);
-			const vel = ((): number => {
-				try {
-					return ve?.getValue?.(key)?.getVelocity?.() ?? 0;
-				} catch {
-					return 0;
-				}
-			})();
+			const vel = ve?.getValue?.(key)?.getVelocity?.() ?? 0;
 			const durMs =
 				toMs(vt?.duration) ??
 				(preferSpring
 					? (() => {
 							try {
 								const gen = spring({ from: fromParsed, to: toParsed, velocity: vel, ...vt });
-								const approx = calcGeneratorDuration ? calcGeneratorDuration(gen) : undefined;
+								const approx = calcGeneratorDuration(gen);
 								return approx != null && isFinite(approx as number) ? approx : 300;
 							} catch {
 								return 300;
@@ -210,7 +199,5 @@ export function motionExit(node: Element, params: MotionTransitionParamsShape) {
 		lastU = u;
 	}
 
-	const delay = 0;
-	const easing = (x: number) => x;
-	return { delay, duration: overallDurationMs, easing, css: () => "", tick } as const;
+	return { duration: overallDurationMs, easing: (x) => x, tick };
 }

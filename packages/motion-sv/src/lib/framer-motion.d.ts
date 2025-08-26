@@ -9,7 +9,7 @@ declare module "framer-motion/dist/es/render/svg/SVGVisualElement.mjs" {
 }
 
 declare module "motion-value" {
-	import type { MotionValue } from "framer-motion/dom";
+	import type { MotionValue } from "motion-dom";
 
 	export const collectMotionValues: { current: MotionValue[] | undefined }; // 根据实际需要定义具体类型
 }
@@ -69,7 +69,7 @@ declare module "framer-motion/dist/es/utils/reduced-motion/state.mjs" {
 }
 
 declare module "framer-motion/dist/es/utils/delay.mjs" {
-	import type { DelayedFunction } from "framer-motion/dom";
+	import type { DelayedFunction } from "motion-dom";
 
 	export function delay(callback: DelayedFunction, timeout: number): () => void;
 	export function delayInSeconds(callback: DelayedFunction, timeout: number): () => void;

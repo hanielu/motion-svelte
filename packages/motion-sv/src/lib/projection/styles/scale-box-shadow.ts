@@ -1,4 +1,4 @@
-import { complex, mixNumber } from "motion-dom";
+import { complex, mixNumber } from "framer-motion/dom";
 import type { ScaleCorrectorDefinition } from "./types.js";
 
 export const correctBoxShadow: ScaleCorrectorDefinition = {
