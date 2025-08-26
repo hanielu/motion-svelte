@@ -11,7 +11,7 @@ export interface PressProps {
 	/**
 	 * @deprecated Use `whilePress` instead.
 	 */
-	press?: VariantLabels | TargetAndTransition;
+	// press?: VariantLabels | TargetAndTransition;
 	/**
 	 * Variant to apply when the element is pressed.
 	 */

@@ -21,7 +21,7 @@ export interface InViewProps {
 	/**
 	 * @deprecated Use `whileInView` instead.
 	 */
-	inView?: VariantLabels | TargetAndTransition;
+	// inView?: VariantLabels | TargetAndTransition;
 	/**
 	 * Variant to apply when the element is in view.
 	 */

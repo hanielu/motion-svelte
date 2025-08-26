@@ -42,6 +42,8 @@ const validMotionProps = new Set<keyof MotionProps>([
 	"forwardMotionProps",
 	"as",
 	"ref",
+
+	// atp idk,
 ]);
 
 /**

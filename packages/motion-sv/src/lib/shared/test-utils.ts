@@ -9,16 +9,16 @@ import { html, type InlineSnippet } from "@hvniel/vite-plugin-svelte-inline-comp
 import type { ComponentInternals, Component, Snippet, ComponentProps } from "svelte";
 
 const { _element } = html`
-  <script lang="ts" module>
-    export { _element };
-  </script>
-  {#snippet _element(html: string)} {@html html} {/snippet}
+	<script lang="ts" module>
+		export { _element };
+	</script>
+	{#snippet _element(html: string)} {@html html} {/snippet}
 ` as unknown as { _element: InlineSnippet<string> };
 
 interface ElementFunction {
-  (a: any, html: () => string): void;
-  s: (html: () => string) => Snippet;
-  c: (html: () => string) => Component;
+	(a: any, html: () => string): void;
+	s: (html: () => string) => Snippet;
+	c: (html: () => string) => Component;
 }
 
 /**
@@ -93,11 +93,7 @@ export type MountChildren = (mount: Mount) => void;
  * ```
  */
 export interface Mount {
-  <C extends Component>(
-    component: C,
-    props?: ComponentProps<C> | MountChildren,
-    children?: MountChildren
-  ): void;
+	<C extends Component>(component: C, props?: ComponentProps<C> | MountChildren, children?: MountChildren): void;
 }
 
 /**
@@ -106,7 +102,7 @@ export interface Mount {
  * @returns True if x is a function that takes a Mount parameter
  */
 function isChildFn(x: unknown): x is MountChildren {
-  return typeof x === "function";
+	return typeof x === "function";
 }
 
 /**
@@ -128,19 +124,19 @@ function isChildFn(x: unknown): x is MountChildren {
  * ```
  */
 export function createMount(anchor: ComponentInternals): Mount {
-  const m: Mount = (component, propsOrChild?, maybeChild?) => {
-    const child = isChildFn(propsOrChild) ? propsOrChild : maybeChild;
-    const props = isChildFn(propsOrChild) ? {} : propsOrChild ?? {};
+	const m: Mount = (component, propsOrChild?, maybeChild?) => {
+		const child = isChildFn(propsOrChild) ? propsOrChild : maybeChild;
+		const props = isChildFn(propsOrChild) ? {} : (propsOrChild ?? {});
 
-    component(anchor, {
-      ...props,
-      ...(child && {
-        children: (a: ComponentInternals) => child(createMount(a)),
-      }),
-    });
-  };
+		component(anchor, {
+			...props,
+			...(child && {
+				children: (a: ComponentInternals) => child(createMount(a)),
+			}),
+		});
+	};
 
-  return m;
+	return m;
 }
 
 /**
@@ -161,7 +157,7 @@ export function createMount(anchor: ComponentInternals): Mount {
  * ```
  */
 export function snippet(fn: (a: ComponentInternals) => void): Snippet {
-  return ((a: ComponentInternals) => fn(a)) as Snippet;
+	return ((a: ComponentInternals) => fn(a)) as Snippet;
 }
 
 /**
@@ -179,11 +175,11 @@ snippet.c = snippet as (fn: (a: ComponentInternals) => void) => Component;
  * where the result of `m()` is a function compatible with vitest's render.
  */
 interface RenderableMount {
-  <C extends Component>(
-    component: C,
-    props?: ComponentProps<C> | MountChildren,
-    children?: MountChildren
-  ): (anchor: ComponentInternals) => void;
+	<C extends Component>(
+		component: C,
+		props?: ComponentProps<C> | MountChildren,
+		children?: MountChildren
+	): (anchor: ComponentInternals) => void;
 }
 
 /**
@@ -225,13 +221,13 @@ interface RenderableMount {
  * ```
  */
 export const m: RenderableMount = (component, propsOrChild?, maybeChild?) => {
-  const child = isChildFn(propsOrChild) ? propsOrChild : maybeChild;
-  const props = isChildFn(propsOrChild) ? {} : propsOrChild ?? {};
+	const child = isChildFn(propsOrChild) ? propsOrChild : maybeChild;
+	const props = isChildFn(propsOrChild) ? {} : (propsOrChild ?? {});
 
-  return (anchor: ComponentInternals) => {
-    const mount = createMount(anchor);
-    mount(component, props as any, child);
-  };
+	return (anchor: ComponentInternals) => {
+		const mount = createMount(anchor);
+		mount(component, props as any, child);
+	};
 };
 
 import type { Locator } from "@vitest/browser/context";
@@ -240,7 +236,7 @@ import type { Locator } from "@vitest/browser/context";
  * Defines the shape of a Svelte element with a compiler-generated click handler.
  */
 type SvelteClickableElement = HTMLElement & {
-  __click: [(_: any, fn: () => void) => void, () => void];
+	__click: [(_: any, fn: () => void) => void, () => void];
 };
 
 /**
@@ -251,19 +247,21 @@ type SvelteClickableElement = HTMLElement & {
  * @returns A zero-argument function that executes the Svelte `on:click` handler.
  */
 export function createClickGetter(locator: Locator): () => void | Promise<void> {
-  const element = locator.element() as SvelteClickableElement;
+	const element = locator.element() as SvelteClickableElement;
 
-  if (!element.__click || !Array.isArray(element.__click) || element.__click.length < 2) {
-    throw new Error(
-      "The located element does not appear to have a Svelte `onclick` handler. " +
-        "Ensure the element in your component has an `onclick` directive."
-    );
-  }
+	if (!element.__click || !Array.isArray(element.__click) || element.__click.length < 2) {
+		throw new Error(
+			"The located element does not appear to have a Svelte `onclick` handler. " +
+				"Ensure the element in your component has an `onclick` directive."
+		);
+	}
 
-  // The Svelte compiler generates `__click` as an array where `__click[0]` is the
-  // internal wrapper and `__click[1]` is the actual function provided to `on:click`.
-  // Calling `__click[0](null, __click[1])` executes the handler.
-  return () => element.__click[0](null, element.__click[1]);
+	// The Svelte compiler generates `__click` as an array where `__click[0]` is the
+	// internal wrapper and `__click[1]` is the actual function provided to `on:click`.
+	// Calling `__click[0](null, __click[1])` executes the handler.
+	return () => element.__click[0](null, element.__click[1]);
 }
 
 export { element, html };
+
+export const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));

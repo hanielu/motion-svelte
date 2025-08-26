@@ -7,7 +7,7 @@ export interface HoverProps {
 	/**
 	 * @deprecated Use `whileHover` instead.
 	 */
-	hover?: VariantLabels | TargetAndTransition;
+	// hover?: VariantLabels | TargetAndTransition;
 	/**
 	 * Variant to apply when the element is hovered.
 	 */
