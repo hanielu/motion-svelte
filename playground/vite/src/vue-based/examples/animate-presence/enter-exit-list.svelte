@@ -10,7 +10,7 @@
 <AnimatedList title="Enter Exit List" {update}>
 	{#snippet children({ filtered, styles, content })}
 		<ul style={css(styles.list)}>
-			<AnimatePresence initial={false} mode="wait" onExitComplete={() => console.log("exit complete")}>
+			<AnimatePresence initial={false} mode="popLayout" onExitComplete={() => console.log("exit complete")}>
 				{#each filtered as item, index (item.id)}
 					<layout.li
 						style={styles.item}

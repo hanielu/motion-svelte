@@ -29,11 +29,7 @@ export function motionExit(node: Element, params: MotionTransitionParamsShape) {
 	}
 
 	// If this is the initial intro and we haven't been allowed to run, skip the transition entirely
-	if (isIntroCall && !params.allowIntro) {
-		const easing = (x: number) => x;
-		const css = () => "";
-		return { delay: 0, duration: 0, easing, css } as const;
-	}
+	if (isIntroCall && !params.allowIntro) return null;
 
 	const state = params.state;
 	const ve = state?.visualElement;

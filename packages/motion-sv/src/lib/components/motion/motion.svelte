@@ -273,19 +273,29 @@
 		};
 	};
 
+	/**
+	 * Controls whether Svelte's built-in intro transition plays on first mount.
+	 *
+	 * When false:
+	 * - Allows MotionState to handle the initial mount animation
+	 * - If an exit prop is present, enables the exit animation to play
+	 * - Supports interrupting and reversing animations from their current state
+	 *
+	 * This approach provides better animation control and interruptibility compared to
+	 * using Svelte's native transitions alone.
+	 */
 	let allowIntro = false;
 
+	// Just here to make sure the behavior is consistent with the vue version, just in case
+	const isInPresenceContext = AnimatePresenceContext.exists();
+
 	function allowExit(node: Element) {
-		if (!props.exit) return null;
-		return motionExit(node, {
-			definition: exitDefinition,
-			state,
-			allowIntro,
-			setAllowIntro: (v) => (allowIntro = v),
-		});
+		if (!props.exit || !isInPresenceContext) return null;
+		return motionExit(node, { definition: exitDefinition, state, allowIntro, setAllowIntro: (v) => (allowIntro = v) });
 	}
 
-	function onIntroStart() {
+	function onintrostart() {
+		if (!isInPresenceContext) return;
 		// Clear popLayout and reset exit state
 		if (popLayout.removePopStyle) popLayout.removePopStyle(state);
 		state.isVShow = true;
@@ -293,14 +303,16 @@
 		state.setActive("exit", false, false);
 	}
 
-	function onOutroStart() {
+	function onoutrostart() {
+		if (!isInPresenceContext) return;
 		// Mark as exiting, add popLayout
 		if (popLayout.addPopStyle) popLayout.addPopStyle(state);
 		state.isVShow = false;
 		popLayout.notifyExitStart?.(state.element!);
 	}
 
-	function onOutroEnd() {
+	function onoutroend() {
+		if (!isInPresenceContext) return;
 		// Cleanup popLayout and notify
 		popLayout.notifyExitEnd?.(state.element!);
 		if (!popLayout.styles || !popLayout.styles.has(state)) {
@@ -317,18 +329,12 @@
 		{...getAttrs}
 		{@attach attachRef}
 		transition:allowExit|global
-		onintrostart={onIntroStart}
-		onoutrostart={onOutroStart}
-		onoutroend={onOutroEnd}
+		{onintrostart}
+		{onoutrostart}
+		{onoutroend}
 	>
 		{@render props.children?.()}
 	</svelte:element>
 {:else}
-	<AsComponent
-		{...getAttrs}
-		{@attach attachRef}
-		onintrostart={onIntroStart}
-		onoutrostart={onOutroStart}
-		onoutroend={onOutroEnd}
-	/>
+	<AsComponent {...getAttrs} {@attach attachRef} {onintrostart} {onoutrostart} {onoutroend} />
 {/if}
