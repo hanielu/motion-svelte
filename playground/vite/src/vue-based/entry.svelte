@@ -16,10 +16,10 @@
 
 <!-- <RollingBox />
 <BasicLayoutToggle />
-<BasicLayoutList /> -->
+<BasicLayoutList />
 <LayoutIdTest />
 
-<!-- <EnterExitBasic />
+<EnterExitBasic />
 <EnterExitList /> -->
 
 <!-- <WhenVariant /> -->
@@ -28,6 +28,6 @@
 <!-- <InView /> -->
 <!-- <UseSpring /> -->
 <!-- <UseTime /> -->
-<!-- <UseTransform /> -->
+<UseTransform />
 <!-- <UseTransformPathMorphing /> -->
 <!-- <DragDirectionLocking /> -->

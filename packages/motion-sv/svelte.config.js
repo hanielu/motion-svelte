@@ -11,7 +11,8 @@ const config = {
 	kit: {
 		alias: {
 			"@": "./src/lib",
-			"framer-motion/dist/es": "./src/lib/framer-motion/dist/es",
+			"framer-motion/dist/es": "./src/lib/vendor/framer-motion/dist/es",
+			runed: "./src/lib/vendor/runed/index.js",
 			"test-utils": "./src/lib/shared/test-utils.js",
 		},
 	},

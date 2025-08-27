@@ -114,9 +114,6 @@ importers:
       motion-utils:
         specifier: ^12.23.6
         version: 12.23.6
-      runed:
-        specifier: workspace:*
-        version: link:../utils
     devDependencies:
       '@hvniel/vite-plugin-svelte-inline-component':
         specifier: ^0.0.16

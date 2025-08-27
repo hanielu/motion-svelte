@@ -60,7 +60,6 @@
 		"framer-motion": "^12.23.12",
 		"hey-listen": "^1.0.8",
 		"motion-dom": "^12.23.12",
-		"motion-utils": "^12.23.6",
-		"runed": "workspace:*"
+		"motion-utils": "^12.23.6"
 	}
 }
