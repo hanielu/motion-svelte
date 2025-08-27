@@ -5,6 +5,7 @@ import type { MotionComponent, MotionProps } from "./types.js";
 import type { SvelteHTMLElements } from "svelte/elements";
 import type { MotionHTMLAttributes } from "@/types/motion-values.js";
 import type { ElementType } from "@/types/index.js";
+import { withProp } from "runed";
 
 export interface MotionCreateOptions {
 	forwardMotionProps?: boolean;
@@ -32,7 +33,7 @@ export function createMotionComponent(component: string | Component, options: Mo
 				return props.as || component || "div";
 			},
 			get props() {
-				return props;
+				return withProp(props, "as", props.as || component || "div");
 			},
 			get ref() {
 				return props.ref!;

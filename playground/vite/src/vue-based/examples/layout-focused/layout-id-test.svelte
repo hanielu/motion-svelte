@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { motion, createLayoutMotion } from "motion-sv";
+	import { motion, createLayoutMotion, AnimatePresence } from "motion-sv";
 
 	const allIngredients = [
 		{ icon: "🍅", label: "Tomato" },
@@ -19,8 +19,8 @@
 	const layout = createLayoutMotion(motion);
 </script>
 
-<div class="container">
-	<div class="nav">
+<div class="l-container">
+	<nav class="nav">
 		<ul class="tabs-container">
 			{#each tabs as item}
 				<motion.li
@@ -36,11 +36,26 @@
 				</motion.li>
 			{/each}
 		</ul>
-	</div>
+	</nav>
+	<main class="icon-container">
+		<AnimatePresence mode="wait">
+			{#key selectedTab.label}
+				<motion.div
+					initial={{ y: 10, opacity: 0 }}
+					animate={{ y: 0, opacity: 1 }}
+					exit={{ y: -10, opacity: 0 }}
+					transition={{ duration: 0.2 }}
+					class="icon"
+				>
+					{selectedTab ? selectedTab.icon : "😋"}
+				</motion.div>
+			{/key}
+		</AnimatePresence>
+	</main>
 </div>
 
 <style>
-	.container {
+	.l-container {
 		width: 480px;
 		height: 60vh;
 		max-height: 360px;
@@ -105,23 +120,25 @@
 		color: #0f1115;
 	}
 
-	:global(.underline) {
-		position: absolute;
-		bottom: -2px;
-		left: 0;
-		right: 0;
-		height: 2px;
-		background: #83e6f7;
-	}
+	:global {
+		.underline {
+			position: absolute;
+			bottom: -2px;
+			left: 0;
+			right: 0;
+			height: 2px;
+			background: #83e6f7;
+		}
 
-	.icon-container {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		flex: 1;
-	}
+		.icon-container {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			flex: 1;
+		}
 
-	.icon {
-		font-size: 128px;
+		.icon {
+			font-size: 128px;
+		}
 	}
 </style>

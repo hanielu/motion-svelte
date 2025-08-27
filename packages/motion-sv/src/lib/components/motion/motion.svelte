@@ -284,6 +284,7 @@
 		{onintrostart}
 		{onoutrostart}
 		{onoutroend}
+		xmlns={state.type === "svg" ? "http://www.w3.org/2000/svg" : undefined}
 	>
 		{@render props.children?.()}
 	</svelte:element>

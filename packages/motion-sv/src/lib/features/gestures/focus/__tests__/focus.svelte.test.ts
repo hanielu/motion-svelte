@@ -6,7 +6,6 @@ import { flushSync } from "svelte";
 // svelte:defs
 import { motionValue } from "framer-motion/dom";
 import { motion } from "@/components/index.js";
-import { useTransform } from "@/value/index.js";
 // sd
 
 describe("focus Gesture", () => {
