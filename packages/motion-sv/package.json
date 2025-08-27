@@ -1,6 +1,12 @@
 {
 	"name": "motion-sv",
 	"version": "0.0.1",
+	"license": "MIT",
+	"author": "Haniel Ubogu <https://github.com/HanielU>",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/HanielU/motion-svelte.git"
+	},
 	"scripts": {
 		"build": "pnpm package",
 		"dev": "pnpm watch",
