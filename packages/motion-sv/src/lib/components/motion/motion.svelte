@@ -1,23 +1,22 @@
 <script lang="ts">
+	import type { Attachment } from "svelte/attachments";
 	import type { DOMKeyframesDefinition } from "framer-motion";
+	import type { Feature } from "@/features/feature.js";
+	import type { MotionProps } from "./types.js";
 	import { AnimatePresenceContext } from "../animate-presence/presence.svelte.js";
 	import { LayoutGroupContext, MotionStateContext } from "../context.js";
+	import { LayoutMotionScopeContext } from "./layout-motion.svelte";
 	import { LazyMotionContext } from "../lazy-motion/context.js";
+	import { MotionState } from "@/state/motion-state.js";
+	import { PopLayoutContext } from "../animate-presence/context.js";
+	import { convertSvgStyleToAttributes, createStyles } from "@/state/style.js";
+	import { css, ref, watch } from "runed";
 	import { invariant, warning } from "hey-listen";
 	import { isMotionValue } from "framer-motion/dom";
-	import { css, ref, watch } from "runed";
-	import { useMotionConfig } from "../motion-config/index.js";
-	import { untrack, type Component } from "svelte";
-	import type { MotionProps } from "./types.js";
-	import type { Feature } from "@/features/feature.js";
-	import { MotionState } from "@/state/motion-state.js";
 	import { isValidMotionProp } from "./valid-prop.js";
-	import { convertSvgStyleToAttributes, createStyles } from "@/state/style.js";
-	import type { Attachment } from "svelte/attachments";
-	import { LayoutMotionScopeContext } from "./layout-motion.svelte";
-	import { motionExit } from "@/animation/transition.svelte.js";
 	import { resolveVariant } from "@/state/utils.js";
-	import { PopLayoutContext } from "../animate-presence/context.js";
+	import { untrack, type Component } from "svelte";
+	import { useMotionConfig } from "../motion-config/index.js";
 
 	type MaybePromise<T> = T | Promise<T> | (() => Promise<T>);
 
@@ -258,8 +257,12 @@
 	// Just here to make sure the behavior is consistent with the vue version, just in case
 	const isInPresenceContext = AnimatePresenceContext.exists();
 
+	// We pass this in only when we're in a presence context,
+	// this way users not using presence don't need to deal with the added bundle size.
+	const motionExit = animatePresenceContext.transition;
+
 	function allowExit(node: Element) {
-		if (!props.exit || !isInPresenceContext) return null;
+		if (!isInPresenceContext) return null;
 		return motionExit(node, { definition: exitDefinition, state, allowIntro, setAllowIntro: (v) => (allowIntro = v) });
 	}
 
