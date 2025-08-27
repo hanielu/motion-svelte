@@ -1,4 +1,4 @@
-import type { DOMKeyframesDefinition, ResolvedValues, VariantLabels } from "framer-motion";
+import type { DOMKeyframesDefinition, ResolvedValues, VariantLabels } from "framer-motion/types";
 import type { MotionValue, TransformProperties, animate } from "framer-motion/dom";
 import type { LayoutOptions } from "@/features/layout/types.js";
 import type { DragProps } from "@/features/gestures/drag/types.js";

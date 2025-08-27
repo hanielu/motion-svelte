@@ -1,8 +1,4 @@
 import { getContext, hasContext, setContext } from "svelte";
-import { read, type ReadableBox } from "./box.svelte.js";
-
-// Type utilities to reduce duplication
-type UnboxedType<T> = T extends ReadableBox<infer U> ? U : never;
 
 export class Context<TContext> {
 	readonly #name: string;
@@ -76,43 +72,5 @@ export class Context<TContext> {
 	 */
 	set(context: TContext): TContext {
 		return setContext(this.#key, context);
-	}
-
-	// ── Box Utilities ─────────────────────────
-	/**
-	 * Creates a Context for ReadableBox values with a simpler API.
-	 *
-	 * @param name The name of the context
-	 * @param fallback Optional fallback value (not a function)
-	 */
-	static boxed<T>(name: string, fallback?: T): Context<ReadableBox<T>> {
-		const fallbackBox = fallback !== undefined ? read(() => fallback) : undefined;
-		return new Context<ReadableBox<T>>(name, fallbackBox);
-	}
-
-	// Convenience methods for ReadableBox contexts (use type assertion when calling)
-	/**
-	 * For ReadableBox contexts: gets the current value directly.
-	 * Equivalent to this.get().current for ReadableBox<T> contexts.
-	 *
-	 * Must be called during component initialisation.
-	 *
-	 * Note: Only use this method if TContext is ReadableBox<T>
-	 */
-	get current(): UnboxedType<TContext> {
-		return (this.getOr() as ReadableBox<UnboxedType<TContext>>).current;
-	}
-
-	/**
-	 * For ReadableBox contexts: sets a value using a getter function.
-	 * Equivalent to this.set(box.with(getter)) for ReadableBox<T> contexts.
-	 *
-	 * Must be called during component initialisation.
-	 *
-	 * Note: Only use this method if TContext is ReadableBox<T>
-	 */
-	setWith(getter: () => UnboxedType<TContext>): TContext {
-		const boxedValue = read(getter);
-		return this.set(boxedValue as TContext);
 	}
 }

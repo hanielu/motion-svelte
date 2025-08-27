@@ -1,7 +1,7 @@
 import type { MotionState } from "@/state/motion-state.js";
 import { Feature } from "@/features/index.js";
 import { frame, press } from "framer-motion/dom";
-import type { EventInfo } from "framer-motion";
+import type { EventInfo } from "framer-motion/types";
 
 export function extractEventInfo(event: PointerEvent): EventInfo {
 	return {

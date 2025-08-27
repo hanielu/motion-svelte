@@ -1,4 +1,4 @@
-import type { IProjectionNode } from "framer-motion";
+import type { IProjectionNode } from "framer-motion/types";
 import type { AnyResolvedKeyframe } from "framer-motion/dom";
 
 export type ScaleCorrector = (latest: AnyResolvedKeyframe, node: IProjectionNode) => AnyResolvedKeyframe;

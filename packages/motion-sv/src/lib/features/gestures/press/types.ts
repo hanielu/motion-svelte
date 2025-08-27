@@ -1,4 +1,4 @@
-import type { EventInfo } from "framer-motion";
+import type { EventInfo } from "framer-motion/types";
 import type { TargetAndTransition, VariantLabels } from "motion-dom";
 
 export type PressEvent = (event: PointerEvent, info: EventInfo) => void;

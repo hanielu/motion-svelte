@@ -15,7 +15,7 @@ declare module "motion-value" {
 }
 
 declare module "framer-motion/dist/es/projection/node/HTMLProjectionNode.mjs" {
-	import type { IProjectionNode } from "framer-motion";
+	import type { IProjectionNode } from "framer-motion/types";
 
 	export const HTMLProjectionNode: IProjectionNode;
 }
@@ -29,7 +29,7 @@ declare module "framer-motion/dist/es/projection/styles/scale-box-shadow.mjs" {
 }
 
 declare module "framer-motion/dist/es/projection/styles/scale-correction.mjs" {
-	import type { addScaleCorrector as addScaleCorrectorF } from "framer-motion";
+	import type { addScaleCorrector as addScaleCorrectorF } from "framer-motion/types";
 
 	export const addScaleCorrector: typeof addScaleCorrectorF;
 }
@@ -42,7 +42,7 @@ declare module "framer-motion/dist/es/projection/node/state.mjs" {
 }
 
 declare module "framer-motion/dist/es/animation/interfaces/motion-value.mjs" {
-	import type { AnimationPlaybackControls, MotionValue, Transition, VisualElement } from "framer-motion";
+	import type { AnimationPlaybackControls, MotionValue, Transition, VisualElement } from "framer-motion/types";
 
 	export type UnresolvedKeyframes<T extends string | number> = Array<T | null>;
 
@@ -58,7 +58,7 @@ declare module "framer-motion/dist/es/animation/interfaces/motion-value.mjs" {
 }
 
 declare module "framer-motion/dist/es/render/utils/setters.mjs" {
-	import type { VisualElement } from "framer-motion";
+	import type { VisualElement } from "framer-motion/types";
 
 	export const setTarget: (visualElement: VisualElement, definition: any) => void;
 }

@@ -3,7 +3,7 @@ import { type MotionState, mountedStates } from "@/state/index.js";
 import type { Options } from "@/types/index.js";
 import { invariant } from "hey-listen";
 import { setTarget } from "framer-motion/dist/es/render/utils/setters.mjs";
-import type { VisualElement } from "framer-motion";
+import type { VisualElement } from "framer-motion/types";
 import { resolveVariant } from "@/state/utils.js";
 
 function stopAnimation(visualElement: VisualElement) {

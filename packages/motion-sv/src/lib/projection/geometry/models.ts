@@ -1,4 +1,4 @@
-import type { Axis, Box } from "framer-motion";
+import type { Axis, Box } from "framer-motion/types";
 
 export const createAxis = (): Axis => ({ min: 0, max: 0 });
 

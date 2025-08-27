@@ -1,4 +1,4 @@
-import type { Axis } from "framer-motion";
+import type { Axis } from "framer-motion/types";
 
 export function translateAxis(axis: Axis, distance: number) {
 	axis.min = axis.min + distance;

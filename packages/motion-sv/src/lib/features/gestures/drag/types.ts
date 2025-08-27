@@ -1,5 +1,5 @@
 import type { DragControls } from "@/features/gestures/drag/use-drag-controls.js";
-import type { Axis, BoundingBox, DragElastic, InertiaOptions, PanInfo } from "framer-motion";
+import type { Axis, BoundingBox, DragElastic, InertiaOptions, PanInfo } from "framer-motion/types";
 import type { TargetAndTransition, VariantLabels } from "motion-dom";
 
 export interface ResolvedConstraints {

@@ -1,4 +1,4 @@
-import type { visualElementStore } from "framer-motion";
+import type { visualElementStore } from "framer-motion/types";
 
 type VisualElementStore = typeof visualElementStore;
 // @ts-ignore

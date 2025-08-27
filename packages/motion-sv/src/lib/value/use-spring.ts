@@ -1,6 +1,6 @@
 import { animateValue, frame, frameData, isMotionValue, motionValue } from "framer-motion/dom";
 import type { JSAnimation, MotionValue } from "framer-motion/dom";
-import type { AnyResolvedKeyframe, SpringOptions } from "framer-motion";
+import type { AnyResolvedKeyframe, SpringOptions } from "framer-motion/types";
 import { watch, extract, type MaybeGetter } from "runed";
 
 function toNumber(v: string | number) {

@@ -3,6 +3,6 @@ export * from "./animate-presence/index.js";
 export * from "./motion-config/index.js";
 // export * from './reorder';
 // export { default as RowValue } from './RowValue.vue';
-export * from "./lazy-motion/lazy-motion.svelte";
+export { default as LazyMotion } from "./lazy-motion/lazy-motion.svelte";
 export * from "./motion/m.js";
 export { mountedStates } from "@/state/index.js";

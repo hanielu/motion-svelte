@@ -1,4 +1,4 @@
-import type { BoundingBox, Box, TransformPoint } from "framer-motion";
+import type { BoundingBox, Box, TransformPoint } from "framer-motion/types";
 
 /**
  * Bounding boxes tend to be defined as top, left, right, bottom. For various operations

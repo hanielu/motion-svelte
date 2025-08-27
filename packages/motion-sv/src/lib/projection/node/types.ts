@@ -1,4 +1,4 @@
-import type { Box, Delta, ResolvedValues } from "framer-motion";
+import type { Box, Delta, ResolvedValues } from "framer-motion/types";
 
 export interface Measurements {
 	animationId: number;

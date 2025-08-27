@@ -1,6 +1,6 @@
 import type { MotionState } from "@/state/index.js";
 import type { Options } from "@/types/index.js";
-import type { DOMKeyframesDefinition } from "framer-motion";
+import type { DOMKeyframesDefinition } from "framer-motion/types";
 
 export interface MotionExitDefinition extends DOMKeyframesDefinition {
 	transition?: {
