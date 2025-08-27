@@ -124,6 +124,12 @@
 			...(isSVG ? {} : state.visualElement?.latestValues || state.baseTarget),
 		};
 
+		// Wait-mode gating: hide new entrants until all exits complete
+		const isWaitBlocked = popLayout.isWaitBlocked?.() === true;
+		if (isWaitBlocked && !state.activeStates.exit) {
+			styleProps.display = "none";
+		}
+
 		// 3) SVG conversion
 		if (isSVG) {
 			const { attrs, style } = convertSvgStyleToAttributes({
@@ -213,10 +219,11 @@
 	const attachRef: Attachment<HTMLElement | SVGElement> = (node) => {
 		externalRef = node;
 
+		const waitBlocked = popLayout.isWaitBlocked?.() === true;
 		state.mount(
 			node,
 			untrack(() => motionOptions),
-			/* isHidden */ false
+			/* notAnimate when wait-blocked */ waitBlocked
 		);
 
 		// onUnmounted
@@ -237,6 +244,16 @@
 	 * using Svelte's native transitions alone.
 	 */
 	let allowIntro = false;
+	let wasWaitBlocked = popLayout.isWaitBlocked?.() === true;
+
+	$effect.pre(() => {
+		const blocked = popLayout.isWaitBlocked?.() === true;
+		if (wasWaitBlocked && !blocked) {
+			// Gate opened: reveal and animate in
+			state.startAnimation();
+		}
+		wasWaitBlocked = blocked;
+	});
 
 	// Just here to make sure the behavior is consistent with the vue version, just in case
 	const isInPresenceContext = AnimatePresenceContext.exists();

@@ -7,6 +7,8 @@ export interface PopLayoutControls {
 	styles?: WeakMap<MotionState, HTMLStyleElement>;
 	notifyExitStart?: (el: Element) => void;
 	notifyExitEnd?: (el: Element) => void;
+	isWaitBlocked?: () => boolean;
+	exits?: { value: number };
 }
 
 export const PopLayoutContext = new Context<PopLayoutControls>("PopLayoutContext", {});

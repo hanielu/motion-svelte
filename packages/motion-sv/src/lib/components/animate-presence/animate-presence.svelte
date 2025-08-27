@@ -37,24 +37,44 @@
 	});
 
 	const exitDom = new Map<Element, boolean>();
+	let exitsRef = $state(0);
 
-	$effect(() => {
+	$effect.pre(() => {
 		return () => {
 			exitDom.clear();
+			exitsRef = 0;
 		};
 	});
 
 	function notifyExitStart(el: Element) {
 		exitDom.set(el, true);
+		exitsRef++;
 	}
 
 	function notifyExitEnd(el: Element) {
 		exitDom.delete(el);
+		if (exitsRef > 0) exitsRef--;
 		if (exitDom.size === 0) onExitComplete?.();
 	}
 
-	// Provide PopLayout + exit registry to Motion children
-	PopLayoutContext.set({ addPopStyle, removePopStyle, styles, notifyExitStart, notifyExitEnd });
+	function isWaitBlocked() {
+		return mode === "wait" && exitsRef > 0;
+	}
+
+	// Provide PopLayout + exit registry + wait gate to Motion children
+	PopLayoutContext.set({
+		addPopStyle,
+		removePopStyle,
+		styles,
+		notifyExitStart,
+		notifyExitEnd,
+		isWaitBlocked,
+		exits: {
+			get value() {
+				return exitsRef;
+			},
+		},
+	});
 </script>
 
 {@render children()}
