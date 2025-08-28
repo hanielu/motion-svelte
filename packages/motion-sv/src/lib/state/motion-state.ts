@@ -1,6 +1,6 @@
 import type { $Transition, MotionStateContext, Options } from "@/types/index.js";
 import type { AnimateUpdates } from "@/features/animation/types.js";
-import type { DOMKeyframesDefinition, VisualElement } from "framer-motion/types";
+import type { DOMKeyframesDefinition, VisualElement } from "framer-motion";
 import type { Feature, StateType } from "@/features/index.js";
 import type { LazyMotionContext } from "@/components/lazy-motion/context.js";
 import type { PresenceContext } from "@/components/animate-presence/presence.svelte.js";

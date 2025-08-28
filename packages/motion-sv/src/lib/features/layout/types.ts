@@ -1,4 +1,4 @@
-import type { Box } from "framer-motion/types";
+import type { Box } from "framer-motion";
 
 export interface LayoutLifecycles {
 	onBeforeLayoutMeasure?: (box: Box) => void;

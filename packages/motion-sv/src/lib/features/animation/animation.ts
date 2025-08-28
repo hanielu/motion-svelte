@@ -9,7 +9,7 @@ import { transformResetValue } from "@/state/transform.js";
 import { hasChanged, resolveVariant } from "@/state/utils.js";
 import type { $Transition, AnimationFactory, Options, VariantType } from "@/types/index.js";
 import { isDef } from "runed";
-import type { VisualElement } from "framer-motion/types";
+import type { VisualElement } from "framer-motion";
 import { noop } from "framer-motion/dom";
 import { animateVisualElement } from "framer-motion/dist/es/animation/interfaces/visual-element.mjs";
 import { createVisualElement } from "@/state/create-visual-element.js";

@@ -5,5 +5,5 @@
 </script>
 
 <LazyMotion features={loadFeatures}>
-	<m.div class="w-10 h-10 bg-red-500" animate={{ scale: 2 }}>Hello</m.div>
+	<m.div class="w-10 h-10 bg-red-500" whileHover={{ scale: 2 }}>Hello</m.div>
 </LazyMotion>

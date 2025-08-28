@@ -1,4 +1,4 @@
-import type { DOMKeyframesDefinition, ResolvedValues } from "framer-motion/types";
+import type { DOMKeyframesDefinition, ResolvedValues } from "framer-motion";
 import { isCssVar, isNumber } from "./utils.js";
 import { buildTransformTemplate, isTransform, transformAlias, transformDefinitions } from "./transform.js";
 import { isMotionValue, px } from "framer-motion/dom";

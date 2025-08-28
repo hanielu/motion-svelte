@@ -1,4 +1,4 @@
-import type { DOMKeyframesDefinition, ResolvedValues, VariantLabels } from "framer-motion/types";
+import type { DOMKeyframesDefinition, ResolvedValues, VariantLabels } from "framer-motion";
 import type { MotionValue, TransformProperties, animate } from "framer-motion/dom";
 import type { LayoutOptions } from "@/features/layout/types.js";
 import type { DragProps } from "@/features/gestures/drag/types.js";
@@ -13,6 +13,7 @@ import type { FocusProps } from "@/features/gestures/focus/types.js";
 import type { AnimationControls } from "@/animation/types.js";
 import type { AsTag } from "./common.js";
 import type { Snippet } from "svelte";
+import type { ClassValue } from "svelte/elements";
 
 type AnimationPlaybackControls = ReturnType<typeof animate>;
 export interface VariantType extends DOMKeyframesDefinition {
@@ -72,6 +73,11 @@ export interface Options<T = any>
 
 	// Svelte specific
 	children?: Snippet;
+	class?: ClassValue;
+	ref?: HTMLElement | SVGElement | null;
+
+	// is this even svelte specific? idk I just know that it stops errors with Reorder.Item and Reorder.Group
+	id?: string;
 	// key?: string | number;
 }
 

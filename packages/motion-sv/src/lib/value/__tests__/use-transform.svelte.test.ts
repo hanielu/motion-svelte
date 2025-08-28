@@ -3,7 +3,7 @@ import { render } from "vitest-browser-svelte";
 import { html, delay } from "test-utils";
 
 // svelte:defs
-import { Motion } from "@/components/index.js";
+import { Motion } from "@/components/motion/index.js";
 import { useTransform } from "@/value/index.js";
 // sd
 

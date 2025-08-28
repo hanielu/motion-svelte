@@ -20,7 +20,7 @@ import { eachAxis } from "@/projection/utils/each-axis.js";
 import type { Options } from "@/types/index.js";
 import { getContextWindow } from "@/utils/index.js";
 import { addValueToWillChange } from "@/value/use-will-change/add-will-change.js";
-import type { AnimationGeneratorType, Axis, BoundingBox, Point, Transition, VisualElement } from "framer-motion/types";
+import type { AnimationGeneratorType, Axis, BoundingBox, Point, Transition, VisualElement } from "framer-motion";
 import { frame, mixNumber, percent } from "framer-motion/dom";
 import { measurePageBox } from "@/projection/utils/measure.js";
 import { convertBoundingBoxToBox, convertBoxToBoundingBox } from "@/projection/conversion.js";

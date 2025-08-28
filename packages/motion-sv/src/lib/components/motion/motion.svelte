@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Attachment } from "svelte/attachments";
-	import type { DOMKeyframesDefinition } from "framer-motion/types";
+	import type { DOMKeyframesDefinition } from "framer-motion";
 	import type { Feature } from "@/features/feature.js";
 	import type { MotionProps } from "./types.js";
 	import { AnimatePresenceContext } from "../animate-presence/presence.svelte.js";

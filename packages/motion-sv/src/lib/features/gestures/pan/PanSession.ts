@@ -1,4 +1,4 @@
-import type { EventInfo, Point, TransformPoint } from "framer-motion/types";
+import type { EventInfo, Point, TransformPoint } from "framer-motion";
 import { addPointerEvent, isPrimaryPointer } from "@/events/index.js";
 import { extractEventInfo } from "@/events/event-info.js";
 import {

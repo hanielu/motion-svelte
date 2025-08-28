@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-svelte";
-import { Motion } from "@/components/index.js";
+import { Motion } from "@/components/motion/index.js";
 
 describe("press Gesture", () => {
 	it("adds tabindex=0 when whilePress is set", async () => {

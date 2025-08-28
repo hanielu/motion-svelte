@@ -1,4 +1,4 @@
-import type { IProjectionNode } from "framer-motion/types";
+import type { IProjectionNode } from "framer-motion";
 
 function notify(node: IProjectionNode) {
 	return !node.isLayoutDirty && node.willUpdate(false);

@@ -1,5 +1,5 @@
 import { isWillChangeMotionValue } from "@/value/use-will-change/is.js";
-import type { VisualElement } from "framer-motion/types";
+import type { VisualElement } from "framer-motion";
 
 export function addValueToWillChange(visualElement: VisualElement, key: string) {
 	const willChange = visualElement.getValue("willChange");

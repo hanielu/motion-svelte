@@ -1,4 +1,4 @@
-import type { IProjectionNode, VisualElement } from "framer-motion/types";
+import type { IProjectionNode, VisualElement } from "framer-motion";
 
 export function getClosestProjectingNode(
 	visualElement?: VisualElement<unknown, unknown, { allowProjection?: boolean }>

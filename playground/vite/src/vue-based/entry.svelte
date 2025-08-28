@@ -13,6 +13,7 @@
 	// import UseTransformPathMorphing from "./examples/from-docs/use-transform-path-morphing.svelte";
 	// import DragDirectionLocking from "./examples/from-docs/drag-direction-locking.svelte";
 	import LazyMotion from "./examples/lazy-motion/lazy-motion.svelte";
+	import ReorderExample_1 from "./examples/reorder/example-1/example-1.svelte";
 </script>
 
 <!-- <RollingBox />
@@ -33,4 +34,5 @@
 <!-- <UseTransformPathMorphing /> -->
 <!-- <DragDirectionLocking /> -->
 
-<LazyMotion />
+<!-- <LazyMotion /> -->
+<ReorderExample_1 />

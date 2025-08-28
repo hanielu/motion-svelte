@@ -1,5 +1,5 @@
 import type { MotionState } from "@/state/index.js";
-import type { IProjectionNode } from "framer-motion/types";
+import type { IProjectionNode } from "framer-motion";
 import { Context, type Ref } from "runed";
 
 export const MotionStateContext = new Context<MotionState>("MotionState");

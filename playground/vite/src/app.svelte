@@ -3,5 +3,9 @@
 	// import ReactEntry from "./react-based/entry.svelte";
 </script>
 
+<svelte:head>
+	<title>Motion Svelte Playground</title>
+</svelte:head>
+
 <!-- <ReactEntry /> -->
 <VueEntry />

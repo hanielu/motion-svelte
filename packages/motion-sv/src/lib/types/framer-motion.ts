@@ -1,6 +1,6 @@
 import type { MotionNodeOptions } from "motion-dom";
 
-export type { Point } from "framer-motion/types";
+export type { Point } from "framer-motion";
 
 export type SupportedEdgeUnit = "px" | "vw" | "vh" | "%";
 

@@ -24,16 +24,17 @@ export function createMotionComponent(component: string | Component, options: Mo
 	}
 
 	const motionComponent: MotionComponent<typeof component> = (anchor, props) => {
+		const getAs = () => props.as || component || "div";
 		return Motion(anchor, {
 			features: options.features,
 			get forwardMotionProps() {
 				return props.forwardMotionProps || options.forwardMotionProps;
 			},
 			get as() {
-				return props.as || component || "div";
+				return getAs();
 			},
 			get props() {
-				return withProp(props, "as", props.as || component || "div");
+				return withProp(props, "as", getAs());
 			},
 			get ref() {
 				return props.ref!;
@@ -66,7 +67,7 @@ export type MotionNameSpace = {
 	create<T extends ElementType>(
 		component: T,
 		options?: MotionCreateOptions
-	): Component<Omit<MotionProps<T, unknown>, "as" | "asChild"> & MotionHTMLAttributes<T>>;
+	): Component<Omit<MotionProps<T, unknown>, "asChild"> & MotionHTMLAttributes<T>>;
 };
 
 export function createMotionComponentWithFeatures(features: Feature[] = []) {

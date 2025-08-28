@@ -5,4 +5,7 @@ export { createLayoutMotion, type LayoutMotionNamespace } from "./layout-motion.
 import { domMax } from "@/features/dom-max.js";
 
 export const motion = createMotionComponentWithFeatures(domMax);
-export const Motion = motion.create("div") as unknown as MotionComponent;
+
+// tbh this only exists because of the tests, but it's not exported from the package
+// reason being that if it were exported, it would get into the bundle, even if it's not used
+export const Motion = motion.create("div");

@@ -1,5 +1,5 @@
 import type { AsTag, Options } from "@/types/index.js";
-import type { DOMMotionComponents } from "framer-motion/types";
+import type { DOMMotionComponents } from "framer-motion";
 import type { Component } from "svelte";
 
 export interface MotionProps<T extends AsTag = "div", K = unknown>
