@@ -3,7 +3,7 @@
 	// import EnterExitList from "./examples/animate-presence/enter-exit-list.svelte";
 	// import InView from "./examples/from-docs/in-view.svelte";
 	// import BasicLayoutList from "./examples/layout-focused/basic-layout-list.svelte";
-	// import BasicLayoutToggle from "./examples/layout-focused/basic-layout-toggle.svelte";
+	import BasicLayoutToggle from "./examples/layout-focused/basic-layout-toggle.svelte";
 	// import LayoutIdTest from "./examples/layout-focused/layout-id-test.svelte";
 	// import RollingBox from "./examples/rolling-box.svelte";
 	// import UseSpring from "./examples/from-docs/use-spring.svelte";
@@ -16,8 +16,9 @@
 	import ReorderExample_1 from "./examples/reorder/example-1/example-1.svelte";
 </script>
 
-<!-- <RollingBox />
 <BasicLayoutToggle />
+<!-- <RollingBox />
+
 <BasicLayoutList />
 <LayoutIdTest />
 
@@ -35,4 +36,4 @@
 <!-- <DragDirectionLocking /> -->
 
 <!-- <LazyMotion /> -->
-<ReorderExample_1 />
+<!-- <ReorderExample_1 /> -->

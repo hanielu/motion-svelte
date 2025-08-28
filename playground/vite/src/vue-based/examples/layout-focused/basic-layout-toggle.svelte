@@ -26,7 +26,7 @@
 </script>
 
 <!-- nested layout animation works -->
-<motion.button
+<!-- <motion.button
 	style={{ ...container, justifyContent: "flex-" + (isOn ? "start" : "end"), marginTop: 50 }}
 	onclick={toggle}
 >
@@ -39,6 +39,34 @@
 			bounce: 0.2,
 		}}
 	/>
+</motion.button> -->
+
+<!-- Using layoutId -->
+<motion.button
+	style={{ ...container, justifyContent: "flex-" + (isOn ? "start" : "end"), marginTop: 50 }}
+	onclick={toggle}
+>
+	{#if isOn}
+		<layout.div
+			style={handle}
+			layoutId="handle"
+			transition={{
+				type: "spring",
+				visualDuration: 0.2,
+				bounce: 0.2,
+			}}
+		/>
+	{:else}
+		<layout.div
+			style={handle}
+			layoutId="handle"
+			transition={{
+				type: "spring",
+				visualDuration: 0.2,
+				bounce: 0.2,
+			}}
+		/>
+	{/if}
 </motion.button>
 
 <!-- nested layout animation does work as expected -->
