@@ -11,8 +11,8 @@
 		{ icon: "🥂", label: "Champers?" },
 	];
 
-	const [tomato, lettuce, cheese] = allIngredients;
-	const tabs = [tomato, lettuce, cheese];
+	const [tomato, lettuce, cheese, carrot] = allIngredients;
+	const tabs = [tomato, lettuce, cheese, carrot];
 
 	let selectedTab = $state(tabs[0]);
 
@@ -21,21 +21,23 @@
 
 <div class="l-container">
 	<nav class="nav">
-		<ul class="tabs-container">
-			{#each tabs as item}
-				<motion.li
+		<layout.ul class="tabs-container">
+			{#each tabs as item (item.label)}
+				<layout.li
 					class="tab"
-					initial={false}
 					animate={{ backgroundColor: item.label === selectedTab.label ? "#eee" : "#eee0" }}
-					onclick={layout.update.with(() => (selectedTab = item))}
+					onfocus={layout.update.with(() => (selectedTab = item))}
+					onmouseover={layout.update.with(() => (selectedTab = item))}
+					onmouseleave={layout.update.with(() => (selectedTab = item))}
+					tabindex={0}
 				>
 					{`${item.icon} ${item.label}`}
 					{#if item.label === selectedTab.label}
 						<layout.div class="underline" layoutId="underline" />
 					{/if}
-				</motion.li>
+				</layout.li>
 			{/each}
-		</ul>
+		</layout.ul>
 	</nav>
 	<main class="icon-container">
 		<AnimatePresence mode="wait">
@@ -86,41 +88,41 @@
 		height: 44px;
 	}
 
-	.tabs-container {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-		font-weight: 500;
-		font-size: 14px;
-		display: flex;
-		width: 100%;
-	}
-
-	:global(.tab) {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-		font-weight: 500;
-		font-size: 14px;
-		border-radius: 5px;
-		border-bottom-left-radius: 0;
-		border-bottom-right-radius: 0;
-		width: 100%;
-		padding: 10px 15px;
-		position: relative;
-		background: white;
-		cursor: pointer;
-		height: 24px;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		flex: 1;
-		min-width: 0;
-		user-select: none;
-		color: #0f1115;
-	}
-
 	:global {
+		.tabs-container {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+			font-weight: 500;
+			font-size: 14px;
+			display: flex;
+			width: 100%;
+		}
+
+		.tab {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+			font-weight: 500;
+			font-size: 14px;
+			border-radius: 5px;
+			border-bottom-left-radius: 0;
+			border-bottom-right-radius: 0;
+			width: 100%;
+			padding: 10px 15px;
+			position: relative;
+			background: white;
+			cursor: pointer;
+			height: 24px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			flex: 1;
+			min-width: 0;
+			user-select: none;
+			color: #0f1115;
+		}
+
 		.underline {
 			position: absolute;
 			bottom: -2px;

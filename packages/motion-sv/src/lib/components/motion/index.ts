@@ -1,7 +1,7 @@
 export type { MotionProps } from "./types.js";
 import type { MotionComponent } from "./types.js";
 import { createMotionComponentWithFeatures } from "./utils.js";
-export { createLayoutMotion, type LayoutMotionNamespace } from "./layout-motion.svelte";
+export { createLayoutMotion, STOP_UPDATE, type LayoutMotionNamespace } from "./layout-motion.svelte";
 import { domMax } from "@/features/dom-max.js";
 
 export const motion = createMotionComponentWithFeatures(domMax);

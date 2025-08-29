@@ -12,6 +12,12 @@
 	}
 
 	export const LayoutMotionScopeContext = new Context<LayoutMotionScope>("LayoutMotionScope");
+	/**
+	 * Symbol to indicate that the update should not be run
+	 * This is useful for cases where you want to update the layout
+	 * but not run the update function
+	 */
+	export const STOP_UPDATE = Symbol("STOP_UPDATE");
 
 	export type LayoutMotionNamespace = MotionNameSpace & {
 		/**
@@ -80,8 +86,10 @@
 		function updateWith<A extends unknown[], R>(fn: (...args: A) => R): (...args: A) => R {
 			return (...args: A) => {
 				const result = fn(...args);
-				update();
-				return result;
+				if (result !== STOP_UPDATE) {
+					update();
+					return result;
+				}
 			};
 		}
 

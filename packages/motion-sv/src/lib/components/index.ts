@@ -1,4 +1,10 @@
-export { motion, createLayoutMotion, type LayoutMotionNamespace, type MotionProps } from "./motion/index.js";
+export {
+	motion,
+	createLayoutMotion,
+	STOP_UPDATE,
+	type LayoutMotionNamespace,
+	type MotionProps,
+} from "./motion/index.js";
 export * from "./animate-presence/index.js";
 export * from "./motion-config/index.js";
 export * from "./reorder/index.js";
