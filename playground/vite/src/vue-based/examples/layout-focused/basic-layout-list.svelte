@@ -1,7 +1,7 @@
 <script lang="ts">
 	import AnimatedList from "../shared/animated-list.svelte";
 	import { css } from "runed";
-	import { motion, createLayoutMotion } from "motion-sv";
+	import { motion, createLayoutMotion } from "motion-sve";
 
 	const layout = createLayoutMotion(motion);
 	const update = layout.update;

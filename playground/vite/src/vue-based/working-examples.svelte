@@ -45,7 +45,7 @@
 		right: 0,
 	};
 
-	import { motion } from "motion-sv";
+	import { motion } from "motion-sve";
 	import { css, Previous } from "runed";
 
 	let isVisible = $state(true);

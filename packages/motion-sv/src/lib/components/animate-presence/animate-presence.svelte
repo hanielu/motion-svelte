@@ -3,7 +3,10 @@
 	import type { AnimatePresenceProps } from "./types.js";
 	import { usePopLayout } from "./use-pop-layout.js";
 	import type { Snippet } from "svelte";
-	import { PopLayoutContext } from "./context.js";
+	import { PopLayoutContext } from "./index.js";
+	import { mountedStates } from "@/state/motion-state.js";
+	import { removeDoneCallback } from "./presence.svelte.js";
+	import { delay } from "@/utils/delay.js";
 
 	let {
 		mode = "sync",
@@ -46,19 +49,46 @@
 		};
 	});
 
-	function notifyExitStart(el: Element) {
-		exitDom.set(el, true);
-		exitsRef++;
+	function isWaitBlocked() {
+		return mode === "wait" && exitsRef > 0;
 	}
 
-	function notifyExitEnd(el: Element) {
+	function handleIntroStart(el: Element) {
+		const state = mountedStates.get(el);
+		if (!state) return;
+		removePopStyle?.(state);
+		state.isVShow = true;
+		removeDoneCallback(el);
+		// Reset exit without animating
+		state.setActive?.("exit", false, false);
+		// Resume enter animation from current values
+		state.startAnimation?.();
+	}
+
+	function handleOutroStart(el: Element) {
+		const state = mountedStates.get(el);
+		if (!state) return;
+		addPopStyle?.(state);
+		state.isVShow = false;
+		exitDom.set(el, true);
+		exitsRef++;
+		// Defer to next microtask to ensure updated layout/values
+		delay(() => {
+			state.setActive?.("exit", true);
+		});
+	}
+
+	function handleOutroEnd(el: Element) {
+		const state = mountedStates.get(el);
+		if (!state) return;
 		exitDom.delete(el);
 		if (exitsRef > 0) exitsRef--;
 		if (exitDom.size === 0) onExitComplete?.();
-	}
-
-	function isWaitBlocked() {
-		return mode === "wait" && exitsRef > 0;
+		if (!styles?.has(state)) {
+			state.willUpdate("done");
+		} else {
+			removePopStyle?.(state);
+		}
 	}
 
 	// Provide PopLayout + exit registry + wait gate to Motion children
@@ -66,14 +96,15 @@
 		addPopStyle,
 		removePopStyle,
 		styles,
-		notifyExitStart,
-		notifyExitEnd,
 		isWaitBlocked,
 		exits: {
 			get value() {
 				return exitsRef;
 			},
 		},
+		onIntroStart: handleIntroStart,
+		onOutroStart: handleOutroStart,
+		onOutroEnd: handleOutroEnd,
 	});
 </script>
 

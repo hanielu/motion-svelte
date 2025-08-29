@@ -1,6 +1,7 @@
 <script lang="ts">
-	// import EnterExitBasic from "./examples/animate-presence/enter-exit-basic.svelte";
-	// import EnterExitList from "./examples/animate-presence/enter-exit-list.svelte";
+	import LoginLinkBtn from "./examples/animate-presence/login-link-btn.svelte";
+	import EnterExitBasic from "./examples/animate-presence/enter-exit-basic.svelte";
+	import EnterExitList from "./examples/animate-presence/enter-exit-list.svelte";
 	// import InView from "./examples/from-docs/in-view.svelte";
 	// import BasicLayoutList from "./examples/layout-focused/basic-layout-list.svelte";
 	import BasicLayoutToggle from "./examples/layout-focused/basic-layout-toggle.svelte";
@@ -15,19 +16,22 @@
 	// import DragDirectionLocking from "./examples/from-docs/drag-direction-locking.svelte";
 	import LazyMotion from "./examples/lazy-motion/lazy-motion.svelte";
 	import ReorderExample_1 from "./examples/reorder/example-1/example-1.svelte";
+	import CopyButton from "./examples/variants/copy-button.svelte";
 	import PathDrawing from "./examples/variants/path-drawing.svelte";
 </script>
 
+<LoginLinkBtn />
+<EnterExitBasic />
 <!-- <BasicLayoutToggle /> -->
 <!-- <LayoutIdTest /> -->
+<!-- <CopyButton /> -->
 <!-- <DirectionalNav /> -->
-<PathDrawing />
+<!-- <PathDrawing /> -->
 <!-- <RollingBox />
 
-<BasicLayoutList />
+<BasicLayoutList /> -->
 
-<EnterExitBasic />
-<EnterExitList /> -->
+<EnterExitList />
 
 <!-- <WhenVariant /> -->
 

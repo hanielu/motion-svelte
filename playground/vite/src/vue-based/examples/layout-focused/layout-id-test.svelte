@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { motion, createLayoutMotion, AnimatePresence } from "motion-sv";
+	import { motion, createLayoutMotion, AnimatePresence } from "motion-sve";
 
 	const allIngredients = [
 		{ icon: "🍅", label: "Tomato" },
@@ -45,7 +45,7 @@
 				<motion.div
 					initial={{ y: 10, opacity: 0 }}
 					animate={{ y: 0, opacity: 1 }}
-					exit={{ y: -10, opacity: 0 }}
+					exit={{ y: -10, scale: 0.5, opacity: 0 }}
 					transition={{ duration: 0.2 }}
 					class="icon"
 				>

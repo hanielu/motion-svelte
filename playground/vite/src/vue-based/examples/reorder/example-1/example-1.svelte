@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ReorderGroup } from "motion-sv";
+	import { ReorderGroup } from "motion-sve";
 	import Item from "./item.svelte";
 
 	const initialItems = ["🍅 Tomato", "🥒 Cucumber", "🧀 Cheese", "🥬 Lettuce"];

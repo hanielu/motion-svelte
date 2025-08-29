@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { useMotionValue, ReorderItem } from "motion-sv";
+	import { useMotionValue, ReorderItem } from "motion-sve";
 	import { useRaisedShadow } from "./use-raised-shadow.svelte";
 
 	let { item = "" } = $props();

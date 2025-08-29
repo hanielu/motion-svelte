@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { interpolate, type Shape } from "flubber";
-	import { motion, motionValue, useTransform, animate, MotionValue } from "motion-sv";
+	import { motion, motionValue, useTransform, animate, MotionValue } from "motion-sve";
 
 	/**
 	 * ==============   Shape data   ================

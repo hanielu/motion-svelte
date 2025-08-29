@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { MotionConfig, motion, createLayoutMotion, STOP_UPDATE } from "motion-sv";
+	import { MotionConfig, motion, createLayoutMotion, STOP_UPDATE } from "motion-sve";
 
 	const TABS = ["Saved Sites", "Collections", "48 Following", "32 Followers"];
 

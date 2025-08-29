@@ -81,7 +81,7 @@
 </script>
 
 <script lang="ts">
-	import { motion } from "motion-sv";
+	import { motion } from "motion-sve";
 	import { css } from "runed";
 </script>
 

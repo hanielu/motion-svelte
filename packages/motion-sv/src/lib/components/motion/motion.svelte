@@ -8,7 +8,7 @@
 	import { LayoutMotionScopeContext } from "./layout-motion.svelte";
 	import { LazyMotionContext } from "../lazy-motion/context.js";
 	import { MotionState } from "@/state/motion-state.js";
-	import { PopLayoutContext } from "../animate-presence/context.js";
+	import { PopLayoutContext } from "../animate-presence/index.js";
 	import { convertSvgStyleToAttributes, createStyles } from "@/state/style.js";
 	import { css, ref, watch } from "runed";
 	import { invariant, warning } from "hey-listen";
@@ -268,30 +268,17 @@
 
 	function onintrostart() {
 		if (!isInPresenceContext) return;
-		// Clear popLayout and reset exit state
-		if (popLayout.removePopStyle) popLayout.removePopStyle(state);
-		state.isVShow = true;
-		// Reset exit active on intro
-		state.setActive("exit", false, false);
+		popLayout.onIntroStart?.(state.element!);
 	}
 
 	function onoutrostart() {
 		if (!isInPresenceContext) return;
-		// Mark as exiting, add popLayout
-		if (popLayout.addPopStyle) popLayout.addPopStyle(state);
-		state.isVShow = false;
-		popLayout.notifyExitStart?.(state.element!);
+		popLayout.onOutroStart?.(state.element!);
 	}
 
 	function onoutroend() {
 		if (!isInPresenceContext) return;
-		// Cleanup popLayout and notify
-		popLayout.notifyExitEnd?.(state.element!);
-		if (!popLayout.styles || !popLayout.styles.has(state)) {
-			state.willUpdate("done");
-		} else if (popLayout.removePopStyle) {
-			popLayout.removePopStyle(state);
-		}
+		popLayout.onOutroEnd?.(state.element!);
 	}
 </script>
 

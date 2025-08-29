@@ -3,11 +3,9 @@ import type { TransitionConfig } from "svelte/transition";
 import { findValueType, spring, calcGeneratorDuration } from "framer-motion/dom";
 import { style as styleUtils } from "@/state/style.js";
 import { transformAlias, transformDefinitions } from "@/state/transform.js";
-import { resolveVariant } from "@/state/utils.js";
 // Use FM internals for parity
 import { getValueTransition } from "framer-motion/dist/es/animation/sequence/create.mjs";
 import { getDefaultTransition } from "framer-motion/dist/es/animation/utils/default-transitions.mjs";
-import { animateTarget } from "framer-motion/dist/es/animation/interfaces/visual-element-target.mjs";
 
 function toMs(seconds?: number): number | undefined {
 	if (seconds == null) return undefined;
@@ -33,36 +31,9 @@ export function motionExit(node: Element, params: MotionTransitionParamsShape): 
 	if (isIntroCall && !params.allowIntro) return null;
 
 	const state = params.state;
-	const ve = state?.visualElement;
-
-	// Helpers to (re)start FM animations in either direction
-	function stopFM() {
-		ve?.values?.forEach((mv) => mv?.stop?.());
-		state?.clearAnimation?.();
-	}
-	function startExitFM() {
-		if (!ve) return;
-		stopFM();
-		// Use provided definition (with its transition) for exact parity
-		animateTarget(ve, def);
-	}
-	function startEnterFM() {
-		if (!ve) return;
-		stopFM();
-		const { animate, variants, custom } = state?.options;
-		const animateDef = resolveVariant(animate, variants, custom);
-		// Respect per-animate transition on reversal
-		if (animateDef) animateTarget(ve, animateDef);
-	}
-
-	// On outro start: kick off exit
-	if (!isIntroCall && ve) {
-		startExitFM();
-	}
 
 	let overallDurationMs = 0;
-	let lastU = -1;
-	let dir: "none" | "exit" | "enter" = !isIntroCall ? "exit" : "none";
+	// We only compute overall duration; animation is driven externally by AnimatePresence handlers
 
 	function mergeValueTransition(base: any, key: string): any {
 		// Prefer FM's merge semantics when available
@@ -128,8 +99,8 @@ export function motionExit(node: Element, params: MotionTransitionParamsShape): 
 			const toNum = typeof to === "number" ? to : parseFloat(String(to)) || 0;
 			const preferSpring =
 				vt?.type === "spring" || vt?.stiffness !== undefined || vt?.damping !== undefined || !hasExplicitTransition(vt);
-			const vel = ve?.getValue?.(key)?.getVelocity?.() ?? 0;
-			const durMs = ((): number => {
+			const vel = state?.visualElement?.getValue?.(key)?.getVelocity?.() ?? 0;
+			const baseDurMs = ((): number => {
 				const specified = toMs(vt?.duration);
 				if (specified != null) return specified;
 				if (preferSpring) {
@@ -144,6 +115,9 @@ export function motionExit(node: Element, params: MotionTransitionParamsShape): 
 				}
 				return baseDuration;
 			})();
+			const repeatCount = Math.max(0, (vt?.repeat as number) ?? 0);
+			const repeatDelayMs = toMs(vt?.repeatDelay) ?? 0;
+			const durMs = baseDurMs * (repeatCount + 1) + repeatDelayMs * repeatCount;
 			overallDurationMs = Math.max(overallDurationMs, delayMs + durMs);
 			continue;
 		}
@@ -158,8 +132,8 @@ export function motionExit(node: Element, params: MotionTransitionParamsShape): 
 			const toParsed = parse(toStr) as number;
 			const preferSpring =
 				vt?.type === "spring" || vt?.stiffness !== undefined || vt?.damping !== undefined || !hasExplicitTransition(vt);
-			const vel = ve?.getValue?.(key)?.getVelocity?.() ?? 0;
-			const durMs =
+			const vel = state?.visualElement?.getValue?.(key)?.getVelocity?.() ?? 0;
+			const baseDurMs =
 				toMs(vt?.duration) ??
 				(preferSpring
 					? (() => {
@@ -172,6 +146,9 @@ export function motionExit(node: Element, params: MotionTransitionParamsShape): 
 							}
 						})()
 					: baseDuration);
+			const repeatCount = Math.max(0, (vt?.repeat as number) ?? 0);
+			const repeatDelayMs = toMs(vt?.repeatDelay) ?? 0;
+			const durMs = baseDurMs * (repeatCount + 1) + repeatDelayMs * repeatCount;
 			overallDurationMs = Math.max(overallDurationMs, delayMs + durMs);
 		} else {
 			const durMs = toMs(vt?.duration) ?? baseDuration;
@@ -179,25 +156,5 @@ export function motionExit(node: Element, params: MotionTransitionParamsShape): 
 		}
 	}
 
-	function tick(_t: number, u: number) {
-		const EPS = 1e-4;
-		if (lastU >= 0 && state?.visualElement) {
-			if (u > lastU + EPS) {
-				// moving towards exit
-				if (dir !== "exit") {
-					dir = "exit";
-					startExitFM();
-				}
-			} else if (u < lastU - EPS) {
-				// moving towards enter (reverse exit)
-				if (dir !== "enter") {
-					dir = "enter";
-					startEnterFM();
-				}
-			}
-		}
-		lastU = u;
-	}
-
-	return { duration: overallDurationMs, easing: (x) => x, tick };
+	return { duration: overallDurationMs };
 }

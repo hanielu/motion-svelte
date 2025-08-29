@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { LayoutMotionNamespace } from "motion-sv";
+	import type { LayoutMotionNamespace } from "motion-sve";
 	import { css } from "runed";
 	import type { Snippet } from "svelte";
 

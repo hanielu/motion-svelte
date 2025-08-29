@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { css } from "runed";
-	import { AnimatePresence, motion } from "motion-sv";
+	import { AnimatePresence, motion } from "motion-sve";
 
 	const container = {
 		display: "flex",

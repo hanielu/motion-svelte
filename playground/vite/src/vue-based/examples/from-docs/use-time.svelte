@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { motion, useTime, useTransform } from "motion-sv";
+	import { motion, useTime, useTransform } from "motion-sve";
 	import { css } from "runed";
 
 	const time = useTime();

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { motion, createLayoutMotion } from "motion-sv";
+	import { motion, createLayoutMotion } from "motion-sve";
 
 	const modalVariants = {
 		visible: {
