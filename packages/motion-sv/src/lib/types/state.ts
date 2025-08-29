@@ -1,4 +1,4 @@
-import type { DOMKeyframesDefinition, ResolvedValues, VariantLabels } from "framer-motion";
+import type { DOMKeyframesDefinition, ResolvedValues, VariantLabels, Variants } from "framer-motion";
 import type { MotionValue, TransformProperties, animate } from "framer-motion/dom";
 import type { LayoutOptions } from "@/features/layout/types.js";
 import type { DragProps } from "@/features/gestures/drag/types.js";
@@ -56,9 +56,7 @@ export interface Options<T = any>
 	initial?: VariantLabels | VariantType | boolean;
 	animate?: VariantLabels | VariantType | AnimationControls;
 	exit?: VariantLabels | VariantType;
-	variants?: {
-		[k: string]: VariantType | ((custom: T) => VariantType);
-	};
+	variants?: Variants;
 	inherit?: boolean;
 	style?: MotionStyle;
 	transformTemplate?: (transform: TransformProperties, generatedTransform: string) => string;

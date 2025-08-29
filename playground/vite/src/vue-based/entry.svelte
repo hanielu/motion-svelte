@@ -15,11 +15,13 @@
 	// import DragDirectionLocking from "./examples/from-docs/drag-direction-locking.svelte";
 	import LazyMotion from "./examples/lazy-motion/lazy-motion.svelte";
 	import ReorderExample_1 from "./examples/reorder/example-1/example-1.svelte";
+	import PathDrawing from "./examples/variants/path-drawing.svelte";
 </script>
 
 <!-- <BasicLayoutToggle /> -->
-<LayoutIdTest />
-<DirectionalNav />
+<!-- <LayoutIdTest /> -->
+<!-- <DirectionalNav /> -->
+<PathDrawing />
 <!-- <RollingBox />
 
 <BasicLayoutList />
