@@ -5,14 +5,14 @@ This is an attempt to bring a Motion (formerly known as Framer Motion) to Svelte
 ## Quick Start
 
 ```bash
-npm install motion-sv
+npm install motion-sve
 ```
 
 Then import the `motion` component:
 
 ```svelte
 <script lang="ts">
-	import { motion } from "motion-sv";
+	import { motion } from "motion-sve";
 </script>
 
 <motion.div animate={{ x: 100 }}>Hello</motion.div>
@@ -32,7 +32,7 @@ Svelte has no equivalent, so layout animations require a helper.
 Enable them by wrapping `motion` with `createLayoutMotion`:
 
 ```ts
-import { motion, createLayoutMotion } from "motion-sv";
+import { motion, createLayoutMotion } from "motion-sve";
 
 const layout = createLayoutMotion(motion);
 ```
@@ -46,7 +46,7 @@ Usage:
 
 ```svelte
 <script lang="ts">
-	import { motion, createLayoutMotion } from "motion-sv";
+	import { motion, createLayoutMotion } from "motion-sve";
 
 	let isOn = $state(false);
 	const layout = createLayoutMotion(motion);
