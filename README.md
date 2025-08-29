@@ -79,9 +79,25 @@ Alternatively, use `layoutId` to link elements across renders:
 ```svelte
 <motion.button style={{ ...container, justifyContent: "flex-" + (isOn ? "start" : "end") }} onclick={toggle}>
 	{#if isOn}
-		<layout.div style={handle} layoutId="handle" transition={{ type: "spring", visualDuration: 0.2, bounce: 0.2 }} />
+		<layout.div
+			style={handle}
+			layoutId="handle"
+			transition={{
+				type: "spring",
+				visualDuration: 0.2,
+				bounce: 0.2,
+			}}
+		/>
 	{:else}
-		<layout.div style={handle} layoutId="handle" transition={{ type: "spring", visualDuration: 0.2, bounce: 0.2 }} />
+		<layout.div
+			style={handle}
+			layoutId="handle"
+			transition={{
+				type: "spring",
+				visualDuration: 0.2,
+				bounce: 0.2,
+			}}
+		/>
 	{/if}
 </motion.button>
 ```
