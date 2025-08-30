@@ -1,58 +1,116 @@
-# Svelte library
+# Motion For Svelte
 
-Everything you need to build a Svelte library, powered by [`sv`](https://npmjs.com/package/sv).
+This is an attempt to bring a Motion (formerly known as Framer Motion) to Svelte.
 
-Read more about creating a library [in the docs](https://svelte.dev/docs/kit/packaging).
+## Quick Start
 
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
-```sh
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
+```bash
+npm install motion-sve
 ```
 
-## Developing
+Then import the `motion` component:
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+```svelte
+<script lang="ts">
+	import { motion } from "motion-sve";
+</script>
 
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+<motion.div animate={{ x: 100 }}>Hello</motion.div>
 ```
 
-Everything inside `src/lib` is part of your library, everything inside `src/routes` can be used as a showcase or preview app.
+Here’s a streamlined rewrite. It cuts repetition, tightens explanations, and emphasizes what a user needs to know to _use_ the port, not just understand internals:
 
-## Building
+## Key Differences from Framer Motion
 
-To build your library:
+Some Framer Motion features cannot be reproduced in Svelte with the same APIs.
 
-```sh
-npm pack
+### Layout Animations
+
+React uses `getSnapshotBeforeUpdate` and Vue uses `onBeforeUpdate`.  
+Svelte has no equivalent, so layout animations require a helper.
+
+Enable them by wrapping `motion` with `createLayoutMotion`:
+
+```ts
+import { motion, createLayoutMotion } from "motion-sve";
+
+const layout = createLayoutMotion(motion);
 ```
 
-To create a production version of your showcase app:
+`createLayoutMotion` provides:
 
-```sh
-npm run build
+- `layout.update()` — mark a layout change after state updates.
+- `layout.update.with(fn)` — wrap a state update so layout changes are tracked automatically.
+
+Usage:
+
+```svelte
+<script lang="ts">
+	import { motion, createLayoutMotion } from "motion-sve";
+
+	let isOn = $state(false);
+	const layout = createLayoutMotion(motion);
+
+	const toggle = layout.update.with(() => (isOn = !isOn));
+	// or:
+	// function toggle() {
+	//   isOn = !isOn;
+	//   layout.update();
+	// }
+</script>
+
+<motion.button style={{ ...container, justifyContent: "flex-" + (isOn ? "start" : "end") }} onclick={toggle}>
+	<layout.div
+		style={handle}
+		layoutDependency={isOn}
+		transition={{ type: "spring", visualDuration: 0.2, bounce: 0.2 }}
+	/>
+</motion.button>
 ```
 
-You can preview the production build with `npm run preview`.
+> Use `layoutDependency` if the element is not being remounted. This gives motion a reactive trigger for the update.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+---
 
-## Publishing
+### Layout Animations with `layoutId`
 
-Go into the `package.json` and give your package the desired name through the `"name"` option. Also consider adding a `"license"` field and point it to a `LICENSE` file which you can create from a template (one popular option is the [MIT license](https://opensource.org/license/mit/)).
+Alternatively, use `layoutId` to link elements across renders:
 
-To publish your library to [npm](https://www.npmjs.com):
-
-```sh
-npm publish
+```svelte
+<motion.button style={{ ...container, justifyContent: "flex-" + (isOn ? "start" : "end") }} onclick={toggle}>
+	{#if isOn}
+		<layout.div
+			style={handle}
+			layoutId="handle"
+			transition={{
+				type: "spring",
+				visualDuration: 0.2,
+				bounce: 0.2,
+			}}
+		/>
+	{:else}
+		<layout.div
+			style={handle}
+			layoutId="handle"
+			transition={{
+				type: "spring",
+				visualDuration: 0.2,
+				bounce: 0.2,
+			}}
+		/>
+	{/if}
+</motion.button>
 ```
+
+---
+
+### Animate Presence (Enter/Exit)
+
+- **React**: implemented with child diffing.
+- **Vue**: uses `Transition` / `TransitionGroup`.
+- **Svelte**: has no equivalent ([issue #8547](https://github.com/sveltejs/svelte/issues/8547)).
+
+Limitations in this port:
+
+- Variants with `AnimatePresence` (e.g. `when`) may not work.
+- Rapid toggling can cause flickers instead of smooth reversal.
