@@ -225,6 +225,12 @@
 			/* notAnimate when wait-blocked */ waitBlocked
 		);
 
+		// In wait mode, prevent the entering node from immediately adopting its animate styles.
+		// We temporarily disable the animate state so VE updates (while blocked) maintain initial values.
+		if (waitBlocked) {
+			state.setActive("animate", false, false);
+		}
+
 		// onUnmounted
 		return () => {
 			state.unmount();
@@ -248,7 +254,8 @@
 	$effect.pre(() => {
 		const blocked = popLayout.isWaitBlocked?.() === true;
 		if (wasWaitBlocked && !blocked) {
-			// Gate opened: reveal and animate in
+			// Gate opened: re-enable animate state and trigger enter from current base/initial
+			state.setActive("animate", true, false);
 			state.startAnimation();
 		}
 		wasWaitBlocked = blocked;
