@@ -1,8 +1,9 @@
 {
 	"name": "motion-sve",
-	"version": "0.2.2",
+	"version": "0.2.3",
 	"license": "MIT",
 	"author": "Haniel Ubogu <https://github.com/HanielU>",
+	"description": "Motion for Svelte",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/HanielU/motion-svelte.git"

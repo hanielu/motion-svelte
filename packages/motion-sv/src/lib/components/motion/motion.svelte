@@ -169,7 +169,7 @@
 	// Resolve exit variant to use as a Svelte out transition
 	const exitDefinition = $derived.by(() => {
 		const customValue = props.custom ?? animatePresenceContext.custom;
-		return resolveVariant(props.exit as any, props.variants, customValue);
+		return resolveVariant(props.exit, props.variants, customValue);
 	});
 
 	// onBeforeMount

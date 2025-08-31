@@ -231,7 +231,14 @@ export class AnimationFeature extends Feature {
 		let variantTransition = this.state.options.transition;
 		let variant: VariantType = {};
 		const { variants, custom, transition, animatePresenceContext } = this.state.options;
-		const customValue = custom ?? animatePresenceContext?.custom;
+		// THIS IS A DEVIATION FROM THE VUE VERSION, according to cursor:
+		// Prefer presence context's `custom` over component-level `custom`.
+		// Rationale: On navigation, AnimatePresence updates its `custom` value immediately.
+		// The outgoing component's `props.custom` can lag by one tick during the first exit
+		// after a direction change, leading to a stale value and incorrect initial exit
+		// direction. Using the presence-level `custom` guarantees we resolve variants with
+		// the latest direction/value on the very first frame of exit and keeps siblings in sync.
+		const customValue = animatePresenceContext?.custom ?? custom;
 
 		this.state.activeStates = { ...this.state.activeStates, ...controlActiveState };
 		STATE_TYPES.forEach((name) => {
