@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { useMotionValue, useTransform, motion } from "motion-sve";
+	import { useMotionValue, useTransform, motion } from "motion-sv";
 	const x = useMotionValue(0);
 	const xInput = [-100, 0, 100];
 	const background = useTransform(x, xInput, [

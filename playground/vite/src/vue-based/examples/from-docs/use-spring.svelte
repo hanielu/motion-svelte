@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { motion, frame, useMotionValue, useSpring } from "motion-sve";
+	import { motion, frame, useMotionValue, useSpring } from "motion-sv";
 
 	const spring = { damping: 3, stiffness: 50, restDelta: 0.001 };
 

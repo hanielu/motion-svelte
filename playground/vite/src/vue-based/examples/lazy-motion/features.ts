@@ -1,3 +1,3 @@
-import { domAnimation } from "motion-sve";
+import { domAnimation } from "motion-sv";
 
 export default domAnimation;

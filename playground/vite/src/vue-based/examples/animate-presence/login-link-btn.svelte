@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { motion, AnimatePresence } from "motion-sve";
+	import { motion, AnimatePresence } from "motion-sv";
 
 	const bars = Array(12).fill(0);
 	const buttonCopy = {

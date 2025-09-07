@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { motion } from "motion-sve";
+	import { motion } from "motion-sv";
 
 	let count = $state(0);
 </script>

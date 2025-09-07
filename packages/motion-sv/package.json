@@ -1,12 +1,12 @@
 {
-	"name": "motion-sve",
-	"version": "0.2.4",
+	"name": "motion-sv",
+	"version": "0.1.0",
 	"license": "MIT",
 	"author": "Haniel Ubogu <https://github.com/HanielU>",
 	"description": "Motion for Svelte",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/HanielU/motion-svelte.git"
+		"url": "git+https://github.com/HanielU/motion-svlte.git"
 	},
 	"scripts": {
 		"build": "pnpm package",

@@ -18,12 +18,13 @@
 	import ReorderExample_1 from "./examples/reorder/example-1/example-1.svelte";
 	import CopyButton from "./examples/variants/copy-button.svelte";
 	import PathDrawing from "./examples/variants/path-drawing.svelte";
+	// import ImageGallery from "./examples/variants/image-gallery.svelte";
 </script>
 
-<LoginLinkBtn />
-<EnterExitBasic />
+<!-- <LoginLinkBtn /> -->
+<!-- <EnterExitBasic /> -->
 <!-- <BasicLayoutToggle /> -->
-<!-- <LayoutIdTest /> -->
+<LayoutIdTest />
 <!-- <CopyButton /> -->
 <!-- <DirectionalNav /> -->
 <!-- <PathDrawing /> -->
@@ -31,9 +32,11 @@
 
 <BasicLayoutList /> -->
 
-<EnterExitList />
+<!-- <EnterExitList /> -->
 
 <!-- <WhenVariant /> -->
+
+<!-- <ImageGallery /> -->
 
 <!-- FROM DOCS: -->
 <!-- <InView /> -->

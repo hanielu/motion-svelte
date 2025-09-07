@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { motion, createLayoutMotion, AnimatePresence } from "motion-sve";
+	import { motion, createLayoutMotion, AnimatePresence } from "motion-sv";
 
 	const allIngredients = [
 		{ icon: "🍅", label: "Tomato" },

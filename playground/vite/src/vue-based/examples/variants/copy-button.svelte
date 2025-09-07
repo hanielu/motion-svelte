@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { motion, AnimatePresence, type Variants } from "motion-sve";
+	import { motion, AnimatePresence, type Variants } from "motion-sv";
 	import CopyIcon from "~icons/mdi/content-copy";
 	import CheckmarkIcon from "~icons/mdi/check";
 

@@ -202,7 +202,7 @@ importers:
       motion-rsv:
         specifier: workspace:*
         version: link:../../packages/motion-rsv
-      motion-sve:
+      motion-sv:
         specifier: workspace:*
         version: link:../../packages/motion-sv
       runed:

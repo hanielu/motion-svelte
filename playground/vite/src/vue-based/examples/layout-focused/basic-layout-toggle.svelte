@@ -16,7 +16,7 @@
 		borderRadius: "50%",
 	};
 
-	import { motion, createLayoutMotion } from "motion-sve";
+	import { motion, createLayoutMotion } from "motion-sv";
 	import { css } from "runed";
 
 	let isOn = $state(false);

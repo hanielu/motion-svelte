@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { m, LazyMotion } from "motion-sve";
+	import { m, LazyMotion } from "motion-sv";
 
 	const loadFeatures = import("./features").then((m) => m.default);
 </script>

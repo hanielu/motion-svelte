@@ -1,4 +1,4 @@
-import { animate, useMotionValue } from "motion-sve";
+import { animate, useMotionValue } from "motion-sv";
 
 const inactiveShadow = "0px 0px 0px rgba(0,0,0,0.8)";
 

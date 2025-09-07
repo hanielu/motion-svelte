@@ -30,7 +30,7 @@
 		"@hvniel/svelte-router": "^0.0.2",
 		"flubber": "^0.4.2",
 		"motion-rsv": "workspace:*",
-		"motion-sve": "workspace:*",
+		"motion-sv": "workspace:*",
 		"runed": "workspace:*"
 	}
 }

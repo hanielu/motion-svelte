@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { motion, type Variants } from "motion-sve";
+	import { motion, type Variants } from "motion-sv";
 
 	/**
 	 * ==============   Styles   ================
