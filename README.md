@@ -18,8 +18,6 @@ Then import the `motion` component:
 <motion.div animate={{ x: 100 }}>Hello</motion.div>
 ```
 
-Here’s a streamlined rewrite. It cuts repetition, tightens explanations, and emphasizes what a user needs to know to _use_ the port, not just understand internals:
-
 ## Key Differences from Framer Motion
 
 Some Framer Motion features cannot be reproduced in Svelte with the same APIs.
