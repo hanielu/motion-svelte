@@ -294,11 +294,30 @@ export class AnimationFeature extends Feature {
 			!visualElement.isControllingVariants &&
 			parentVisualElement?.enteringChildren?.has(visualElement)
 		) {
-			const { delayChildren } = this.state.parent.finalTransition || {};
+			// Prefer parent's resolved transition; if not yet available (mount order), resolve from parent's variants
+			const parentOptions = this.state.parent.options;
+			const parentCustom = parentOptions.custom ?? parentOptions.animatePresenceContext?.custom;
+			const derivedParentVariant = parentOptions.animate
+				? resolveVariant(parentOptions.animate as any, parentOptions.variants, parentCustom)
+				: undefined;
+			const parentTransition = (this.state.parent.finalTransition ||
+				derivedParentVariant?.transition ||
+				{}) as $Transition;
+			const { delayChildren, staggerChildren = 0, staggerDirection = 1 } = parentTransition;
+			const delayIsFunction = typeof delayChildren === "function";
+			// Choose the correct group of children to calculate index from
+			const group = parentVisualElement.variantChildren?.size
+				? parentVisualElement.variantChildren
+				: parentVisualElement.enteringChildren?.size
+					? parentVisualElement.enteringChildren
+					: parentVisualElement.children;
+			const controlDelay =
+				(delayIsFunction ? 0 : (delayChildren as number) || 0) +
+				calcChildStagger(group, visualElement, delayChildren as any, staggerChildren, staggerDirection);
 			(
 				this.animateUpdates({
 					controlActiveState: this.state.parent.activeStates,
-					controlDelay: calcChildStagger(parentVisualElement.enteringChildren, visualElement, delayChildren),
+					controlDelay,
 				}) as Function
 			)();
 		}
