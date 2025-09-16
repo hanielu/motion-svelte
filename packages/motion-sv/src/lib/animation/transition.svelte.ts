@@ -14,7 +14,7 @@ function toMs(seconds?: number): number | undefined {
 
 export function motionExit(node: Element, params: MotionTransitionParamsShape): TransitionConfig | null {
 	const def: MotionExitDefinition = params.definition;
-	const { transition: baseTransition, ...target } = def;
+	const { transition: baseTransition, ...target } = def || {};
 
 	const baseDuration = toMs(baseTransition?.duration) ?? 200;
 	const baseDelay = toMs(baseTransition?.delay) ?? 0;

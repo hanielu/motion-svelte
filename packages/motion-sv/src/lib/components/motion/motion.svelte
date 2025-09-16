@@ -267,24 +267,25 @@
 	// We pass this in only when we're in a presence context,
 	// this way users not using presence don't need to deal with the added bundle size.
 	const motionExit = animatePresenceContext.transition;
+	const allowExitFunctions = () => !!props.exit && isInPresenceContext;
 
 	function allowExit(node: Element) {
-		if (!isInPresenceContext) return null;
+		if (!allowExitFunctions()) return null;
 		return motionExit(node, { definition: exitDefinition, state, allowIntro, setAllowIntro: (v) => (allowIntro = v) });
 	}
 
 	function onintrostart() {
-		if (!isInPresenceContext) return;
+		if (!allowExitFunctions()) return;
 		popLayout.onIntroStart?.(state.element!);
 	}
 
 	function onoutrostart() {
-		if (!isInPresenceContext) return;
+		if (!allowExitFunctions()) return;
 		popLayout.onOutroStart?.(state.element!);
 	}
 
 	function onoutroend() {
-		if (!isInPresenceContext) return;
+		if (!allowExitFunctions()) return;
 		popLayout.onOutroEnd?.(state.element!);
 	}
 </script>
