@@ -9,6 +9,10 @@
 			"name": "playground",
 		},
 		{
+			"path": "../repo-dump/motion-vue/packages/motion",
+			"name": "motion-vue",
+		},
+		{
 			"path": "../repo-dump/motion/packages",
 			"name": "packages",
 		},
@@ -21,7 +25,4 @@
 			"name": "root",
 		},
 	],
-	"settings": {
-		,
-	},
 }
