@@ -7,5 +7,15 @@
 	<title>Motion Svelte Playground</title>
 </svelte:head>
 
-<!-- <ReactEntry /> -->
-<VueEntry />
+<div class="h-screen w-screen overflow-hidden">
+	<VueEntry />
+</div>
+
+<style>
+	:global(html, body, #app) {
+		height: 100%;
+		margin: 0;
+		padding: 0;
+		overflow: hidden;
+	}
+</style>

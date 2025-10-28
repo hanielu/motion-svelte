@@ -21,21 +21,21 @@
 
 			setTimeout(() => {
 				buttonState = "success";
-			}, 10000);
+			}, 1750);
 
 			setTimeout(() => {
 				buttonState = "idle";
-			}, 20000);
+			}, 3500);
 		}}
 	>
 		<AnimatePresence mode="popLayout" initial={false}>
 			{#key buttonState}
 				<motion.span
 					class="abs inset-0"
-					transition={{ type: "spring", duration: 8, bounce: 0 }}
+					transition={{ type: "spring", duration: 0.3, bounce: 0 }}
 					initial={{ opacity: 0, y: -25 }}
 					animate={{ opacity: 1, y: 0 }}
-					exit={{ opacity: 0, y: 25, transition: { duration: 8 } }}
+					exit={{ opacity: 0, y: 25, transition: { duration: 0.3 } }}
 				>
 					{#if buttonState === "loading"}
 						{@render buttonCopy[buttonState].snippet(buttonCopy[buttonState].props)}
