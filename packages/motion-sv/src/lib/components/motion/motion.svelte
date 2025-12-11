@@ -183,6 +183,22 @@
 		};
 	});
 
+	// For layout-only elements in presence context, subscribe to exit start notifications.
+	// This ensures the layout animation runs in parallel with exit animations, not after they complete.
+	$effect(() => {
+		if (!props.layoutId || props.exit || !isInPresenceContext) return;
+
+		const unsubscribe = popLayout.subscribeToExitStart?.(() => {
+			// Trigger layout animation immediately when a blocking exit starts
+			state.unmount();
+			if (state.element) {
+				state.element.style.visibility = "hidden";
+			}
+		});
+
+		return () => unsubscribe?.();
+	});
+
 	// onBeforeUpdate (not really, svelte doesn't have a beforeUpdate hook)
 	// so it doesn't work for layout updates like the vue version
 	// instead we use the createLayoutMotion().update() method
@@ -263,6 +279,20 @@
 
 	// Just here to make sure the behavior is consistent with the vue version, just in case
 	const isInPresenceContext = AnimatePresenceContext.exists();
+
+	// For popLayout mode, track element position continuously.
+	// This ensures we always have the correct position cached when the element
+	// starts exiting, even if the DOM shifts due to other elements being added.
+	$effect(() => {
+		if (!props.exit || !isInPresenceContext) return;
+		// Start tracking this element's position
+		popLayout.trackPosition?.(state);
+
+		return () => {
+			// Stop tracking when element unmounts or exits
+			popLayout.untrackPosition?.(state);
+		};
+	});
 
 	// We pass this in only when we're in a presence context,
 	// this way users not using presence don't need to deal with the added bundle size.
