@@ -17,6 +17,12 @@
 	let selectedTab = $state(tabs[0]);
 
 	const layout = createLayoutMotion(motion);
+
+	function selectTab(tab: (typeof tabs)[number]) {
+		return layout.update.with(() => {
+			selectedTab = tab;
+		});
+	}
 </script>
 
 <div class="l-container">
@@ -26,9 +32,9 @@
 				<layout.li
 					class="tab"
 					animate={{ backgroundColor: item.label === selectedTab.label ? "#eee" : "#eee0" }}
-					onfocus={layout.update.with(() => (selectedTab = item))}
-					onmouseover={layout.update.with(() => (selectedTab = item))}
-					onmouseleave={layout.update.with(() => (selectedTab = item))}
+					onfocus={selectTab(item)}
+					onmouseover={selectTab(item)}
+					onmouseleave={selectTab(item)}
 					tabindex={0}
 				>
 					{`${item.icon} ${item.label}`}

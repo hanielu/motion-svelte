@@ -1,18 +1,18 @@
 <script lang="ts">
-	import { useLocation } from "@hvniel/svelte-router";
+	import { useLocation, Link } from "@hvniel/svelte-router";
 	import { examplesByCategory } from "./example-registry";
 
 	const location = useLocation();
 	const categories = Object.keys(examplesByCategory);
+	const currentPath = $derived(location.pathname);
 
 	let isOpen = $state(true);
-	let currentPath = $derived(location.pathname);
 </script>
 
 <aside
 	class={[
 		"relative flex flex-col border-r border-neutral-800 bg-neutral-900 transition-all duration-300",
-		{ "w-72": isOpen, "w-14": !isOpen },
+		isOpen ? "w-72" : "w-14",
 	]}
 >
 	<!-- Header -->
@@ -41,8 +41,8 @@
 	{#if isOpen}
 		<nav class="flex-1 overflow-y-auto px-3 py-4">
 			<!-- Home Link -->
-			<a
-				href="/"
+			<Link
+				to="/"
 				class={[
 					"mb-4 flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors",
 					{
@@ -60,7 +60,7 @@
 					/>
 				</svg>
 				Home
-			</a>
+			</Link>
 
 			<!-- Categories -->
 			{#each categories as category}
@@ -71,8 +71,8 @@
 					<div class="space-y-1">
 						{#each examplesByCategory[category] as example}
 							{@const isActive = currentPath === `/example/${example.id}`}
-							<a
-								href={`/example/${example.id}`}
+							<Link
+								to={`/example/${example.id}`}
 								class={[
 									"flex items-center rounded-lg px-3 py-2 text-sm transition-colors",
 									{
@@ -82,7 +82,7 @@
 								]}
 							>
 								{example.name}
-							</a>
+							</Link>
 						{/each}
 					</div>
 				</div>

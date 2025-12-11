@@ -2,7 +2,7 @@
 import {
 	defineConfig,
 	presetIcons,
-	presetWind3,
+	presetWind4,
 	presetWebFonts,
 	transformerDirectives,
 	transformerVariantGroup,
@@ -62,7 +62,7 @@ export default defineConfig({
 	presets: [
 		customPreset,
 		shadcnPreset,
-		presetWind3(),
+		presetWind4({ preflights: { reset: false } }),
 		// presetAnimations(),
 		presetIcons({ scale: 1.2 }),
 		presetWebFonts({

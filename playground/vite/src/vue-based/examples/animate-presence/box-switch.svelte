@@ -1,16 +1,15 @@
 <script lang="ts">
-	import { motion, MotionConfig, AnimatePresence, createLayoutMotion } from "motion-sv";
+	import { motion, MotionConfig, AnimatePresence } from "motion-sv";
 
 	let value = $state(true);
-	const layout = createLayoutMotion(motion);
 </script>
 
-<button onclick={layout.update.with(() => (value = !value))}>
+<button onclick={() => (value = !value)}>
 	Toggle value: {value}
 </button>
 
 <div class="relative flex h-full w-full items-center justify-center">
-	<MotionConfig transition={{ type: "spring", duration: 0.8, bounce: 0 }}>
+	<MotionConfig transition={{ type: "spring", duration: 2, bounce: 0 }}>
 		<AnimatePresence mode="popLayout">
 			{#if value}
 				<motion.span

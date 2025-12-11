@@ -1,0 +1,1 @@
+{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../../src/vue-reactivity/index.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,QAAQ,EAAE,MAAM,sBAAsB,CAAC;AAChD,OAAO,EAAE,KAAK,EAAE,GAAG,EAAE,MAAM,iBAAiB,CAAC;AAC7C,YAAY,EAAE,WAAW,EAAE,uBAAuB,EAAE,mBAAmB,EAAE,MAAM,sBAAsB,CAAC;AACtG,YAAY,EAAE,GAAG,EAAE,MAAM,iBAAiB,CAAC"}

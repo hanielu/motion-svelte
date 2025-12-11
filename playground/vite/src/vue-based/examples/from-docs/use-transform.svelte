@@ -13,7 +13,7 @@
 	const crossPathB = useTransform(x, [-50, -100], [0, 1]);
 </script>
 
-<div>
+<div class="grid place-items-center">
 	<motion.div class="container" style={{ background }}>
 		<motion.div
 			class="use-transform-box"

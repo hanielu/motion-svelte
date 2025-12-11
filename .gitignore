@@ -7,7 +7,8 @@ node_modules
 .wrangler
 .svelte-kit
 build
-dist
+/dist
+.zed*
 
 # OS
 .DS_Store
@@ -22,3 +23,6 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Temporary additions
+/docs

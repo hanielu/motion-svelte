@@ -26,7 +26,7 @@
 				<layout.li
 					class={[
 						"relative cursor-pointer px-2 py-1 text-sm outline-none transition-colors",
-						activeTab === tab ? "text-gray-800" : "text-gray-700",
+						activeTab === tab ? "text-gray-100" : "text-gray-400",
 					]}
 					tabindex={0}
 					onfocus={() => setTab(tab)}
@@ -34,7 +34,7 @@
 					onmouseleave={() => setTab(tab)}
 				>
 					{#if activeTab === tab}
-						<layout.div layoutId="tab-indicator" class="absolute inset-0 rounded-lg bg-black/5" />
+						<layout.div layoutId="tab-indicator" class="absolute inset-0 rounded-lg bg-white/5" />
 					{/if}
 					<span class="relative text-inherit">{tab}</span>
 				</layout.li>
@@ -44,7 +44,7 @@
 		<button
 			onclick={setDirection}
 			aria-label={`Change direction to ${direction === "vertical" ? "horizontal" : "vertical"}`}
-			class="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-lg text-black opacity-50 hover:bg-black/10 hover:opacity-100 focus-visible:opacity-100 dark:hover:bg-black/10 transition-all"
+			class="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-lg text-white opacity-50 hover:bg-white/10 hover:opacity-100 focus-visible:opacity-100 dark:hover:bg-black/10 transition-all"
 		>
 			<motion.svg
 				initial={false}

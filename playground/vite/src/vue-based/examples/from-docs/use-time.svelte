@@ -55,7 +55,7 @@
 	};
 </script>
 
-<div>
+<div class="relative h-500px">
 	<div style={css({ ...layer, filter: "blur(4px)" })}>
 		<div style={css({ ...boxContainer, width: "500px", gap: "80px" })}>
 			<motion.div style={tinyBox} />

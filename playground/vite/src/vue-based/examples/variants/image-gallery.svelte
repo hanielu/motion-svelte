@@ -54,110 +54,47 @@
 	};
 </script>
 
-<AnimatePresence initial={false} custom={direction}>
-	{#key page}
-		<motion.img
-			src={images[imageIndex]}
-			draggable="false"
-			custom={direction}
-			{variants}
-			initial="enter"
-			animate="center"
-			exit="exit"
-			transition={{
-				x: { type: "spring", stiffness: 300, damping: 30 },
-				opacity: { duration: 0.2 },
-			}}
-			drag="x"
-			dragConstraints={{ left: 0, right: 0 }}
-			dragElastic={1}
-			onDragEnd={(e, { offset, velocity }) => {
-				const swipe = swipePower(offset.x, velocity.x);
+<div class="relative flex h-[600px] w-full items-center justify-center overflow-hidden rounded-xl bg-neutral-950">
+	<AnimatePresence initial={false} custom={direction}>
+		{#key page}
+			<motion.img
+				src={images[imageIndex]}
+				draggable="false"
+				custom={direction}
+				{variants}
+				initial="enter"
+				animate="center"
+				exit="exit"
+				transition={{
+					x: { type: "spring", stiffness: 300, damping: 30 },
+					opacity: { duration: 0.2 },
+				}}
+				drag="x"
+				dragConstraints={{ left: 0, right: 0 }}
+				dragElastic={1}
+				onDragEnd={(e, { offset, velocity }) => {
+					const swipe = swipePower(offset.x, velocity.x);
 
-				if (swipe < -swipeConfidenceThreshold) {
-					paginate(1);
-				} else if (swipe > swipeConfidenceThreshold) {
-					paginate(-1);
-				}
-			}}
-		/>
-	{/key}
-</AnimatePresence>
-<button class="next" onclick={() => paginate(1)}>
-	{"‣"}
-</button>
-<button class="prev" onclick={() => paginate(-1)}>
-	{"‣"}
-</button>
-
-<style>
-	:global {
-		body {
-			width: 100vw;
-			height: 100vh;
-			background: #151515;
-			overflow: hidden;
-			padding: 0;
-			margin: 0;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-		}
-
-		.example-container {
-			width: 100vw;
-			height: 100vh;
-			position: relative;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-		}
-
-		.next,
-		.prev {
-			top: calc(50% - 20px);
-			position: absolute;
-			background: white;
-			border-radius: 30px;
-			width: 40px;
-			height: 40px;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			user-select: none;
-			cursor: pointer;
-			font-weight: bold;
-			font-size: 18px;
-			z-index: 2;
-		}
-
-		.next {
-			right: 10px;
-		}
-
-		.prev {
-			left: 10px;
-			transform: scale(-1);
-		}
-
-		img {
-			position: absolute;
-			max-width: 100vw;
-		}
-
-		.refresh {
-			padding: 10px;
-			position: absolute;
-			background: rgba(0, 0, 0, 0.4);
-			border-radius: 10px;
-			width: 20px;
-			height: 20px;
-			top: 10px;
-			right: 10px;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			cursor: pointer;
-		}
-	}
-</style>
+					if (swipe < -swipeConfidenceThreshold) {
+						paginate(1);
+					} else if (swipe > swipeConfidenceThreshold) {
+						paginate(-1);
+					}
+				}}
+				class="absolute max-h-full max-w-full object-contain"
+			/>
+		{/key}
+	</AnimatePresence>
+	<button
+		class="absolute right-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white text-lg font-bold shadow-lg transition-transform"
+		onclick={() => paginate(1)}
+	>
+		{"‣"}
+	</button>
+	<button
+		class="absolute left-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 scale-x-[-1] cursor-pointer items-center justify-center rounded-full bg-white text-lg font-bold shadow-lg transition-transform"
+		onclick={() => paginate(-1)}
+	>
+		{"‣"}
+	</button>
+</div>
