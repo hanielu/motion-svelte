@@ -3,7 +3,7 @@
 	import type { AnimatePresenceProps } from "./types.js";
 	import { usePopLayout } from "./use-pop-layout.js";
 	import type { Snippet } from "svelte";
-	import { PopLayoutContext } from "./index.js";
+	import { PresenceManagerContext } from "./index.js";
 	import { mountedStates } from "@/state/motion-state.js";
 	import { removeDoneCallback } from "./presence.svelte.js";
 	import { delay } from "@/utils/delay.js";
@@ -39,9 +39,26 @@
 		},
 	});
 
-	// Track elements that are actively exiting AND blocking (have actual exit animations)
+	/**
+	 * Track elements that are actively exiting.
+	 * Key: The DOM element exiting.
+	 * Value: { blocksExit: boolean } - whether this exit should block "wait" mode.
+	 *
+	 * This prevents double-handling of exit events and allows tracking specific element status.
+	 */
 	const exitDom = new Map<Element, { blocksExit: boolean }>();
-	let exitsRef = $state(0);
+
+	/**
+	 * Track elements that are actively exiting AND blocking (have actual exit animations).
+	 *
+	 * This is crucial for `mode="wait"`. When this count is > 0, `isWaitBlocked` becomes true.
+	 * Child `motion` components subscribe to this state via `PresenceManagerContext`.
+	 *
+	 * In `motion.svelte`, if `isWaitBlocked` is true:
+	 * 1. The entering component is hidden (`display: none`) and its animation is paused.
+	 * 2. When the count drops to 0, the component unhides and starts its "animate" state.
+	 */
+	let blockingExitCount = $state(0);
 
 	// Subscribers to be notified when a blocking exit starts
 	const exitStartSubscribers = new Set<() => void>();
@@ -49,21 +66,15 @@
 		exitStartSubscribers.add(callback);
 		return () => exitStartSubscribers.delete(callback);
 	}
-	function notifyExitStart() {
-		exitStartSubscribers.forEach((cb) => cb());
-	}
+	const notifyExitStart = () => exitStartSubscribers.forEach((cb) => cb());
 
-	$effect.pre(() => {
-		return () => {
-			exitDom.clear();
-			exitsRef = 0;
-			exitStartSubscribers.clear();
-		};
+	$effect.pre(() => () => {
+		exitDom.clear();
+		blockingExitCount = 0;
+		exitStartSubscribers.clear();
 	});
 
-	function isWaitBlocked() {
-		return mode === "wait" && exitsRef > 0;
-	}
+	const isWaitBlocked = () => mode === "wait" && blockingExitCount > 0;
 
 	function handleIntroStart(el: Element) {
 		const state = mountedStates.get(el);
@@ -73,20 +84,20 @@
 		const entry = exitDom.get(el);
 		if (entry) {
 			exitDom.delete(el);
-			if (entry.blocksExit && exitsRef > 0) {
-				exitsRef--;
+			if (entry.blocksExit && blockingExitCount > 0) {
+				blockingExitCount--;
 			}
 		}
 
 		removePopStyle(state);
 		// Re-track position for popLayout mode since element is re-entering
 		trackPosition(state);
-		state.isVShow = true;
+
 		removeDoneCallback(el);
 		// Reset exit without animating
-		state.setActive?.("exit", false, false);
+		state.setActive("exit", false, false);
 		// Resume enter animation from current values
-		state.startAnimation?.();
+		state.startAnimation();
 	}
 
 	function handleOutroStart(el: Element) {
@@ -95,7 +106,6 @@
 		if (exitDom.has(el)) return;
 
 		addPopStyle(state);
-		state.isVShow = false;
 
 		// Only elements with an actual exit animation should block.
 		// Elements with only layoutId (no exit) should run their layout animation
@@ -106,7 +116,7 @@
 
 		// Only increment the blocking counter for elements that should block
 		if (blocksExit) {
-			exitsRef++;
+			blockingExitCount++;
 			// Notify layout-only elements to start their animations in parallel
 			notifyExitStart();
 		}
@@ -125,8 +135,8 @@
 		if (entry) {
 			exitDom.delete(el);
 			// Only decrement if this element was blocking
-			if (entry.blocksExit && exitsRef > 0) {
-				exitsRef--;
+			if (entry.blocksExit && blockingExitCount > 0) {
+				blockingExitCount--;
 			}
 		}
 
@@ -134,21 +144,16 @@
 		if (!styles?.has(state)) {
 			state.willUpdate("done");
 		} else {
-			removePopStyle?.(state);
+			removePopStyle(state);
 		}
 	}
 
 	// Provide PopLayout + exit registry + wait gate to Motion children
-	PopLayoutContext.set({
+	PresenceManagerContext.set({
 		trackPosition,
 		untrackPosition,
 		isWaitBlocked,
 		subscribeToExitStart,
-		exits: {
-			get value() {
-				return exitsRef;
-			},
-		},
 		onIntroStart: handleIntroStart,
 		onOutroStart: handleOutroStart,
 		onOutroEnd: handleOutroEnd,

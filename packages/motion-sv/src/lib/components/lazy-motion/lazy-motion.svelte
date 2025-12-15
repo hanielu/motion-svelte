@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Feature } from "@/features/index.js";
 	import type { Snippet } from "svelte";
-	import { ref } from "runed";
 	import { LazyMotionContext } from "./context.js";
 
 	type MaybePromise<T> = T | Promise<T> | (() => Promise<T>);
@@ -14,17 +13,17 @@
 
 	let { children, features: featuresProp = [], strict = false }: LazyMotionProps = $props();
 
-	const features = ref<any[]>(Array.isArray(featuresProp) ? featuresProp : []);
+	let features = $state<Feature[]>(Array.isArray(featuresProp) ? featuresProp : []);
 
 	if (!Array.isArray(featuresProp)) {
 		const featuresPromise = typeof featuresProp === "function" ? featuresProp() : featuresProp;
 		featuresPromise.then((feats) => {
-			features.value = feats;
+			features = feats;
 		});
 	}
 
 	LazyMotionContext.set({
-		features,
+		features: () => features,
 		strict,
 	});
 </script>

@@ -27,3 +27,5 @@ vite.config.ts.timestamp-*
 # Temporary additions
 /docs
 .cursor
+#AGENTS.md
+#GEMINI.md

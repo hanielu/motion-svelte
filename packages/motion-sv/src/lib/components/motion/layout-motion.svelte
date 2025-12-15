@@ -4,6 +4,7 @@
 	import type { MotionState } from "@/state/motion-state.js";
 	import type { Snippet } from "svelte";
 	import { Context, withProp } from "runed";
+	import { motion } from "./instance.js";
 
 	export interface LayoutMotionScope {
 		states: Set<MotionState>;
@@ -63,7 +64,7 @@
 	 *
 	 * @param base - The base motion namespace to create a layout motion namespace from
 	 */
-	export function createLayoutMotion(base: MotionNameSpace): LayoutMotionNamespace {
+	export function createLayoutMotion(base: MotionNameSpace = motion): LayoutMotionNamespace {
 		const scope: LayoutMotionScope = {
 			states: new Set<MotionState>(),
 			register(state: MotionState) {

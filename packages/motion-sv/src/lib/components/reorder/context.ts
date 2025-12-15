@@ -1,8 +1,9 @@
 import type { Box } from "framer-motion";
-import { Context, type WritableComputedRef } from "runed";
+import { Context } from "runed";
+import type { Mutable } from "@/types/common.js";
 
 export interface ReorderContextProps<T> {
-	axis?: WritableComputedRef<"x" | "y">;
+	axis?: Mutable<"x" | "y">;
 	registerItem?: (item: T, layout: Box) => void;
 	updateOrder?: (item: T, offset: number, velocity: number) => void;
 }

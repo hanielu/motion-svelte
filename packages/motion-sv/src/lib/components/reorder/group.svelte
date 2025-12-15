@@ -3,7 +3,6 @@
 	import type { ItemData } from "./types.js";
 	import { Motion, type MotionProps } from "../motion/index.js";
 	import { ReorderContext } from "./context.js";
-	import { computed } from "runed";
 	import { invariant } from "hey-listen";
 	import { checkReorder, compareMin, getValue } from "./utils.js";
 
@@ -53,12 +52,14 @@
 		...rest
 	}: GroupProps<AsTag, K, V> = $props();
 
-	const axis = computed({
-		get: () => axisProp,
-		set: (value) => {
+	const axis = {
+		get current() {
+			return axisProp;
+		},
+		set current(value) {
 			axisProp = value;
 		},
-	});
+	};
 
 	let order: ItemData<any>[] = [];
 	let isReordering = false;
@@ -85,9 +86,9 @@
 			// If the entry was already added, update it rather than adding it again
 			const idx = order.findIndex((entry) => value === entry.value);
 			if (idx !== -1) {
-				order[idx].layout = layout[axis.value];
+				order[idx].layout = layout[axis.current];
 			} else {
-				order.push({ value, layout: layout[axis.value] });
+				order.push({ value, layout: layout[axis.current] });
 			}
 			order.sort(compareMin);
 		},

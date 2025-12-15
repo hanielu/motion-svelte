@@ -91,7 +91,7 @@
 		if (dragProp) {
 			return dragProp;
 		}
-		return axis.value;
+		return axis.current;
 	});
 	let isDragging = $state(false);
 
@@ -116,7 +116,7 @@
 	dragSnapToOrigin
 	onDrag={(event, gesturePoint) => {
 		const { velocity } = gesturePoint;
-		velocity[axis.value] && updateOrder(value, point[axis.value].get(), velocity[axis.value]);
+		velocity[axis.current] && updateOrder(value, point[axis.current].get(), velocity[axis.current]);
 		!isDragging && (isDragging = true);
 		onDrag && onDrag(event, gesturePoint);
 	}}

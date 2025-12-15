@@ -1,5 +1,6 @@
-import { computed, Context, type ComputedRef } from "runed";
+import { Context } from "runed";
 import type { MotionConfigState } from "./types.js";
+import type { FnGetter } from "@/types/common.js";
 
 /**
  * Default motion configuration
@@ -13,8 +14,8 @@ export const defaultConfig: MotionConfigState = {
 /**
  * Context for sharing motion configuration with child components
  */
-export const MotionConfigContext = new Context<ComputedRef<MotionConfigState>>("MotionConfig");
+export const MotionConfigContext = new Context<FnGetter<MotionConfigState>>("MotionConfig");
 
 export function useMotionConfig() {
-	return MotionConfigContext.getOr(computed(() => defaultConfig));
+	return MotionConfigContext.getOr(() => defaultConfig);
 }

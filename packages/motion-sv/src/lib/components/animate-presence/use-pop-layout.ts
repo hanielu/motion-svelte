@@ -116,8 +116,8 @@ export function usePopLayout(props: AnimatePresenceProps) {
 
 		state.element.dataset.motionPopId = state.id;
 		const style = document.createElement("style");
-		if (config.value.nonce) {
-			style.nonce = config.value.nonce;
+		if (config().nonce) {
+			style.nonce = config().nonce;
 		}
 		styles.set(state, style);
 		document.head.appendChild(style);

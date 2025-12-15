@@ -1,8 +1,9 @@
+import { Context } from "runed";
 import type { Feature } from "@/features/index.js";
-import { Context, type Ref } from "runed";
+import type { FnGetter } from "@/types/common.js";
 
 export type LazyMotionContext = {
-	features: Ref<Feature[]>;
+	features: FnGetter<Feature[]>;
 	strict: boolean;
 };
 

@@ -1,13 +1,13 @@
 <script lang="ts">
-	import type { Ref } from "runed";
 	import type { Snippet } from "svelte";
 	import { useLayoutGroupProvider, type LayoutGroupProps } from "./use-layout-group.js";
+	import type { FnGetter } from "@/types/common.js";
 
 	let {
 		inherit = true,
 		id,
 		children,
-	}: LayoutGroupProps & { children: Snippet<[props: { forceRender: () => void; key: Ref<number> }]> } = $props();
+	}: LayoutGroupProps & { children: Snippet<[props: { forceRender: () => void; key: FnGetter<number> }]> } = $props();
 
 	const { forceRender, key } = useLayoutGroupProvider({
 		get inherit() {

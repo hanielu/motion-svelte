@@ -1,5 +1,32 @@
+<script lang="ts" module>
+	/**
+	 * Set of void HTML tag names that cannot contain children.
+	 *
+	 * These tags are treated specially by motion components to prevent
+	 * rendering `children` content and to avoid hydration edge cases.
+	 *
+	 * Source: HTML Living Standard — list of void elements.
+	 * @see https://html.spec.whatwg.org/multipage/syntax.html#void-elements
+	 */
+	const VOID_TAGS = new Set<string>([
+		"area",
+		"base",
+		"br",
+		"col",
+		"embed",
+		"hr",
+		"img",
+		"input",
+		"link",
+		"meta",
+		"param",
+		"source",
+		"track",
+		"wbr",
+	]);
+</script>
+
 <script lang="ts">
-	import type { Attachment } from "svelte/attachments";
 	import type { DOMKeyframesDefinition } from "framer-motion";
 	import type { Feature } from "@/features/feature.js";
 	import type { MotionProps } from "./types.js";
@@ -8,9 +35,10 @@
 	import { LayoutMotionScopeContext } from "./layout-motion.svelte";
 	import { LazyMotionContext } from "../lazy-motion/context.js";
 	import { MotionState } from "@/state/motion-state.js";
-	import { PopLayoutContext } from "../animate-presence/index.js";
+	import { PresenceManagerContext } from "../animate-presence/index.js";
 	import { convertSvgStyleToAttributes, createStyles } from "@/state/style.js";
-	import { css, ref, watch } from "runed";
+	import { createAttachmentKey } from "svelte/attachments";
+	import { css, watch } from "runed";
 	import { invariant, warning } from "hey-listen";
 	import { isMotionValue } from "framer-motion/dom";
 	import { isValidMotionProp } from "./valid-prop.js";
@@ -32,7 +60,7 @@
 		features = [],
 		as: AsComponent,
 		props,
-		ref: externalRef = $bindable(),
+		ref: externalRef = $bindable(null),
 		forwardMotionProps = false,
 	}: MotionComponentProps = $props();
 
@@ -44,10 +72,10 @@
 	const config = useMotionConfig();
 	// animate presence context
 	const animatePresenceContext = AnimatePresenceContext.getOr({});
-	const popLayout = PopLayoutContext.getOr({});
+	const presenceManager = PresenceManagerContext.getOr({});
 	// lazy motion context
 	const lazyMotionContext = LazyMotionContext.getOr({
-		features: ref([]),
+		features: () => [],
 		strict: false,
 	});
 	// layout motion scope context
@@ -83,10 +111,10 @@
 		features,
 		lazyMotionContext,
 		layoutId: getLayoutId(),
-		transition: props.transition ?? config.value.transition,
+		transition: props.transition ?? config().transition,
 		layoutGroup,
-		motionConfig: config.value,
-		inViewOptions: props.inViewOptions ?? config.value.inViewOptions,
+		motionConfig: config(),
+		inViewOptions: props.inViewOptions ?? config().inViewOptions,
 		animatePresenceContext,
 		initial:
 			animatePresenceContext.initial === false
@@ -98,12 +126,12 @@
 
 	// svelte-ignore state_referenced_locally - mountOptions is meant to be referenced once per component
 	// then updated in onUpdated (which is $effect.pre)
-	const state = new MotionState(motionOptions, parentState!);
-	MotionStateContext.set(state);
-	layoutMotionScope?.register(state);
+	const motionState = new MotionState(motionOptions, parentState!);
+	MotionStateContext.set(motionState);
+	layoutMotionScope?.register(motionState);
 
 	const getAttrs = $derived.by(() => {
-		const isSVG = state.type === "svg";
+		const isSVG = motionState.type === "svg";
 		const attrsProps: Record<string | symbol, any> = {};
 
 		// 1) Start from DOM-facing attributes, unwrap MotionValues
@@ -120,19 +148,19 @@
 		// 2) Build styleProps
 		let styleProps: Record<string, any> = {
 			...props.style,
-			...(isSVG ? {} : state.visualElement?.latestValues || state.baseTarget),
+			...(isSVG ? {} : motionState.visualElement?.latestValues || motionState.baseTarget),
 		};
 
 		// Wait-mode gating: hide new entrants until all exits complete
-		const isWaitBlocked = popLayout.isWaitBlocked?.() === true;
-		if (isWaitBlocked && !state.activeStates.exit) {
+		const isWaitBlocked = presenceManager.isWaitBlocked?.() === true;
+		if (isWaitBlocked && !motionState.activeStates.exit) {
 			styleProps.display = "none";
 		}
 
 		// 3) SVG conversion
 		if (isSVG) {
 			const { attrs, style } = convertSvgStyleToAttributes({
-				...(state.isMounted() ? state.target : state.baseTarget),
+				...(motionState.isMounted() ? motionState.target : motionState.baseTarget),
 				...styleProps,
 			} as DOMKeyframesDefinition);
 
@@ -174,12 +202,12 @@
 
 	// onBeforeMount
 	$effect.pre(() => {
-		state.beforeMount();
+		motionState.beforeMount();
 
 		// onBeforeUnmount
 		return () => {
-			layoutMotionScope?.unregister(state);
-			state.beforeUnmount();
+			layoutMotionScope?.unregister(motionState);
+			motionState.beforeUnmount();
 		};
 	});
 
@@ -188,11 +216,11 @@
 	$effect(() => {
 		if (!props.layoutId || props.exit || !isInPresenceContext) return;
 
-		const unsubscribe = popLayout.subscribeToExitStart?.(() => {
+		const unsubscribe = presenceManager.subscribeToExitStart?.(() => {
 			// Trigger layout animation immediately when a blocking exit starts
-			state.unmount();
-			if (state.element) {
-				state.element.style.visibility = "hidden";
+			motionState.unmount();
+			if (motionState.element) {
+				motionState.element.style.visibility = "hidden";
 			}
 		});
 
@@ -225,17 +253,17 @@
 	watch(
 		() => motionOptions,
 		(options) => {
-			state.update(options);
+			motionState.update(options);
 		},
 		{ lazy: true }
 	);
 
-	// onMounted
-	const attachRef: Attachment<HTMLElement | SVGElement> = (node) => {
+	// onMounted (attachment)
+	function nodeRef(node: HTMLElement | SVGElement) {
 		externalRef = node;
 
-		const waitBlocked = popLayout.isWaitBlocked?.() === true;
-		state.mount(
+		const waitBlocked = untrack(() => presenceManager.isWaitBlocked?.() === true);
+		motionState.mount(
 			node,
 			untrack(() => motionOptions),
 			/* notAnimate when wait-blocked */ waitBlocked
@@ -244,14 +272,14 @@
 		// In wait mode, prevent the entering node from immediately adopting its animate styles.
 		// We temporarily disable the animate state so VE updates (while blocked) maintain initial values.
 		if (waitBlocked) {
-			state.setActive("animate", false, false);
+			motionState.setActive("animate", false, false);
 		}
 
 		// onUnmounted
 		return () => {
-			state.unmount();
+			motionState.unmount();
 		};
-	};
+	}
 
 	/**
 	 * Controls whether Svelte's built-in intro transition plays on first mount.
@@ -265,14 +293,14 @@
 	 * using Svelte's native transitions alone.
 	 */
 	let allowIntro = false;
-	let wasWaitBlocked = popLayout.isWaitBlocked?.() === true;
+	let wasWaitBlocked = presenceManager.isWaitBlocked?.() === true;
 
 	$effect.pre(() => {
-		const blocked = popLayout.isWaitBlocked?.() === true;
+		const blocked = presenceManager.isWaitBlocked?.() === true;
 		if (wasWaitBlocked && !blocked) {
 			// Gate opened: re-enable animate state and trigger enter from current base/initial
-			state.setActive("animate", true, false);
-			state.startAnimation();
+			motionState.setActive("animate", true, false);
+			motionState.startAnimation();
 		}
 		wasWaitBlocked = blocked;
 	});
@@ -286,11 +314,11 @@
 	$effect(() => {
 		if (!props.exit || !isInPresenceContext) return;
 		// Start tracking this element's position
-		popLayout.trackPosition?.(state);
+		presenceManager.trackPosition?.(motionState);
 
 		return () => {
 			// Stop tracking when element unmounts or exits
-			popLayout.untrackPosition?.(state);
+			presenceManager.untrackPosition?.(motionState);
 		};
 	});
 
@@ -301,38 +329,51 @@
 
 	function allowExit(node: Element) {
 		if (!allowExitFunctions()) return null;
-		return motionExit(node, { definition: exitDefinition, state, allowIntro, setAllowIntro: (v) => (allowIntro = v) });
+		return motionExit(node, {
+			definition: exitDefinition,
+			state: motionState,
+			allowIntro,
+			setAllowIntro: (v) => (allowIntro = v),
+		});
 	}
 
 	function onintrostart() {
 		if (!allowExitFunctions()) return;
-		popLayout.onIntroStart?.(state.element!);
+		presenceManager.onIntroStart?.(motionState.element!);
 	}
 
 	function onoutrostart() {
 		if (!allowExitFunctions()) return;
-		popLayout.onOutroStart?.(state.element!);
+		presenceManager.onOutroStart?.(motionState.element!);
 	}
 
 	function onoutroend() {
 		if (!allowExitFunctions()) return;
-		popLayout.onOutroEnd?.(state.element!);
+		presenceManager.onOutroEnd?.(motionState.element!);
 	}
+
+	const sharedProps = $derived({
+		...getAttrs,
+		[createAttachmentKey()]: nodeRef,
+		onintrostart,
+		onoutrostart,
+		onoutroend,
+	});
 </script>
 
 {#if typeof AsComponent === "string"}
-	<svelte:element
-		this={AsComponent}
-		{...getAttrs}
-		{@attach attachRef}
-		transition:allowExit|global
-		{onintrostart}
-		{onoutrostart}
-		{onoutroend}
-		xmlns={state.type === "svg" ? "http://www.w3.org/2000/svg" : undefined}
-	>
-		{@render props.children?.()}
-	</svelte:element>
+	{#if VOID_TAGS.has(AsComponent)}
+		<svelte:element this={AsComponent} {...sharedProps} transition:allowExit|global />
+	{:else}
+		<svelte:element
+			this={AsComponent}
+			{...sharedProps}
+			xmlns={motionState.type === "svg" ? "http://www.w3.org/2000/svg" : undefined}
+			transition:allowExit|global
+		>
+			{@render props.children?.()}
+		</svelte:element>
+	{/if}
 {:else}
-	<AsComponent {...getAttrs} {@attach attachRef} {onintrostart} {onoutrostart} {onoutroend} />
+	<AsComponent {...sharedProps} />
 {/if}

@@ -6,7 +6,7 @@ export class FeatureManager {
 	features: Feature[] = [];
 	constructor(state: MotionState) {
 		const { features = [], lazyMotionContext } = state.options;
-		const allFeatures = features.concat(lazyMotionContext.features.value);
+		const allFeatures = features.concat(lazyMotionContext.features());
 		this.features = allFeatures.map((Feature: any) => new Feature(state));
 		// watch for lazy motion features
 		// @eslint-disable-next-line
@@ -18,7 +18,7 @@ export class FeatureManager {
 		 */
 		watch.pre(
 			() => {
-				const features = lazyMotionContext.features.value;
+				const features = lazyMotionContext.features();
 				void features.length;
 				return features;
 			},
