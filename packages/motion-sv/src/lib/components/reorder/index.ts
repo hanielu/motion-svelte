@@ -1,9 +1,4 @@
-import Group from "./group.svelte";
-import Item from "./item.svelte";
+import ReorderGroup from "./group.svelte";
+import ReorderItem from "./item.svelte";
 
-export const ReorderGroup = Group;
-export const ReorderItem = Item;
-export const Reorder = {
-	Group,
-	Item,
-};
+export { ReorderGroup, ReorderItem };

@@ -60,7 +60,7 @@
 		features = [],
 		as: AsComponent,
 		props,
-		ref: externalRef = $bindable(null),
+		ref: externalRef = $bindable(),
 		forwardMotionProps = false,
 	}: MotionComponentProps = $props();
 
