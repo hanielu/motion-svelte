@@ -324,12 +324,12 @@
 
 	// We pass this in only when we're in a presence context,
 	// this way users not using presence don't need to deal with the added bundle size.
-	const motionExit = animatePresenceContext.transition;
-	const allowExitFunctions = () => !!props.exit && isInPresenceContext;
+	const motionExitTransition = animatePresenceContext.transition;
+	const shouldAllowExit = () => !!props.exit && isInPresenceContext;
 
-	function allowExit(node: Element) {
-		if (!allowExitFunctions()) return null;
-		return motionExit(node, {
+	function motionExit(node: Element) {
+		if (!shouldAllowExit()) return null;
+		return motionExitTransition(node, {
 			definition: exitDefinition,
 			state: motionState,
 			allowIntro,
@@ -337,24 +337,14 @@
 		});
 	}
 
-	function onintrostart() {
-		if (!allowExitFunctions()) return;
-		presenceManager.onIntroStart?.(motionState.element!);
-	}
+	const onintrostart = () => shouldAllowExit() && presenceManager.onIntroStart?.(motionState.element!);
+	const onoutrostart = () => shouldAllowExit() && presenceManager.onOutroStart?.(motionState.element!);
+	const onoutroend = () => shouldAllowExit() && presenceManager.onOutroEnd?.(motionState.element!);
 
-	function onoutrostart() {
-		if (!allowExitFunctions()) return;
-		presenceManager.onOutroStart?.(motionState.element!);
-	}
-
-	function onoutroend() {
-		if (!allowExitFunctions()) return;
-		presenceManager.onOutroEnd?.(motionState.element!);
-	}
-
+	const key = createAttachmentKey();
 	const sharedProps = $derived({
 		...getAttrs,
-		[createAttachmentKey()]: nodeRef,
+		[key]: nodeRef,
 		onintrostart,
 		onoutrostart,
 		onoutroend,
@@ -363,13 +353,13 @@
 
 {#if typeof AsComponent === "string"}
 	{#if VOID_TAGS.has(AsComponent)}
-		<svelte:element this={AsComponent} {...sharedProps} transition:allowExit|global />
+		<svelte:element this={AsComponent} {...sharedProps} transition:motionExit|global />
 	{:else}
 		<svelte:element
 			this={AsComponent}
 			{...sharedProps}
 			xmlns={motionState.type === "svg" ? "http://www.w3.org/2000/svg" : undefined}
-			transition:allowExit|global
+			transition:motionExit|global
 		>
 			{@render props.children?.()}
 		</svelte:element>
