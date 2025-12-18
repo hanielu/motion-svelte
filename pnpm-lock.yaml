@@ -258,8 +258,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/motion-rsv
       motion-sv:
-        specifier: latest
-        version: 0.1.5(svelte@5.45.8)
+        specifier: workspace:*
+        version: link:../../packages/motion-sv
       runed:
         specifier: workspace:*
         version: link:../../packages/utils
@@ -2313,11 +2313,6 @@ packages:
 
   motion-sv@0.1.2:
     resolution: {integrity: sha512-oAbg8405aBxAodtkJK9w0btnCEOgKFf7H5K4uM10zN/KLeT4Ej5K3OkWNaifjjpZV3MFuqBp3wsoovs9axhMxg==}
-    peerDependencies:
-      svelte: ^5.0.0
-
-  motion-sv@0.1.5:
-    resolution: {integrity: sha512-RqwmvACqLvWyli2tl2qdB0nKaazBT9jrk6mp23K44+TA2hv10577urXrMb6ZeCPQZ40o5SmI+xvp3g10YMb04g==}
     peerDependencies:
       svelte: ^5.0.0
 
@@ -5357,19 +5352,6 @@ snapshots:
       motion-dom: 12.23.12
       motion-utils: 12.23.6
       svelte: 5.41.3
-    transitivePeerDependencies:
-      - '@emotion/is-prop-valid'
-      - react
-      - react-dom
-
-  motion-sv@0.1.5(svelte@5.45.8):
-    dependencies:
-      csstype: 3.1.3
-      framer-motion: 12.23.12
-      hey-listen: 1.0.8
-      motion-dom: 12.23.12
-      motion-utils: 12.23.6
-      svelte: 5.45.8
     transitivePeerDependencies:
       - '@emotion/is-prop-valid'
       - react
