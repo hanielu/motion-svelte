@@ -10,10 +10,6 @@ export default defineConfig(({ mode }) => ({
 	build: {
 		minify: mode === "development" ? false : true,
 	},
-	optimizeDeps: {
-		// Force pre-bundle linked workspace packages to avoid circular dep issues in dev
-		include: ["motion-sv"],
-	},
 	resolve: {
 		alias: {
 			$lib: path.resolve(__dirname, "./src/lib"),

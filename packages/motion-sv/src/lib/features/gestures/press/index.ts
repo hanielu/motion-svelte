@@ -1,5 +1,5 @@
 import type { MotionState } from "@/state/motion-state.js";
-import { Feature } from "@/features/index.js";
+import { Feature } from "@/features/feature.js";
 import { frame, press } from "framer-motion/dom";
 import type { EventInfo } from "framer-motion";
 

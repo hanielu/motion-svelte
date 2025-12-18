@@ -1,10 +1,11 @@
 import type { $Transition, MotionStateContext, Options } from "@/types/index.js";
 import type { AnimateUpdates } from "@/features/animation/types.js";
 import type { DOMKeyframesDefinition, VisualElement } from "framer-motion";
-import type { Feature, StateType } from "@/features/index.js";
+import type { Feature } from "@/features/feature.js";
 import type { LazyMotionContext } from "@/components/lazy-motion/context.js";
 import type { PresenceContext } from "@/components/animate-presence/presence.svelte.js";
-import { FeatureManager } from "@/features/index.js";
+import type { StateType } from "@/features/animation/animation.js";
+import { FeatureManager } from "@/features/feature-manager.js";
 import { cancelFrame, frame, noop } from "framer-motion/dom";
 import { doneCallbacks } from "@/components/animate-presence/presence.svelte.js";
 import { invariant } from "hey-listen";

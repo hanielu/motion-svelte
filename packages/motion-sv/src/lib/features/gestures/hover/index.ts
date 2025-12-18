@@ -1,5 +1,6 @@
 import type { MotionState } from "@/state/motion-state.js";
-import { Feature, extractEventInfo } from "@/features/index.js";
+import { Feature } from "@/features/feature.js";
+import { extractEventInfo } from "@/features/gestures/press/index.js";
 import { frame, hover } from "framer-motion/dom";
 
 function handleHoverEvent(state: MotionState, event: PointerEvent, lifecycle: "Start" | "End") {

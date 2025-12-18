@@ -1,5 +1,5 @@
 import type { MotionState } from "@/state/motion-state.js";
-import { Feature } from "@/features/index.js";
+import { Feature } from "@/features/feature.js";
 import { frame, inView } from "framer-motion/dom";
 import type { Options } from "@/types/index.js";
 

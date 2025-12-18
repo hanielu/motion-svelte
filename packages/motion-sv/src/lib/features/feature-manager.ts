@@ -1,4 +1,4 @@
-import type { Feature } from "@/features/index.js";
+import type { Feature } from "@/features/feature.js";
 import type { MotionState } from "@/state/index.js";
 import { watch } from "runed";
 
