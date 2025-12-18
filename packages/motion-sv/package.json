@@ -1,6 +1,6 @@
 {
 	"name": "motion-sv",
-	"version": "0.1.7",
+	"version": "0.1.8",
 	"license": "MIT",
 	"author": "Haniel Ubogu <https://github.com/HanielU>",
 	"description": "Motion for Svelte",

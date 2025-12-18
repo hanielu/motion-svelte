@@ -17,11 +17,7 @@ export class FeatureManager {
 		 * and create a new instance of the feature
 		 */
 		watch.pre(
-			() => {
-				const features = lazyMotionContext.features();
-				void features.length;
-				return features;
-			},
+			() => lazyMotionContext.features(),
 			(features) => {
 				features.forEach((feature) => {
 					if (!allFeatures.includes(feature)) {
