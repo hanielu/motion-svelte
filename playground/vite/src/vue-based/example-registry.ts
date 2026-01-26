@@ -36,6 +36,7 @@ import ReorderExample_1 from "./examples/reorder/example-1/example-1.svelte";
 
 // Other
 import RollingBox from "./examples/rolling-box.svelte";
+import QuillowCard from "./examples/layout-focused/quillow-card.svelte";
 
 export interface Example {
 	id: string;
@@ -54,6 +55,7 @@ export const examples: Example[] = [
 
 	// Layout Focused
 	{ id: "basic-layout-toggle", name: "Basic Layout Toggle", component: BasicLayoutToggle, category: "Layout" },
+	// { id: "quillow-card", name: "Quillow Card", component: QuillowCard, category: "Layout" },
 	{ id: "basic-layout-list", name: "Basic Layout List", component: BasicLayoutList, category: "Layout" },
 	{ id: "layout-id-test", name: "Layout ID Test", component: LayoutIdTest, category: "Layout" },
 	{ id: "directional-nav", name: "Directional Nav", component: DirectionalNav, category: "Layout" },

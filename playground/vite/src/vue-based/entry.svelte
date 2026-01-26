@@ -3,6 +3,7 @@
 	import Navigation from "./navigation.svelte";
 	import type { Snippet } from "svelte";
 	import { BrowserRouter, Routes, Route, Outlet } from "@hvniel/svelte-router";
+	// import QuillowCard from "./examples/layout-focused/quillow-card.svelte";
 </script>
 
 <BrowserRouter>
@@ -11,6 +12,7 @@
 			<Route path="/" element={home as Snippet} />
 			<Route path="/example/:id" Component={ExampleView} />
 		</Route>
+		<!-- <Route path="/quillow-card" Component={QuillowCard} /> -->
 	</Routes>
 </BrowserRouter>
 
