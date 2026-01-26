@@ -61,12 +61,12 @@
 	let blockingExitCount = $state(0);
 
 	// Subscribers to be notified when a blocking exit starts
-	const exitStartSubscribers = new Set<() => void>();
-	function subscribeToExitStart(callback: () => void): () => void {
+	const exitStartSubscribers = new Set<(exitingEl: Element) => void>();
+	function subscribeToExitStart(callback: (exitingEl: Element) => void): () => void {
 		exitStartSubscribers.add(callback);
 		return () => exitStartSubscribers.delete(callback);
 	}
-	const notifyExitStart = () => exitStartSubscribers.forEach((cb) => cb());
+	const notifyExitStart = (exitingEl: Element) => exitStartSubscribers.forEach((cb) => cb(exitingEl));
 
 	$effect.pre(() => () => {
 		exitDom.clear();
@@ -118,7 +118,7 @@
 		if (blocksExit) {
 			blockingExitCount++;
 			// Notify layout-only elements to start their animations in parallel
-			notifyExitStart();
+			notifyExitStart(el);
 		}
 
 		// Defer to next microtask to ensure updated layout/values

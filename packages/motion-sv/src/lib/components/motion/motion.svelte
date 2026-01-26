@@ -216,7 +216,12 @@
 	$effect(() => {
 		if (!props.layoutId || props.exit || !isInPresenceContext) return;
 
-		const unsubscribe = presenceManager.subscribeToExitStart?.(() => {
+		const unsubscribe = presenceManager.subscribeToExitStart?.((exitingEl) => {
+			// Skip if we're a descendant of the exiting element - we'll fade out naturally with our parent
+			if (motionState.element && exitingEl.contains(motionState.element)) {
+				return;
+			}
+
 			// Trigger layout animation immediately when a blocking exit starts
 			motionState.unmount();
 			if (motionState.element) {
