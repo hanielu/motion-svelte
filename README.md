@@ -42,12 +42,12 @@ Some Framer Motion features cannot be reproduced in Svelte with the same APIs.
 React uses `getSnapshotBeforeUpdate` and Vue uses `onBeforeUpdate`.
 Svelte has no equivalent, so layout animations require a helper.
 
-Enable them by wrapping `motion` with `createLayoutMotion`:
+Enable them using `createLayoutMotion`:
 
 ```ts
-import { motion, createLayoutMotion } from "motion-sv";
+import { createLayoutMotion } from "motion-sv";
 
-const layout = createLayoutMotion(motion);
+const layout = createLayoutMotion();
 ```
 
 `createLayoutMotion` provides:
@@ -62,7 +62,7 @@ Usage:
 	import { motion, createLayoutMotion } from "motion-sv";
 
 	let isOn = $state(false);
-	const layout = createLayoutMotion(motion);
+	const layout = createLayoutMotion();
 
 	const toggle = layout.update.with(() => (isOn = !isOn));
 	// or:
@@ -125,5 +125,4 @@ Alternatively, use `layoutId` to link elements across renders:
 
 Limitations in this port:
 
-- Variants with `AnimatePresence` (e.g. `when`) may not work.
-- Rapid toggling can cause flickers instead of smooth reversal.
+- Certiain Variants with `AnimatePresence` (e.g. `when`) may not work.
