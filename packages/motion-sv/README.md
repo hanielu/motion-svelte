@@ -4,7 +4,7 @@ This is an attempt to bring a Motion (formerly known as Framer Motion) to Svelte
 
 # Documentation
 
-This project is based on the [Motion for Vue](https://motion.dev/vue) documentation.
+This project is based on the [Motion for Vue](https://motion.dev/docs/vue) documentation.
 
 ## Quick Start
 
