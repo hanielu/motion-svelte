@@ -23,16 +23,26 @@ export function motionExit(node: Element, params: MotionTransitionParamsShape): 
 	const baseDuration = toMs(baseTransition?.duration) ?? 200;
 	const baseDelay = toMs(baseTransition?.delay) ?? 0;
 
-	const seen = (motionExit as any)._seen || new WeakSet<Element>();
-	(motionExit as any)._seen = seen;
+	// Use globalThis to ensure WeakSet persists across module boundaries (SvelteKit bundling issue)
+	const SEEN_KEY = "__motion_sv_exit_seen__";
+	const seen: WeakSet<Element> =
+		(globalThis as any)[SEEN_KEY] || ((globalThis as any)[SEEN_KEY] = new WeakSet<Element>());
+
 	const isIntroCall = !seen.has(node);
+	// Check if the element was marked as exiting by onoutrostart
+	const EXITING_KEY = "__motion_exiting__";
+	const isExiting = (node as any)[EXITING_KEY] === true;
+
 	if (isIntroCall) {
 		seen.add(node);
 		node.addEventListener("outroend", () => params.setAllowIntro(true), { once: true });
 	}
 
-	// If this is the initial intro and we haven't been allowed to run, skip the transition entirely
-	if (isIntroCall && !params.allowIntro) return null;
+	// If this is the initial intro and we haven't been allowed to run, skip the transition
+	// BUT if the element is marked as exiting, it's an outro (not intro)
+	if (isIntroCall && !params.allowIntro && !isExiting) {
+		return null;
+	}
 
 	const state = params.state;
 

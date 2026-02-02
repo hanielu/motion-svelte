@@ -342,9 +342,21 @@
 		});
 	}
 
+	// Mark element as exiting so motionExit can distinguish intro from outro
+	const EXITING_KEY = '__motion_exiting__';
+	
 	const onintrostart = () => shouldAllowExit() && presenceManager.onIntroStart?.(motionState.element!);
-	const onoutrostart = () => shouldAllowExit() && presenceManager.onOutroStart?.(motionState.element!);
-	const onoutroend = () => shouldAllowExit() && presenceManager.onOutroEnd?.(motionState.element!);
+	const onoutrostart = () => {
+		if (!shouldAllowExit()) return;
+		// Mark the element as exiting BEFORE the transition function is called
+		(motionState.element as any)[EXITING_KEY] = true;
+		presenceManager.onOutroStart?.(motionState.element!);
+	};
+	const onoutroend = () => {
+		if (!shouldAllowExit()) return;
+		delete (motionState.element as any)[EXITING_KEY];
+		presenceManager.onOutroEnd?.(motionState.element!);
+	};
 
 	const key = createAttachmentKey();
 	const sharedProps = $derived({
