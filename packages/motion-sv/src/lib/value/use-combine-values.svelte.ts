@@ -1,4 +1,4 @@
-import { type MotionValue, cancelFrame, frame, motionValue } from "framer-motion/dom";
+import { type MotionValue, cancelFrame, frame, motionValue } from "motion-dom";
 
 export function useCombineMotionValues<T>(combineValues: () => T) {
 	/**
@@ -19,7 +19,7 @@ export function useCombineMotionValues<T>(combineValues: () => T) {
 	 * schedule an update.
 	 */
 	const scheduleUpdate = () => frame.preRender(updateValue, false, true);
-	let subscriptions: VoidFunction[];
+	let subscriptions: VoidFunction[] = [];
 
 	const subscribe = (values: MotionValue[]) => {
 		subscriptions = values.map((v) => v.on("change", scheduleUpdate));

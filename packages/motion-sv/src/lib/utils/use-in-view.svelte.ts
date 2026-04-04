@@ -8,7 +8,11 @@ export interface UseInViewOptions extends Omit<InViewOptions, "root"> {
 }
 
 class UseInView {
-	isInView = $state(false);
+	#isInView = $state(false);
+
+	get current() {
+		return this.#isInView;
+	}
 
 	constructor(node: () => HTMLElement, options: () => UseInViewOptions) {
 		$effect(() => {
@@ -16,16 +20,16 @@ class UseInView {
 			const { once } = realOptions;
 			const el = node();
 
-			if (!el || (once && this.isInView)) {
+			if (!el || (once && this.#isInView)) {
 				return;
 			}
 
 			const onEnter = () => {
-				this.isInView = true;
+				this.#isInView = true;
 				return once
 					? undefined
 					: () => {
-							this.isInView = false;
+							this.#isInView = false;
 						};
 			};
 

@@ -4,6 +4,7 @@ export * from "./use-transform.svelte.js";
 export * from "./use-time.js";
 export * from "./use-motion-template.js";
 export * from "./use-motion-value-event.svelte.js";
+export * from "./use-current-motion-value.svelte.js";
 export * from "./use-spring.js";
 export * from "./use-scroll.svelte.js";
 export * from "./use-velocity.js";

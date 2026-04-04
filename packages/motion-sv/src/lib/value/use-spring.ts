@@ -1,11 +1,23 @@
-import { animateValue, frame, frameData, isMotionValue, motionValue } from "framer-motion/dom";
-import type { JSAnimation, MotionValue } from "framer-motion/dom";
-import type { AnyResolvedKeyframe, SpringOptions } from "framer-motion";
+import { isMotionValue, motionValue } from "framer-motion/dom";
+import type { MotionValue } from "framer-motion/dom";
+import type { FollowValueOptions, SpringOptions } from "motion-dom";
+import { attachFollow } from "motion-dom";
 import { watch, extract, type MaybeGetter } from "runed";
 
-function toNumber(v: string | number) {
-	if (typeof v === "number") return v;
-	return parseFloat(v);
+type AnyResolvedKeyframe = string | number;
+
+export function useFollowValue<T extends AnyResolvedKeyframe>(
+	source: T | MotionValue<T>,
+	options: MaybeGetter<FollowValueOptions> = {}
+) {
+	const value = motionValue(isMotionValue(source) ? source.get() : source);
+
+	watch(
+		() => extract(options),
+		() => attachFollow(value, source, extract(options))
+	);
+
+	return value;
 }
 
 /**
@@ -27,64 +39,90 @@ function toNumber(v: string | number) {
  *
  * @public
  */
-export function useSpring(source: MotionValue<string>, config?: MaybeGetter<SpringOptions>): MotionValue<string>;
-export function useSpring(source: string, config?: MaybeGetter<SpringOptions>): MotionValue<string>;
-export function useSpring(source: MotionValue<number>, config?: MaybeGetter<SpringOptions>): MotionValue<number>;
-export function useSpring(source: number, config?: MaybeGetter<SpringOptions>): MotionValue<number>;
-export function useSpring(
-	source: MotionValue<string> | MotionValue<number> | AnyResolvedKeyframe,
+export function useSpring<T extends AnyResolvedKeyframe>(
+	source: T | MotionValue<T>,
 	config: MaybeGetter<SpringOptions> = {}
-): MotionValue<any> {
-	let activeSpringAnimation: JSAnimation<number | string> | null = null;
-	const sourceValue = isMotionValue(source) ? toNumber(source.get()) : (source as string | number);
-	const value = motionValue(sourceValue);
-	let latestValue: number | string = sourceValue;
-	let latestSetter = () => {};
-
-	const stopAnimation = () => {
-		if (activeSpringAnimation) {
-			activeSpringAnimation.stop();
-			activeSpringAnimation = null;
-		}
-	};
-
-	const startAnimation = () => {
-		const animation = activeSpringAnimation;
-
-		if (animation?.time === 0) {
-			animation.sample(frameData.delta);
-		}
-
-		stopAnimation();
-		const springConfig = extract(config);
-		activeSpringAnimation = animateValue({
-			keyframes: [value.get(), latestValue],
-			velocity: value.getVelocity(),
-			type: "spring",
-			restDelta: 0.001,
-			restSpeed: 0.01,
-			...springConfig,
-			onUpdate: latestSetter,
-		});
-	};
+) {
+	const value = motionValue(isMotionValue(source) ? source.get() : source);
 
 	watch(
 		() => extract(config),
-		() => {
-			(value as any).attach((v: any, set: any) => {
-				latestValue = toNumber(v);
-				latestSetter = set;
-				frame.update(startAnimation);
-				return value.get();
-			}, stopAnimation);
-		}
+		() => attachFollow(value, source, { type: "spring", ...extract(config) })
 	);
-
-	if (isMotionValue(source)) {
-		source.on("change", (v) => {
-			value.set(toNumber(v));
-		});
-	}
 
 	return value;
 }
+
+// ------------------------------------------------------------
+
+// import { animateValue, frame, frameData, isMotionValue, motionValue } from "framer-motion/dom";
+// import type { JSAnimation, MotionValue } from "framer-motion/dom";
+// import type { AnyResolvedKeyframe, SpringOptions } from "framer-motion";
+// import { watch, extract, type MaybeGetter } from "runed";
+
+// function toNumber(v: string | number) {
+// 	if (typeof v === "number") return v;
+// 	return parseFloat(v);
+// }
+
+// export function useSpring(source: MotionValue<string>, config?: MaybeGetter<SpringOptions>): MotionValue<string>;
+// export function useSpring(source: string, config?: MaybeGetter<SpringOptions>): MotionValue<string>;
+// export function useSpring(source: MotionValue<number>, config?: MaybeGetter<SpringOptions>): MotionValue<number>;
+// export function useSpring(source: number, config?: MaybeGetter<SpringOptions>): MotionValue<number>;
+// export function useSpring(
+// 	source: MotionValue<string> | MotionValue<number> | AnyResolvedKeyframe,
+// 	config: MaybeGetter<SpringOptions> = {}
+// ): MotionValue<any> {
+// 	let activeSpringAnimation: JSAnimation<number | string> | null = null;
+// 	const sourceValue = isMotionValue(source) ? toNumber(source.get()) : (source as string | number);
+// 	const value = motionValue(sourceValue);
+// 	let latestValue: number | string = sourceValue;
+// 	let latestSetter = () => {};
+
+// 	const stopAnimation = () => {
+// 		if (activeSpringAnimation) {
+// 			activeSpringAnimation.stop();
+// 			activeSpringAnimation = null;
+// 		}
+// 	};
+
+// 	const startAnimation = () => {
+// 		const animation = activeSpringAnimation;
+
+// 		if (animation?.time === 0) {
+// 			animation.sample(frameData.delta);
+// 		}
+
+// 		stopAnimation();
+// 		const springConfig = extract(config);
+// 		activeSpringAnimation = animateValue({
+// 			keyframes: [value.get(), latestValue],
+// 			velocity: value.getVelocity(),
+// 			type: "spring",
+// 			restDelta: 0.001,
+// 			restSpeed: 0.01,
+// 			...springConfig,
+// 			onUpdate: latestSetter,
+// 		});
+// 	};
+
+// 	watch(
+// 		() => extract(config),
+// 		() => {
+// 			(value as any).attach((v: any, set: any) => {
+// 				latestValue = toNumber(v);
+// 				latestSetter = set;
+// 				frame.update(startAnimation);
+// 				return value.get();
+// 			}, stopAnimation);
+// 		}
+// 	);
+
+// 	if (isMotionValue(source)) {
+// 		source.on("change", (v) => {
+// 			value.set(toNumber(v));
+// 		});
+// 	}
+
+// 	return value;
+// }

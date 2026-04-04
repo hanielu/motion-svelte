@@ -1,4 +1,4 @@
-import { type MotionValue, collectMotionValues } from "framer-motion/dom";
+import { type MotionValue, collectMotionValues } from "motion-dom";
 import { useCombineMotionValues } from "./use-combine-values.svelte.js";
 
 export function useComputed<T>(computed: () => T): MotionValue<T> {

@@ -1,6 +1,6 @@
 {
 	"name": "motion-sv",
-	"version": "0.1.10",
+	"version": "0.1.11",
 	"license": "MIT",
 	"author": "Haniel Ubogu <https://github.com/HanielU>",
 	"description": "Motion for Svelte",
@@ -63,9 +63,9 @@
 	],
 	"dependencies": {
 		"csstype": "^3.1.3",
-		"framer-motion": "^12.23.12",
+		"framer-motion": "^12.38.0",
 		"hey-listen": "^1.0.8",
-		"motion-dom": "^12.23.12",
-		"motion-utils": "^12.23.6"
+		"motion-dom": "^12.38.0",
+		"motion-utils": "^12.36.0"
 	}
 }

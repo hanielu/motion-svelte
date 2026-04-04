@@ -1,20 +1,31 @@
-import { createScopedAnimate, type AnimationScope } from "framer-motion/dom";
+import { createScopedAnimate, type AnimationPlaybackControls } from "framer-motion/dom";
 
-export function useAnimate<T extends Element = Element>() {
-	const scope: AnimationScope<T> = {
-		current: null!, // Will be hydrated on mount by svelte
-		animations: [],
-	};
+type Scope = { current: Element; animations: AnimationPlaybackControls[] };
 
-	const animate = createScopedAnimate(scope);
+export function useAnimate<T extends Element = any>(): [Scope, ReturnType<typeof createScopedAnimate>] {
+	let domNode = $state<{ current: T | null }>({ current: null });
+
+	const domProxy = new Proxy(domNode, {
+		get(target, key) {
+			if (typeof key === "string" || typeof key === "symbol") {
+				if (key === "current") return Reflect.get(target, "current");
+				return Reflect.get(target, key);
+			}
+			return undefined;
+		},
+		set(target, key, value) {
+			if (key === "current") return Reflect.set(target, key, value);
+			if (key === "animations") return Reflect.set(target, key, value);
+			return true;
+		},
+	}) as unknown as Scope;
+
+	domProxy.animations = [];
+
+	const animate = createScopedAnimate({ scope: domProxy });
 
 	// stop any running animations on unmount
-	$effect(() => {
-		return () => {
-			for (const a of scope.animations) a.stop();
-			scope.animations.length = 0;
-		};
-	});
+	$effect(() => () => domProxy.animations.forEach((animation) => animation.stop()));
 
-	return [scope, animate] as const;
+	return [domProxy, animate] as const;
 }

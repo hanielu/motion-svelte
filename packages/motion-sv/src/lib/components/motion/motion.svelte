@@ -146,9 +146,37 @@
 		}
 
 		// 2) Build styleProps
+		let styleSource = isSVG ? {} : motionState.visualElement?.latestValues || motionState.baseTarget;
+
+		// Opt-in workaround for Chrome IntersectionObserver issue.
+		// Chrome's IntersectionObserver correctly computes intersection based on the visible/painted
+		// area rather than the layout box. Elements with CSS properties that make them visually
+		// invisible (e.g., `clipPath: inset(0% 100% 0% 0%)`) won't trigger `whileInView` because
+		// Chrome reports `isIntersecting: false`. When enabled via `inViewOptions.useClipPathWorkaround`,
+		// we exclude such properties from inline styles until the animation triggers.
+		// @see https://github.com/hanielu/motion-svelte/issues/9
+		if (
+			props.whileInView &&
+			props.inViewOptions?.useClipPathWorkaround &&
+			!motionState.activeStates.whileInView
+		) {
+			const filtered: Record<string, any> = {};
+			for (const key in styleSource) {
+				// Skip clipPath if it would fully clip the element (any inset with 100%)
+				if (key === "clipPath") {
+					const value = styleSource[key];
+					if (typeof value === "string" && value.includes("100%")) {
+						continue;
+					}
+				}
+				filtered[key] = styleSource[key];
+			}
+			styleSource = filtered;
+		}
+
 		let styleProps: Record<string, any> = {
 			...props.style,
-			...(isSVG ? {} : motionState.visualElement?.latestValues || motionState.baseTarget),
+			...styleSource,
 		};
 
 		// Wait-mode gating: hide new entrants until all exits complete
@@ -343,8 +371,8 @@
 	}
 
 	// Mark element as exiting so motionExit can distinguish intro from outro
-	const EXITING_KEY = '__motion_exiting__';
-	
+	const EXITING_KEY = "__motion_exiting__";
+
 	const onintrostart = () => shouldAllowExit() && presenceManager.onIntroStart?.(motionState.element!);
 	const onoutrostart = () => {
 		if (!shouldAllowExit()) return;

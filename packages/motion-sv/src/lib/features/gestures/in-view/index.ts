@@ -3,7 +3,7 @@ import { Feature } from "@/features/feature.js";
 import { frame, inView } from "framer-motion/dom";
 import type { Options } from "@/types/index.js";
 
-function handleHoverEvent(state: MotionState, entry: IntersectionObserverEntry, lifecycle: "Enter" | "Leave") {
+function handleViewportEvent(state: MotionState, entry: IntersectionObserverEntry, lifecycle: "Enter" | "Leave") {
 	const props = state.options;
 	if (props.whileInView) {
 		state.setActive("whileInView", lifecycle === "Enter");
@@ -35,10 +35,10 @@ export class InViewGesture extends Feature {
 		this.unmount = inView(
 			element,
 			(_, entry) => {
-				handleHoverEvent(this.state, entry, "Enter");
+				handleViewportEvent(this.state, entry, "Enter");
 				if (!once) {
 					return (endEvent) => {
-						handleHoverEvent(this.state, entry, "Leave");
+						handleViewportEvent(this.state, entry, "Leave");
 					};
 				}
 			},
