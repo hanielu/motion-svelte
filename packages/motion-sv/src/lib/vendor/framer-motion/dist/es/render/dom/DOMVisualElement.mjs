@@ -12,6 +12,9 @@ class DOMVisualElement extends VisualElement {
          * we're returning true if 2 in that bitmask is set to true. 2 is set
          * to true if b preceeds a.
          */
+        if (!a || !b || typeof a.compareDocumentPosition !== 'function' || typeof b.compareDocumentPosition !== 'function') {
+            return 0;
+        }
         return a.compareDocumentPosition(b) & 2 ? 1 : -1;
     }
     getBaseTargetFromProps(props, key) {
