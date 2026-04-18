@@ -4,6 +4,7 @@
 	"license": "MIT",
 	"author": "Haniel Ubogu <https://github.com/HanielU>",
 	"description": "Motion for Svelte",
+	"homepage": "https://github.com/hanielu/motion-svelte/tree/main/packages/motion-sv#readme",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/HanielU/motion-svlte.git"
