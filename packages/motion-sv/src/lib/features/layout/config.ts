@@ -1,5 +1,4 @@
-import { correctBorderRadius } from "@/projection/styles/scale-border-radius.js";
-import { correctBoxShadow } from "@/projection/styles/scale-box-shadow.js";
+import { correctBorderRadius, correctBoxShadow } from "motion-dom";
 
 export const defaultScaleCorrector = {
 	borderRadius: {

@@ -3,14 +3,21 @@
 	import type { MotionConfigProps } from "./types.js";
 	import { MotionConfigContext, useMotionConfig } from "./context.js";
 
-	let { children, transition, reducedMotion, nonce, inViewOptions }: MotionConfigProps & { children: Snippet } =
-		$props();
+	let {
+		children,
+		transition,
+		reducedMotion,
+		skipAnimations,
+		nonce,
+		inViewOptions,
+	}: MotionConfigProps & { children: Snippet } = $props();
 
 	const parentConfig = useMotionConfig();
 
 	const config = $derived({
 		transition: transition ?? parentConfig().transition,
 		reducedMotion: reducedMotion ?? parentConfig().reducedMotion,
+		skipAnimations: skipAnimations ?? parentConfig().skipAnimations,
 		nonce: nonce ?? parentConfig().nonce,
 		inViewOptions: inViewOptions ?? parentConfig().inViewOptions,
 	});

@@ -1,38 +1,41 @@
 import { Feature } from "@/features/feature.js";
-import { HTMLProjectionNode } from "framer-motion/dist/es/projection/node/HTMLProjectionNode.mjs";
+import type { IProjectionNode } from "motion-dom";
+import { HTMLProjectionNode, addScaleCorrector } from "motion-dom";
 import { getClosestProjectingNode } from "@/features/layout/utils.js";
-import { addScaleCorrector } from "framer-motion/dist/es/projection/styles/scale-correction.mjs";
 import { defaultScaleCorrector } from "@/features/layout/config.js";
 import { isHTMLElement } from "@/features/gestures/drag/utils/is.js";
-import { doneCallbacks } from "@/components/animate-presence/presence.svelte.js";
+import { isSSR } from "@/utils/is.js";
 
 export class ProjectionFeature extends Feature {
+	static key = "projection" as const;
+	private projection: IProjectionNode | undefined;
+
 	constructor(state) {
 		super(state);
 		addScaleCorrector(defaultScaleCorrector);
+		if (!isSSR) {
+			this.initProjection();
+		}
 	}
 
 	initProjection() {
 		const options = this.state.options;
-		// @ts-ignore
-		this.state.visualElement.projection = new HTMLProjectionNode<HTMLElement>(
+		this.state.visualElement.projection = new HTMLProjectionNode(
 			this.state.visualElement.latestValues,
 			options["data-framer-portal-id"] ? undefined : getClosestProjectingNode(this.state.visualElement.parent)
 		);
-		this.state.visualElement.projection.isPresent = true;
+		this.projection = this.state.visualElement.projection;
+		this.projection.isPresent = true;
 		this.setOptions();
-	}
-
-	beforeMount() {
-		this.initProjection();
 	}
 
 	setOptions() {
 		const options = this.state.options;
-		this.state.visualElement.projection.setOptions({
-			layout: options.layout,
-			layoutId: options.layoutId,
-			alwaysMeasureLayout: Boolean(options.drag) || (options.dragConstraints && isHTMLElement(options.dragConstraints)),
+		const { layoutId, layout, drag = false, dragConstraints = false } = options;
+		this.projection?.setOptions({
+			layout,
+			layoutId,
+			alwaysMeasureLayout: Boolean(layoutId) || Boolean(drag) || (dragConstraints && isHTMLElement(dragConstraints)),
 			visualElement: this.state.visualElement,
 			animationType: typeof options.layout === "string" ? options.layout : "both",
 			// initialPromotionConfig
@@ -40,19 +43,14 @@ export class ProjectionFeature extends Feature {
 			layoutScroll: options.layoutScroll,
 			crossfade: options.crossfade,
 			onExitComplete: () => {
-				if (!this.state.visualElement.projection?.isPresent) {
-					const done = doneCallbacks.get(this.state.element);
-					this.state.isSafeToRemove = true;
-					if (done) {
-						done(
-							{
-								detail: {
-									isExit: true,
-								},
-							},
-							true
-						);
-					}
+				if (!this.projection?.isPresent && this.state.options.layoutId && !this.state.isExiting) {
+					// Defer to avoid re-entrant microtask.read() during projection update().
+					// notifyLayoutUpdate can call this synchronously while the microtask batcher
+					// is processing; a direct root.didUpdate() call here would be permanently lost
+					// because the microtask batcher's allowKeepAlive=false skips follow-up batches.
+					queueMicrotask(() => {
+						this.state.options.presenceContext?.onMotionExitComplete?.(this.state.presenceContainer, this.state);
+					});
 				}
 			},
 		});
@@ -63,6 +61,6 @@ export class ProjectionFeature extends Feature {
 	}
 
 	mount() {
-		this.state.visualElement.projection?.mount(this.state.element);
+		this.projection?.mount(this.state.element);
 	}
 }

@@ -1,11 +1,8 @@
 import type { MotionExitDefinition, MotionTransitionParamsShape } from "./types.js";
 import type { TransitionConfig } from "svelte/transition";
-import { findValueType, spring, calcGeneratorDuration } from "framer-motion/dom";
+import { findValueType, spring, calcGeneratorDuration, getValueTransition, getDefaultTransition } from "motion-dom";
 import { style as styleUtils } from "@/state/style.js";
 import { transformAlias, transformDefinitions } from "@/state/transform.js";
-// Use FM internals for parity
-import { getValueTransition } from "framer-motion/dist/es/animation/sequence/create.mjs";
-import { getDefaultTransition } from "framer-motion/dist/es/animation/utils/default-transitions.mjs";
 
 function toMs(seconds?: number): number | undefined {
 	if (seconds == null) return undefined;

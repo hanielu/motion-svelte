@@ -1,7 +1,7 @@
 import type { LayoutGroupState } from "./context.js";
 import { LayoutGroupContext } from "./context.js";
 import { useForceUpdate } from "./use-force-update.svelte.js";
-import { nodeGroup } from "./group.js";
+import { nodeGroup } from "motion-dom";
 
 /**
  * Props for configuring layout group behavior

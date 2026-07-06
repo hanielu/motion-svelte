@@ -1,5 +1,12 @@
-import type { CssPropertyDefinition, CssPropertyDefinitionMap } from "@/types/index.js";
 import { noopReturn } from "@/state/utils.js";
+
+export interface CssPropertyDefinition {
+	syntax: `<${string}>`;
+	initialValue: string | number;
+	toDefaultUnit: (v: number) => string | number;
+}
+
+export type CssPropertyDefinitionMap = { [key: string]: CssPropertyDefinition };
 
 const rotation: CssPropertyDefinition = {
 	syntax: "<angle>",

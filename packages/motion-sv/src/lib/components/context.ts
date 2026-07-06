@@ -1,15 +1,11 @@
 import type { MotionState } from "@/state/index.js";
-import type { IProjectionNode } from "framer-motion";
+import type { NodeGroup } from "motion-dom";
 import { Context } from "runed";
 import type { FnGetter } from "@/types/common.js";
 
 export const MotionStateContext = new Context<MotionState>("MotionState");
 
-export interface NodeGroup {
-	add: (node: IProjectionNode) => void;
-	remove: (node: IProjectionNode) => void;
-	dirty: VoidFunction;
-}
+export type { NodeGroup };
 export interface LayoutGroupState {
 	id?: string;
 	group?: NodeGroup;

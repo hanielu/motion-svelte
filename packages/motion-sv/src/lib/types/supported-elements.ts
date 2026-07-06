@@ -117,7 +117,7 @@ export interface HTMLElements {
 	var: HTMLElement;
 	video: HTMLVideoElement;
 	wbr: HTMLElement;
-	webview: HTMLWebViewElement;
+	webview: HTMLElement;
 }
 
 type UnionStringArray<T extends Readonly<string[]>> = T[number];

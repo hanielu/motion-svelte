@@ -27,29 +27,29 @@
 </script>
 
 <script lang="ts">
-	import type { DOMKeyframesDefinition } from "framer-motion";
-	import type { Feature } from "@/features/feature.js";
 	import type { MotionProps } from "./types.js";
+	import type { FeatureBundle } from "@/features/dom-animation.js";
+	import type { createVisualElement } from "@/state/create-visual-element.js";
 	import { AnimatePresenceContext } from "../animate-presence/presence.svelte.js";
 	import { LayoutGroupContext, MotionStateContext } from "../context.js";
 	import { LayoutMotionScopeContext } from "./layout-motion.svelte";
 	import { LazyMotionContext } from "../lazy-motion/context.js";
 	import { MotionState } from "@/state/motion-state.js";
 	import { PresenceManagerContext } from "../animate-presence/index.js";
-	import { convertSvgStyleToAttributes, createStyles } from "@/state/style.js";
+	import { createSVGStyles, createStyles } from "@/state/style.js";
 	import { createAttachmentKey } from "svelte/attachments";
 	import { css, watch } from "runed";
 	import { invariant, warning } from "hey-listen";
 	import { isMotionValue } from "framer-motion/dom";
 	import { isValidMotionProp } from "./valid-prop.js";
-	import { resolveVariant } from "@/state/utils.js";
+	import { resolveVariantValue } from "@/state/utils.js";
+	import { resolveMotionProps } from "@/utils/resolve-motion-props.js";
+	import { updateLazyFeatures } from "@/features/lazy-features.js";
 	import { untrack, type Component } from "svelte";
 	import { useMotionConfig } from "../motion-config/index.js";
 
-	type MaybePromise<T> = T | Promise<T> | (() => Promise<T>);
-
 	interface MotionComponentProps {
-		features?: MaybePromise<Feature[]>;
+		renderer?: typeof createVisualElement;
 		as: string | Component;
 		forwardMotionProps?: boolean;
 		props: MotionProps;
@@ -57,7 +57,7 @@
 	}
 
 	let {
-		features = [],
+		renderer,
 		as: AsComponent,
 		props,
 		ref: externalRef = $bindable(),
@@ -71,11 +71,11 @@
 	// motion config context
 	const config = useMotionConfig();
 	// animate presence context
-	const animatePresenceContext = AnimatePresenceContext.getOr({});
+	const presenceContext = AnimatePresenceContext.getOr({});
 	const presenceManager = PresenceManagerContext.getOr({});
 	// lazy motion context
 	const lazyMotionContext = LazyMotionContext.getOr({
-		features: () => [],
+		features: () => ({}) as Partial<FeatureBundle>,
 		strict: false,
 	});
 	// layout motion scope context
@@ -85,50 +85,45 @@
 	 * If we're in development mode, check to make sure we're not rendering a motion component
 	 * as a child of LazyMotion, as this will break the file-size benefits of using it.
 	 */
-	if (
-		process.env.NODE_ENV !== "production" &&
-		// @ts-expect-error
-		features?.length &&
-		lazyMotionContext.strict
-	) {
+	if (process.env.NODE_ENV !== "production" && renderer && lazyMotionContext.strict) {
 		const strictMessage =
 			"You have rendered a `motion` component within a `LazyMotion` component. This will break tree shaking. Import and render a `m` component instead.";
 		props.ignoreStrict ? warning(false, strictMessage) : invariant(false, strictMessage);
 	}
 
-	/**
-	 * Get the layout ID for the motion component
-	 * If both layoutGroup.id and props.layoutId exist, combine them with a hyphen
-	 * Otherwise return props.layoutId or undefined
-	 */
-	function getLayoutId() {
-		if (layoutGroup.id && props.layoutId) return `${layoutGroup.id}-${props.layoutId}`;
-		return props.layoutId || undefined;
-	}
-
-	const motionOptions = $derived({
-		...props,
-		features,
-		lazyMotionContext,
-		layoutId: getLayoutId(),
-		transition: props.transition ?? config().transition,
-		layoutGroup,
-		motionConfig: config(),
-		inViewOptions: props.inViewOptions ?? config().inViewOptions,
-		animatePresenceContext,
-		initial:
-			animatePresenceContext.initial === false
-				? animatePresenceContext.initial
-				: props.initial === true
-					? undefined
-					: props.initial,
-	});
+	const motionOptions = $derived(
+		resolveMotionProps(props, {
+			layoutGroup,
+			presenceContext,
+			config: config(),
+		})
+	);
 
 	// svelte-ignore state_referenced_locally - mountOptions is meant to be referenced once per component
-	// then updated in onUpdated (which is $effect.pre)
+	// then updated in the update watcher
 	const motionState = new MotionState(motionOptions, parentState!);
 	MotionStateContext.set(motionState);
 	layoutMotionScope?.register(motionState);
+
+	// If renderer is provided directly (motion component), use it immediately
+	if (renderer) {
+		motionState.initVisualElement(renderer);
+		motionState.updateFeatures();
+	}
+
+	// Watch for lazy-loaded features (for m component with LazyMotion)
+	watch.pre(
+		() => lazyMotionContext.features(),
+		(bundle) => {
+			if (bundle.features?.length) {
+				updateLazyFeatures(bundle.features);
+			}
+			if (bundle.renderer) {
+				motionState.initVisualElement(bundle.renderer);
+			}
+			motionState.updateFeatures();
+		}
+	);
 
 	const getAttrs = $derived.by(() => {
 		const isSVG = motionState.type === "svg";
@@ -146,7 +141,8 @@
 		}
 
 		// 2) Build styleProps
-		let styleSource = isSVG ? {} : motionState.visualElement?.latestValues || motionState.baseTarget;
+		const currentValues = motionState.visualElement?.latestValues || motionState.latestValues;
+		let styleSource = isSVG ? {} : currentValues;
 
 		// Opt-in workaround for Chrome IntersectionObserver issue.
 		// Chrome's IntersectionObserver correctly computes intersection based on the visible/painted
@@ -155,11 +151,7 @@
 		// Chrome reports `isIntersecting: false`. When enabled via `inViewOptions.useClipPathWorkaround`,
 		// we exclude such properties from inline styles until the animation triggers.
 		// @see https://github.com/hanielu/motion-svelte/issues/9
-		if (
-			props.whileInView &&
-			props.inViewOptions?.useClipPathWorkaround &&
-			!motionState.activeStates.whileInView
-		) {
+		if (props.whileInView && props.inViewOptions?.useClipPathWorkaround && !motionState.isActive("whileInView")) {
 			const filtered: Record<string, any> = {};
 			for (const key in styleSource) {
 				// Skip clipPath if it would fully clip the element (any inset with 100%)
@@ -179,30 +171,27 @@
 			...styleSource,
 		};
 
+		// Extract MotionValue objects to their current values
+		// (buildSVGAttrs/buildHTMLStyles expect plain values)
+		for (const key in styleProps) {
+			if (isMotionValue(styleProps[key])) styleProps[key] = styleProps[key].get();
+		}
+
 		// Wait-mode gating: hide new entrants until all exits complete
 		const isWaitBlocked = presenceManager.isWaitBlocked?.() === true;
-		if (isWaitBlocked && !motionState.activeStates.exit) {
+		if (isWaitBlocked && !motionState.isActive("exit")) {
 			styleProps.display = "none";
 		}
 
 		// 3) SVG conversion
 		if (isSVG) {
-			const { attrs, style } = convertSvgStyleToAttributes({
-				...(motionState.isMounted() ? motionState.target : motionState.baseTarget),
-				...styleProps,
-			} as DOMKeyframesDefinition);
-
-			if (style.transform || attrs.transformOrigin) {
-				style.transformOrigin = attrs.transformOrigin ?? "50% 50%";
-				delete attrs.transformOrigin;
-			}
-			if (style.transform) {
-				style.transformBox = style.transformBox ?? "fill-box";
-				delete attrs.transformBox;
-			}
-
-			Object.assign(attrsProps, attrs);
-			styleProps = style as Record<string, any>;
+			const { attrs: svgAttrs, style: svgStyle } = createSVGStyles(
+				{ ...currentValues, ...styleProps },
+				motionState.options.as as string,
+				props.style as Record<string, any>
+			);
+			Object.assign(attrsProps, svgAttrs);
+			styleProps = svgStyle;
 		}
 
 		// 4) Drag safety styles
@@ -222,17 +211,14 @@
 		return attrsProps;
 	});
 
-	// Resolve exit variant to use as a Svelte out transition
+	// Resolve exit variant (including its transition) to size the Svelte out transition
 	const exitDefinition = $derived.by(() => {
-		const customValue = props.custom ?? animatePresenceContext.custom;
-		return resolveVariant(props.exit, props.variants, customValue);
+		const customValue = props.custom ?? presenceContext.custom;
+		return resolveVariantValue(props.exit, props.variants, customValue);
 	});
 
-	// onBeforeMount
+	// onBeforeUnmount
 	$effect.pre(() => {
-		motionState.beforeMount();
-
-		// onBeforeUnmount
 		return () => {
 			layoutMotionScope?.unregister(motionState);
 			motionState.beforeUnmount();
@@ -263,11 +249,7 @@
 	// onBeforeUpdate (not really, svelte doesn't have a beforeUpdate hook)
 	// so it doesn't work for layout updates like the vue version
 	// instead we use the createLayoutMotion().update() method
-	// $effect.pre(() => {
-	// 	void motionOptions; // trigger effect
-	// 	state.beforeUpdate();
-	// });
-
+	//
 	// onUpdated
 	// now technically, a watch.pre would be more accurate to vue's onUpdated,
 	// but I noticed something odd when i tried it:
@@ -277,16 +259,12 @@
 	// then each subsequent button's handle with a `layoutId` prop would not work as expected.
 	// they'd kinda flicker when toggling (I guess going from opacity 0->1?)
 	// unless I set `crossfade={false}` on the handle(s) with the `layoutId` prop.
-	// Nothing I tried would fix it. (setting `layoutRoot` on the button, or using `LayoutGroup` or both)
 	// so we're using a watch instead.
-	//
-	// This bug(?) exists in vue too, so this is kinda an advantage the svelte version has over the vue version.
-	//
-	// TBD if we'll run into other issues with this.
 	watch(
 		() => motionOptions,
 		(options) => {
-			motionState.update(options);
+			motionState.updateOptions(options);
+			motionState.update();
 		},
 		{ lazy: true }
 	);
@@ -296,17 +274,14 @@
 		externalRef = node;
 
 		const waitBlocked = untrack(() => presenceManager.isWaitBlocked?.() === true);
-		motionState.mount(
-			node,
-			untrack(() => motionOptions),
-			/* notAnimate when wait-blocked */ waitBlocked
-		);
 
 		// In wait mode, prevent the entering node from immediately adopting its animate styles.
 		// We temporarily disable the animate state so VE updates (while blocked) maintain initial values.
 		if (waitBlocked) {
-			motionState.setActive("animate", false, false);
+			motionState.setActiveNoAnimate("animate", false);
 		}
+
+		motionState.mount(node);
 
 		// onUnmounted
 		return () => {
@@ -332,8 +307,7 @@
 		const blocked = presenceManager.isWaitBlocked?.() === true;
 		if (wasWaitBlocked && !blocked) {
 			// Gate opened: re-enable animate state and trigger enter from current base/initial
-			motionState.setActive("animate", true, false);
-			motionState.startAnimation();
+			motionState.setActive("animate", true);
 		}
 		wasWaitBlocked = blocked;
 	});
@@ -357,7 +331,7 @@
 
 	// We pass this in only when we're in a presence context,
 	// this way users not using presence don't need to deal with the added bundle size.
-	const motionExitTransition = animatePresenceContext.transition;
+	const motionExitTransition = presenceContext.transition;
 	const shouldAllowExit = () => !!props.exit && isInPresenceContext;
 
 	function motionExit(node: Element) {

@@ -5,6 +5,7 @@
 	import { createLayoutMotion, motion, type MotionProps } from "../motion/index.js";
 	import { invariant } from "hey-listen";
 	import { useDefaultMotionValue } from "./utils.js";
+	import { autoScrollIfNeeded, resetAutoScrollState } from "./auto-scroll.js";
 	import { useTransform } from "@/value/index.js";
 	import { watch } from "runed";
 
@@ -60,10 +61,13 @@
 
 	const zIndex = useTransform([point.x, point.y], ([latestX, latestY]) => (latestX || latestY ? 1 : "unset"));
 	function warning() {
-		invariant(Boolean(context), "Reorder.Item must be a child of Reorder.Group");
+		invariant(Boolean(context), "Reorder.Item must be a descendant of Reorder.Group");
 	}
 
-	const { axis, registerItem, updateOrder } = context;
+	// Call immediately to fail during setup, not render
+	warning();
+
+	const { axis, registerItem, updateOrder, groupRef } = context!;
 
 	const restProps = $derived({
 		...rest,
@@ -95,37 +99,44 @@
 	});
 	let isDragging = $state(false);
 
-	$effect(() => warning());
-
 	const layout = createLayoutMotion(motion);
 	const Motion = layout.div;
 
 	watch.pre(
 		() => [restProps.custom],
-		([current], [old]) => {
-			console.log("due update", current, old);
+		() => {
 			layout.update();
 		},
 		{ lazy: true }
 	);
+
+	// Track drag position for auto-scroll
+	function handleDrag(event: PointerEvent, gesturePoint: any) {
+		const { velocity, point: pointerPoint } = gesturePoint;
+		const offset = point[axis.current].get();
+
+		// Always attempt to update order - checkReorder handles the logic
+		updateOrder(value, offset, velocity[axis.current]);
+
+		autoScrollIfNeeded(groupRef() ?? null, pointerPoint[axis.current], axis.current, velocity[axis.current]);
+		if (!isDragging) isDragging = true;
+		onDrag?.(event, gesturePoint);
+	}
+
+	function handleDragEnd(event: PointerEvent, gesturePoint: any) {
+		isDragging = false;
+		resetAutoScrollState();
+		onDragEnd?.(event, gesturePoint);
+	}
 </script>
 
 <layout.div
 	{...restProps}
 	{drag}
 	dragSnapToOrigin
-	onDrag={(event, gesturePoint) => {
-		const { velocity } = gesturePoint;
-		velocity[axis.current] && updateOrder(value, point[axis.current].get(), velocity[axis.current]);
-		!isDragging && (isDragging = true);
-		onDrag && onDrag(event, gesturePoint);
-	}}
-	onDragEnd={(event, gesturePoint) => {
-		isDragging = false;
-		onDragEnd && onDragEnd(event, gesturePoint);
-	}}
+	onDrag={handleDrag}
+	onDragEnd={handleDragEnd}
 	onLayoutMeasure={(measured) => {
-		console.log("[measured]", measured);
 		registerItem(value, measured);
 	}}
 	bind:ref

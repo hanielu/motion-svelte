@@ -1,6 +1,8 @@
 import type { Component, ComponentProps } from "svelte";
 import Motion from "./motion.svelte";
-import type { Feature } from "@/features/index.js";
+import type { FeatureBundle } from "@/features/dom-animation.js";
+import type { createVisualElement } from "@/state/create-visual-element.js";
+import { updateLazyFeatures } from "@/features/lazy-features.js";
 import type { MotionComponent, MotionProps } from "./types.js";
 import type { SvelteHTMLElements } from "svelte/elements";
 import type { MotionHTMLAttributes } from "@/types/motion-values.js";
@@ -9,7 +11,7 @@ import { withProp } from "runed";
 
 export interface MotionCreateOptions {
 	forwardMotionProps?: boolean;
-	features?: Feature[];
+	renderer?: typeof createVisualElement;
 }
 
 const componentMaxCache = new Map<any, Component>();
@@ -18,7 +20,7 @@ const componentMiniCache = new Map<any, Component>();
 export function createMotionComponent(component: string | Component, options: MotionCreateOptions = {}) {
 	const isString = typeof component === "string";
 	const name = isString ? component : component.name || "";
-	const componentCache = options.features?.length! > 0 ? componentMaxCache : componentMiniCache;
+	const componentCache = options.renderer ? componentMaxCache : componentMiniCache;
 	if (isString && componentCache?.has(component)) {
 		return componentCache.get(component);
 	}
@@ -26,7 +28,7 @@ export function createMotionComponent(component: string | Component, options: Mo
 	const motionComponent: MotionComponent<typeof component> = (anchor, props) => {
 		const getAs = () => props.as || component || "div";
 		return Motion(anchor, {
-			features: options.features,
+			renderer: options.renderer,
 			get forwardMotionProps() {
 				return props.forwardMotionProps || options.forwardMotionProps;
 			},
@@ -70,19 +72,21 @@ export type MotionNameSpace = {
 	): Component<Omit<MotionProps<T, unknown>, "asChild"> & MotionHTMLAttributes<T>>;
 };
 
-export function createMotionComponentWithFeatures(features: Feature[] = []) {
+export function createMotionComponentWithFeatures(featureBundle?: FeatureBundle) {
+	const renderer = featureBundle?.renderer;
+	updateLazyFeatures(featureBundle?.features || []);
 	return new Proxy({} as unknown as MotionNameSpace, {
 		get(_target, key) {
 			if (key === "create") {
 				return (component: any, options?: MotionCreateOptions) =>
 					createMotionComponent(component, {
 						...options,
-						features,
+						renderer,
 					});
 			}
 
 			return createMotionComponent(key as string, {
-				features,
+				renderer,
 			});
 		},
 	});

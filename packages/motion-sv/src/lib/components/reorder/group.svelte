@@ -68,21 +68,24 @@
 		invariant(Boolean(values), "Reorder.Group must be provided a values prop");
 	}
 
-	// TODO: (haniel) need to figure out what triggers this
+	$effect(() => {
+		isReordering = false;
+	});
+
+	// Only reset order if the values changed externally (not from our own reordering)
 	$effect.pre(() => {
 		void values;
-		console.log("[reorder.group.values]", JSON.stringify($state.snapshot(values), null, 4));
-		isReordering = false;
-		order = [];
-
-		return () => {
-			// TODO: (haniel) this might work better in a function returned to the pre effect
-		};
+		if (!isReordering) {
+			order = [];
+		}
 	});
 
 	ReorderContext.set({
 		axis,
+		groupRef: () => ref,
 		registerItem: (value, layout) => {
+			// Skip items that are no longer in the values list (e.g., exiting with AnimatePresence)
+			if (!values.includes(value)) return;
 			// If the entry was already added, update it rather than adding it again
 			const idx = order.findIndex((entry) => value === entry.value);
 			if (idx !== -1) {
@@ -98,8 +101,9 @@
 			const newOrder = checkReorder(order, item, offset, velocity);
 			if (order !== newOrder) {
 				isReordering = true;
+				// Update the internal order array to match the new order
+				order = newOrder;
 				values = newOrder.map(getValue).filter((value) => values.includes(value));
-				console.log("[newOrder]", JSON.stringify($state.snapshot(values)));
 				onReorder?.(values);
 			}
 		},
@@ -107,6 +111,8 @@
 
 	// (haniel) might put this in the template effect, who knows
 	$effect(() => warning());
+
+	const groupStyle = $derived({ overflowAnchor: "none", ...(rest.style as Record<string, any>) });
 </script>
 
-<Motion as={as as any} {...rest} bind:ref />
+<Motion as={as as any} {...rest} style={groupStyle} bind:ref />

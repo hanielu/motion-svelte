@@ -1,29 +1,34 @@
 import type { AnimatePresenceProps } from "./types.js";
+import type { MotionState } from "@/state/motion-state.js";
 import { Context } from "runed";
 import { motionExit } from "@/animation/transition.svelte.js";
-
-export const doneCallbacks = new WeakMap<Element, (v?: any, safeUnmount?: boolean) => void>();
-
-export function removeDoneCallback(element: Element) {
-	const prevDoneCallback = doneCallbacks.get(element);
-	if (prevDoneCallback) {
-		element.removeEventListener("motioncomplete", prevDoneCallback);
-	}
-	doneCallbacks.delete(element);
-}
 
 export interface PresenceContext {
 	initial?: boolean;
 	custom?: any;
+	presenceId?: string;
+	// Notify when a motion component's exit animation is complete
+	onMotionExitComplete?: (container: HTMLElement | null, state: MotionState) => void;
+	/**
+	 * Svelte-specific: the exit transition estimator used by Motion components
+	 * to keep the DOM node alive for the duration of the exit animation.
+	 */
 	transition?: typeof motionExit;
 }
 
 export const AnimatePresenceContext = new Context<PresenceContext>("AnimatePresenceContext");
 
-export function useAnimatePresence(props: AnimatePresenceProps) {
-	const presenceContext = {
+let apId = 0;
+
+export function useAnimatePresence(
+	props: AnimatePresenceProps,
+	onMotionExitComplete?: PresenceContext["onMotionExitComplete"]
+) {
+	const presenceContext: PresenceContext = {
 		initial: props.initial,
 		custom: props.custom,
+		presenceId: String(apId++),
+		onMotionExitComplete,
 		transition: motionExit,
 	};
 
@@ -36,4 +41,6 @@ export function useAnimatePresence(props: AnimatePresenceProps) {
 	$effect(() => {
 		presenceContext.initial = undefined;
 	});
+
+	return presenceContext;
 }

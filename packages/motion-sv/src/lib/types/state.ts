@@ -1,5 +1,14 @@
-import type { DOMKeyframesDefinition, ResolvedValues, VariantLabels, Variants } from "framer-motion";
-import type { MotionValue, TransformProperties, animate } from "framer-motion/dom";
+import type {
+	DOMKeyframesDefinition,
+	LegacyAnimationControls,
+	MotionPath,
+	MotionValue,
+	ResolvedValues,
+	TransformProperties,
+	VariantLabels,
+	Variants,
+} from "motion-dom";
+import type { animate } from "framer-motion/dom";
 import type { LayoutOptions } from "@/features/layout/types.js";
 import type { DragProps } from "@/features/gestures/drag/types.js";
 import type { PressProps } from "@/features/gestures/press/types.js";
@@ -10,7 +19,6 @@ import type { PanProps } from "@/features/gestures/pan/types.js";
 import type { MotionConfigState } from "@/components/motion-config/types.js";
 import type { $Transition } from "./framer-motion.js";
 import type { FocusProps } from "@/features/gestures/focus/types.js";
-import type { AnimationControls } from "@/animation/types.js";
 import type { AsTag } from "./common.js";
 import type { Snippet } from "svelte";
 import type { ClassValue } from "svelte/elements";
@@ -35,7 +43,20 @@ export interface DragOptions {
 }
 
 type TransformPropertiesWithoutTransition = Omit<TransformProperties, "transition">;
-export type MotionStyle = Partial<{
+
+/**
+ * In motion-dom's `Transition` union, the `path` key carries two meanings:
+ * the curved-motion factory (`arc()`, typed `MotionPath`) and the SVG `path`
+ * attribute's per-value transition (typed `ValueTransition`, and non-optional
+ * in the mapped `SVGPathTransitions`). That collision can obscure the
+ * `MotionPath` type at call sites like `transition: { path: arc() }`.
+ *
+ * This distributive override pins `path` to `MotionPath` on every union member
+ * while preserving each member's other fields, so `arc()` is accepted cleanly.
+ */
+type WithMotionPath<T> = T extends any ? Omit<T, "path"> & { path?: MotionPath } : never;
+
+export type MotionStyleProps = Partial<{
 	[K in keyof Omit<VariantType & TransformPropertiesWithoutTransition, "attrX" | "attrY" | "attrScale">]:
 		| string
 		| number
@@ -54,14 +75,14 @@ export interface Options<T = any>
 	custom?: T;
 	as?: AsTag;
 	initial?: VariantLabels | VariantType | boolean;
-	animate?: VariantLabels | VariantType | AnimationControls;
+	animate?: VariantLabels | VariantType | LegacyAnimationControls;
 	exit?: VariantLabels | VariantType;
 	variants?: Variants;
 	inherit?: boolean;
-	style?: MotionStyle;
+	style?: MotionStyleProps;
 	transformTemplate?: (transform: TransformProperties, generatedTransform: string) => string;
-	transition?: $Transition & {
-		layout?: $Transition;
+	transition?: WithMotionPath<$Transition> & {
+		layout?: WithMotionPath<$Transition>;
 	};
 	layoutGroup?: LayoutGroupState;
 	motionConfig?: MotionConfigState;
@@ -89,11 +110,3 @@ export interface MotionStateContext {
 }
 
 export type AnimationFactory = () => AnimationPlaybackControls | undefined;
-
-export interface CssPropertyDefinition {
-	syntax: `<${string}>`;
-	initialValue: string | number;
-	toDefaultUnit: (v: number) => string | number;
-}
-
-export type CssPropertyDefinitionMap = { [key: string]: CssPropertyDefinition };

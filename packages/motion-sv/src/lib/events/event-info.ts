@@ -1,4 +1,4 @@
-import { isPrimaryPointer } from "@/events/index.js";
+import { isPrimaryPointer } from "./utils/index.js";
 import type { EventInfo } from "./types.js";
 
 export type EventListenerWithPointInfo = (e: PointerEvent, info: EventInfo) => void;

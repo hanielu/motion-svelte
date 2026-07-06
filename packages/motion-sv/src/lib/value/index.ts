@@ -8,3 +8,4 @@ export * from "./use-current-motion-value.svelte.js";
 export * from "./use-spring.js";
 export * from "./use-scroll.svelte.js";
 export * from "./use-velocity.js";
+export * from "./scroll/offsets.js";

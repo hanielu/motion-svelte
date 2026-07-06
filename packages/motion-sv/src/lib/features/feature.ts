@@ -1,21 +1,30 @@
 import type { MotionState } from "@/state/motion-state.js";
 
-export abstract class Feature {
+export type FeatureKey =
+	| "animation"
+	| "projection"
+	| "layout"
+	| "hover"
+	| "press"
+	| "focus"
+	| "drag"
+	| "pan"
+	| "inView";
+
+export class Feature {
+	static key: FeatureKey;
+
+	isMount: boolean;
+
 	state: MotionState;
 
 	constructor(state: MotionState) {
 		this.state = state;
 	}
 
-	beforeMount(): void {}
+	mount() {}
 
-	mount(): void {}
+	unmount() {}
 
-	unmount(): void {}
-
-	update?(): void {}
-
-	beforeUpdate?(): void {}
-
-	beforeUnmount?(): void {}
+	update() {}
 }

@@ -1,7 +1,9 @@
 import type { AnimatePresenceProps } from "./types.js";
 import type { MotionState } from "@/state/motion-state.js";
-import { frame } from "framer-motion/dom";
+import { frame } from "motion-dom";
 import { useMotionConfig } from "../motion-config/index.js";
+
+let popId = 0;
 
 export function usePopLayout(props: AnimatePresenceProps) {
 	const styles = new WeakMap<MotionState, HTMLStyleElement>();
@@ -112,9 +114,11 @@ export function usePopLayout(props: AnimatePresenceProps) {
 		// Clear the cache after use
 		cachedPositions.delete(state);
 
-		const x = props.anchorX === "left" ? `left: ${size.left}` : `right: ${size.right}`;
+		const x = props.anchorX === "left" ? `left: ${size.left}px` : `right: ${size.right}px`;
 
-		state.element.dataset.motionPopId = state.id;
+		// Use unique pop id for CSS selector
+		const elementPopId = `pop-${popId++}`;
+		(state.element as HTMLElement).dataset.motionPopId = elementPopId;
 		const style = document.createElement("style");
 		if (config().nonce) {
 			style.nonce = config().nonce;
@@ -123,12 +127,12 @@ export function usePopLayout(props: AnimatePresenceProps) {
 		document.head.appendChild(style);
 		if (style.sheet) {
 			style.sheet.insertRule(`
-    [data-motion-pop-id="${state.id}"] {
+    [data-motion-pop-id="${elementPopId}"] {
       position: absolute !important;
       width: ${size.width}px !important;
       height: ${size.height}px !important;
       top: ${size.top}px !important;
-      ${x}px !important;
+      ${x} !important;
       }
       `);
 		}

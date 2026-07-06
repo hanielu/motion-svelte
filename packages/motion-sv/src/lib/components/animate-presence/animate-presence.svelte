@@ -5,7 +5,7 @@
 	import type { Snippet } from "svelte";
 	import { PresenceManagerContext } from "./index.js";
 	import { mountedStates } from "@/state/motion-state.js";
-	import { removeDoneCallback } from "./presence.svelte.js";
+	import type { MotionState } from "@/state/motion-state.js";
 	import { delay } from "@/utils/delay.js";
 
 	let {
@@ -17,18 +17,6 @@
 		onExitComplete,
 		children,
 	}: AnimatePresenceProps & { children: Snippet } = $props();
-
-	// TODO: (haniel) maybe these don't need to be getters?
-	useAnimatePresence({
-		mode,
-		initial,
-		get custom() {
-			return custom;
-		},
-		get anchorX() {
-			return anchorX;
-		},
-	});
 
 	const { addPopStyle, removePopStyle, trackPosition, untrackPosition, styles } = usePopLayout({
 		get mode() {
@@ -76,6 +64,31 @@
 
 	const isWaitBlocked = () => mode === "wait" && blockingExitCount > 0;
 
+	/**
+	 * Called by MotionState (via ProjectionFeature / setActive("exit", true) promise)
+	 * when a motion component's exit animation truly completes. Used for popLayout
+	 * style cleanup and layout bookkeeping — DOM removal timing stays with Svelte's outro.
+	 */
+	function handleMotionExitComplete(container: HTMLElement | null, state: MotionState) {
+		if (styles.has(state)) {
+			removePopStyle(state);
+		}
+	}
+
+	useAnimatePresence(
+		{
+			mode,
+			initial,
+			get custom() {
+				return custom;
+			},
+			get anchorX() {
+				return anchorX;
+			},
+		},
+		handleMotionExitComplete
+	);
+
 	function handleIntroStart(el: Element) {
 		const state = mountedStates.get(el);
 		if (!state) return;
@@ -93,11 +106,9 @@
 		// Re-track position for popLayout mode since element is re-entering
 		trackPosition(state);
 
-		removeDoneCallback(el);
-		// Reset exit without animating
-		state.setActive("exit", false, false);
 		// Resume enter animation from current values
-		state.startAnimation();
+		state.setActive("exit", false);
+		state.getSnapshot(state.options, true);
 	}
 
 	function handleOutroStart(el: Element) {
@@ -121,9 +132,13 @@
 			notifyExitStart(el);
 		}
 
+		state.presenceContainer = el as HTMLElement;
+
 		// Defer to next microtask to ensure updated layout/values
 		delay(() => {
-			state.setActive?.("exit", true);
+			state.setActive("exit", true);
+			state.getSnapshot(state.options, false);
+			state.didUpdate();
 		});
 	}
 
@@ -142,7 +157,8 @@
 
 		if (exitDom.size === 0) onExitComplete?.();
 		if (!styles?.has(state)) {
-			state.willUpdate("done");
+			state.getSnapshot(state.options, false);
+			state.didUpdate();
 		} else {
 			removePopStyle(state);
 		}

@@ -1,24 +1,33 @@
 <script lang="ts">
-	import type { Feature } from "@/features/index.js";
+	import type { FeatureBundle } from "@/features/dom-animation.js";
 	import type { Snippet } from "svelte";
 	import { LazyMotionContext } from "./context.js";
 
-	type MaybePromise<T> = T | Promise<T> | (() => Promise<T>);
+	type FeaturesProp = FeatureBundle | Promise<FeatureBundle> | (() => Promise<FeatureBundle>);
 
 	interface LazyMotionProps {
 		children: Snippet;
-		features?: MaybePromise<Feature[]>;
+		features: FeaturesProp;
 		strict?: boolean;
 	}
 
-	let { children, features: featuresProp = [], strict = false }: LazyMotionProps = $props();
+	let { children, features: featuresProp, strict = false }: LazyMotionProps = $props();
 
-	let features = $state.raw<Feature[]>(Array.isArray(featuresProp) ? featuresProp : []);
+	let features = $state.raw<Partial<FeatureBundle>>({});
 
-	if (!Array.isArray(featuresProp)) {
-		const featuresPromise = typeof featuresProp === "function" ? featuresProp() : featuresProp;
-		featuresPromise.then((feats) => {
-			features = feats;
+	// Check if it's a FeatureBundle object (has renderer property)
+	if (typeof featuresProp === "object" && "renderer" in featuresProp) {
+		// Sync load
+		features = featuresProp;
+	} else if (typeof featuresProp === "function") {
+		// Async load - function that returns promise
+		featuresProp().then((mod) => {
+			features = mod;
+		});
+	} else if (featuresProp instanceof Promise) {
+		// Async load - direct promise
+		featuresProp.then((mod) => {
+			features = mod;
 		});
 	}
 

@@ -1,31 +1,60 @@
-import type { $Transition, AsTag, Options, VariantType } from "@/types/index.js";
+import type { AsTag, MotionStateContext, Options, VariantType } from "@/types/index.js";
 
-export function resolveVariant(
+/**
+ * Resolve a variant definition to its full target, including `transition`.
+ * Used by the Svelte exit-transition duration estimator, which needs the
+ * variant's own transition to size the outro window.
+ */
+export function resolveVariantValue(
 	definition?: Options["animate"],
 	variants?: Options["variants"],
 	custom?: Options["custom"]
 ): VariantType | undefined {
 	if (Array.isArray(definition)) {
 		return definition.reduce((acc, item) => {
-			const resolvedVariant = resolveVariant(item, variants, custom);
+			const resolvedVariant = resolveVariantValue(item, variants, custom);
 			return resolvedVariant ? { ...acc, ...resolvedVariant } : acc;
 		}, {});
 	} else if (typeof definition === "object") {
 		return definition as VariantType;
 	} else if (definition && variants) {
 		const variant = variants[definition as string];
-		return typeof variant === "function" ? variant(custom) : variant;
+		return (typeof variant === "function" ? (variant as any)(custom) : variant) as VariantType;
 	}
 }
 
-export function hasChanged(a: any, b: any): boolean {
-	if (typeof a !== typeof b) return true;
-	if (Array.isArray(a) && Array.isArray(b)) return !shallowCompare(a, b);
-	return a !== b;
+export function resolveVariant(
+	definition?: Options["animate"],
+	variants?: Options["variants"],
+	custom?: Options["custom"]
+): VariantType | undefined {
+	const resolved = resolveVariantValue(definition, variants, custom);
+	if (!resolved) return undefined;
+	const { transition, transitionEnd, ...target } = resolved as any;
+	return { ...target, ...transitionEnd };
+}
+
+/**
+ * Resolve initial latest values from variant sources.
+ * Shared by MotionState constructor and SSR style resolution.
+ *
+ * @param options - Motion options
+ * @param context - Optional parent context for variant inheritance (MotionState passes this)
+ */
+export function resolveInitialValues(options: Options, context?: MotionStateContext): Record<string, any> {
+	const initial = options.initial === undefined && options.variants ? context?.initial : options.initial;
+	const sources = initial === false ? ["initial", "animate"] : ["initial"];
+	const custom = options.custom ?? (options as any).presenceContext?.custom;
+	return sources.reduce<Record<string, any>>((acc, variant) => {
+		return {
+			...acc,
+			...resolveVariant(options[variant] || context?.[variant], options.variants, custom),
+		};
+	}, {});
 }
 
 export function shallowCompare(next: any[], prev: any[]) {
-	const prevLength = prev.length;
+	const prevLength = prev?.length;
 
 	if (prevLength !== next.length) return false;
 
@@ -34,22 +63,6 @@ export function shallowCompare(next: any[], prev: any[]) {
 	}
 
 	return true;
-}
-
-export function addUniqueItem<T>(array: T[], item: T) {
-	!array.includes(item) && array.push(item);
-}
-
-export function removeItem<T>(array: T[], item: T) {
-	const index = array.indexOf(item);
-
-	index !== -1 && array.splice(index, 1);
-}
-export function getOptions(options: $Transition, key: string): $Transition {
-	if (!options) return {};
-	return options[key as keyof typeof options]
-		? { ...options, ...options[key as keyof typeof options], [key]: undefined }
-		: { ...options };
 }
 
 export function isCssVar(name: string) {

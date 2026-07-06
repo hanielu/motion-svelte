@@ -1,7 +1,8 @@
 import type { ResolvedConstraints } from "@/features/gestures/drag/types.js";
-import { calcLength } from "@/projection/geometry/delta-calc.js";
-import { progress as calcProgress, clamp, mixNumber } from "framer-motion/dom";
-import type { Axis, BoundingBox, Box, DragElastic } from "framer-motion";
+import type { DragElastic } from "motion-dom";
+import { calcLength, mixNumber } from "motion-dom";
+import type { Axis, BoundingBox, Box } from "motion-utils";
+import { clamp, progress as calcProgress } from "motion-utils";
 
 /**
  * Apply constraints to a point. These constraints are both physical along an
