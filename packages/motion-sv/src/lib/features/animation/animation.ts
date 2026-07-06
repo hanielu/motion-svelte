@@ -1,8 +1,7 @@
 import { Feature } from "@/features/feature.js";
-import { type AnimationState, isAnimationControls } from "motion-dom";
+import { type AnimationState, isAnimationControls, microtask } from "motion-dom";
 import { createAnimationState } from "@/state/animation-state.js";
 import type { MotionState } from "@/state/motion-state.js";
-import { isHidden } from "@/utils/is-hidden.js";
 
 const STATE_TYPES = [
 	"initial",
@@ -39,12 +38,29 @@ export class AnimationFeature extends Feature {
 	 * Subscribe any provided AnimationControls to the component's VisualElement
 	 */
 	mount() {
-		const isPresent = !isHidden(this.state.element as HTMLElement);
-		if (!isPresent) {
-			this.state.setActive("exit", true);
-		} else {
+		/**
+		 * Defer the initial animation pass by one microtask so the whole subtree
+		 * has mounted first. Unlike Vue (children mount before parents), Svelte
+		 * mounts parents before children, so a variant-controlling parent would
+		 * otherwise run animateChanges() before its variantChildren have
+		 * registered — breaking orchestration (staggerChildren, delayChildren,
+		 * when: "beforeChildren"/"afterChildren").
+		 *
+		 * Note: Vue's port also checks `isHidden(element)` here to support
+		 * v-show. Svelte has no v-show equivalent, and our AnimatePresence
+		 * wait-mode gate hides entrants with display:none, which must NOT be
+		 * treated as exiting — so that check is intentionally omitted.
+		 */
+		microtask.render(() => {
+			if (!this.state.isMounted()) return;
+			if (this.state.isEnterBlocked?.()) {
+				// AnimatePresence wait-mode: hold initial values; the Motion component
+				// re-activates "animate" when the gate opens.
+				this.state.setActiveNoAnimate("animate", false);
+				return;
+			}
 			this.state.visualElement.animationState?.animateChanges();
-		}
+		});
 		this.updateAnimationControlsSubscription();
 	}
 

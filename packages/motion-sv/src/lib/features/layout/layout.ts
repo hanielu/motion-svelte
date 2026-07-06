@@ -82,7 +82,7 @@ export class LayoutFeature extends Feature {
 
 	getSnapshot(newOptions: Options, isPresent?: boolean): void {
 		const projection = this.state.visualElement.projection;
-		const { drag, layoutDependency, layout, layoutId } = newOptions;
+		const { drag, layout, layoutId } = newOptions;
 		if (!projection || (!layout && !layoutId && !drag)) {
 			return;
 		}
@@ -95,17 +95,18 @@ export class LayoutFeature extends Feature {
 		}
 
 		hasLayoutUpdate = true;
-		const prevProps = this.state.options;
 
 		/**
-		 * If the drag or layoutDependency has changed, or the isPresent has changed, we need to update the snapshot
+		 * Snapshot the current layout.
+		 *
+		 * Unlike Vue, we can't gate this on a layoutDependency comparison: in the
+		 * Svelte port, getSnapshot always runs from an *explicit* pre-update trigger
+		 * (createLayoutMotion().update() or presence transitions) before the state
+		 * change has been applied, so old and new options are the same object and a
+		 * dependency comparison can never detect a change. The explicit trigger is
+		 * itself the opt-in, so snapshot unconditionally.
 		 */
-		if (
-			drag ||
-			prevProps.layoutDependency !== layoutDependency ||
-			layoutDependency === undefined ||
-			(isDef(isPresent) && projection.isPresent !== isPresent)
-		) {
+		if (drag || !isDef(isPresent) || projection.isPresent !== isPresent) {
 			projection.willUpdate();
 		}
 

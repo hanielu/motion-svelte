@@ -181,6 +181,8 @@
 		const isWaitBlocked = presenceManager.isWaitBlocked?.() === true;
 		if (isWaitBlocked && !motionState.isActive("exit")) {
 			styleProps.display = "none";
+			// Remember that this element's enter was gated so it replays on gate open
+			motionState.enterWasGated = true;
 		}
 
 		// 3) SVG conversion
@@ -269,17 +271,18 @@
 		{ lazy: true }
 	);
 
+	// In wait mode, entering nodes must not adopt their animate styles until all
+	// blocking exits complete. The gate is checked lazily (at the deferred initial
+	// animateChanges) because when a keyed block switches, the entering element can
+	// mount *before* the outgoing element's outro starts raising the gate.
+	if (presenceManager.isWaitBlocked) {
+		motionState.isEnterBlocked = () =>
+			untrack(() => presenceManager.isWaitBlocked!() === true && !motionState.isActive("exit"));
+	}
+
 	// onMounted (attachment)
 	function nodeRef(node: HTMLElement | SVGElement) {
 		externalRef = node;
-
-		const waitBlocked = untrack(() => presenceManager.isWaitBlocked?.() === true);
-
-		// In wait mode, prevent the entering node from immediately adopting its animate styles.
-		// We temporarily disable the animate state so VE updates (while blocked) maintain initial values.
-		if (waitBlocked) {
-			motionState.setActiveNoAnimate("animate", false);
-		}
 
 		motionState.mount(node);
 
@@ -305,9 +308,13 @@
 
 	$effect.pre(() => {
 		const blocked = presenceManager.isWaitBlocked?.() === true;
-		if (wasWaitBlocked && !blocked) {
-			// Gate opened: re-enable animate state and trigger enter from current base/initial
-			motionState.setActive("animate", true);
+		if (wasWaitBlocked && !blocked && motionState.enterWasGated && !motionState.isActive("exit")) {
+			// Gate opened: replay the enter animation from initial values. The mount
+			// animation may have already run while the element was hidden (the gate
+			// can rise after this element's deferred mount pass), so a plain
+			// setActive("animate", true) would no-op.
+			motionState.enterWasGated = false;
+			motionState.enterFromInitial();
 		}
 		wasWaitBlocked = blocked;
 	});

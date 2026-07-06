@@ -75,6 +75,26 @@
 		}
 	}
 
+	/**
+	 * Snapshot every layout-enabled projection node in the tree.
+	 *
+	 * Svelte dispatches `outrostart`/`outroend` a frame after the flush (behind a
+	 * 0-duration WAAPI placeholder), so by the time an exiting element pops out of
+	 * flow (popLayout) or is removed from the DOM (sync), the regular pre-update
+	 * snapshots have already been consumed by an earlier didUpdate pass. Re-snapshot
+	 * here so siblings can FLIP from their pre-shift positions; nodes that don't
+	 * move resolve to zero deltas and won't animate.
+	 */
+	function snapshotLayoutTree(state: MotionState) {
+		const root = state.visualElement?.projection?.root;
+		if (!root) return;
+		(root as any).nodes?.forEach((node: any) => {
+			if (node.options.layout || node.options.layoutId) {
+				node.willUpdate(false);
+			}
+		});
+	}
+
 	useAnimatePresence(
 		{
 			mode,
@@ -115,6 +135,10 @@
 		const state = mountedStates.get(el);
 		if (!state) return;
 		if (exitDom.has(el)) return;
+
+		// Capture pre-exit positions of the whole layout tree BEFORE popLayout pulls
+		// this element out of flow, so siblings can FLIP to their new positions.
+		snapshotLayoutTree(state);
 
 		addPopStyle(state);
 
@@ -157,8 +181,14 @@
 
 		if (exitDom.size === 0) onExitComplete?.();
 		if (!styles?.has(state)) {
+			// Sync mode: the element leaves the DOM right after outroend, shifting
+			// siblings. Snapshot the tree now (element still in flow) and run the
+			// layout pass after Svelte has removed the node.
+			snapshotLayoutTree(state);
 			state.getSnapshot(state.options, false);
-			state.didUpdate();
+			queueMicrotask(() => {
+				state.didUpdate();
+			});
 		} else {
 			removePopStyle(state);
 		}

@@ -26,6 +26,17 @@ export class MotionState {
 	public isExiting = false;
 	// The AnimatePresence container this motion component belongs to
 	public presenceContainer: HTMLElement | null = null;
+	/**
+	 * Svelte-specific: set by the Motion component when inside an AnimatePresence
+	 * wait-mode gate. While it returns true, the entering element holds its
+	 * initial values instead of running its mount animation.
+	 */
+	public isEnterBlocked?: () => boolean;
+	/**
+	 * Svelte-specific: marked when this element was hidden by the wait-mode gate,
+	 * so the enter animation is replayed once the gate opens.
+	 */
+	public enterWasGated = false;
 	public options: Options & {
 		presenceContext?: PresenceContext;
 		features?: Array<typeof Feature>;
@@ -175,6 +186,27 @@ export class MotionState {
 		if (typeState) {
 			typeState.isActive = isActive;
 		}
+	}
+
+	/**
+	 * Svelte-specific: replay the enter animation from initial values.
+	 * Used by AnimatePresence wait-mode when the gate opens. The element was
+	 * hidden (display:none) while blocked, and its mount animation may have
+	 * already started or completed underneath — so we jump back to the resolved
+	 * initial values, reset the animation state, and run a fresh pass.
+	 */
+	enterFromInitial() {
+		const ve = this.visualElement;
+		if (!ve) return;
+		ve.values.forEach((value) => value.stop());
+		for (const key in this.latestValues) {
+			const initial = (this.latestValues as any)[key];
+			if (initial === undefined) continue;
+			ve.getValue(key)?.jump(initial);
+			ve.latestValues[key] = initial;
+		}
+		ve.animationState?.reset();
+		ve.animationState?.animateChanges();
 	}
 
 	/**
