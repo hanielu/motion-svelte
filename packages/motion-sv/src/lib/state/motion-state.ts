@@ -128,6 +128,7 @@ export class MotionState {
 		if (presenceId !== undefined) {
 			element.setAttribute(motionGlobalConfig.motionAttribute, presenceId);
 		}
+		this.features.get("projection")?.update();
 		this.visualElement?.mount(element);
 		this.updateFeatures();
 	}
@@ -141,7 +142,20 @@ export class MotionState {
 		this.parent?.children?.delete(this);
 		mountedStates.delete(this.element);
 		this.features.forEach((f) => f.unmount?.());
+
+		const projection = this.visualElement?.projection;
+		const shouldDeferProjectionUnmount = Boolean(this.options.layoutId && projection);
+
+		if (shouldDeferProjectionUnmount) {
+			this.visualElement.projection = undefined;
+		}
+
 		this.visualElement?.unmount();
+
+		if (shouldDeferProjectionUnmount && projection) {
+			this.visualElement.projection = projection;
+			frame.postRender(() => projection.unmount());
+		}
 	}
 
 	// Called before updating, executes in parent-to-child order

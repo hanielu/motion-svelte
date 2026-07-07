@@ -21,8 +21,10 @@ export class LayoutFeature extends Feature {
 
 	private updatePrevLead(projection: NonNullable<typeof this.state.visualElement.projection>) {
 		const stack = projection.getStack();
-		if (stack?.prevLead && !stack.prevLead.snapshot) {
-			stack.prevLead.willUpdate();
+		if (stack?.prevLead) {
+			if (!stack.prevLead.snapshot) {
+				stack.prevLead.willUpdate();
+			}
 			hasLayoutUpdate = true;
 		}
 	}
@@ -74,9 +76,10 @@ export class LayoutFeature extends Feature {
 			}
 			// when layoutId is set, unMount will update the layout
 			if (this.state.options.layoutId) {
-				hasLayoutUpdate = true;
+				projection.scheduleCheckAfterUnmount();
+			} else {
+				this.didUpdate();
 			}
-			this.didUpdate();
 		}
 	}
 
@@ -108,6 +111,10 @@ export class LayoutFeature extends Feature {
 		 */
 		if (drag || !isDef(isPresent) || projection.isPresent !== isPresent) {
 			projection.willUpdate();
+			if (layoutId && (projection.instance as Element | undefined)?.isConnected) {
+				// Replace stale shared-layout snapshots while the old node is still measurable.
+				projection.snapshot = projection.measure();
+			}
 		}
 
 		/**

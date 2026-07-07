@@ -32,6 +32,7 @@ export class ProjectionFeature extends Feature {
 	setOptions() {
 		const options = this.state.options;
 		const { layoutId, layout, drag = false, dragConstraints = false } = options;
+		const shouldDisableInitialCrossfade = this.shouldDisableInitialCrossfade(layoutId);
 		this.projection?.setOptions({
 			layout,
 			layoutId,
@@ -41,7 +42,7 @@ export class ProjectionFeature extends Feature {
 			// initialPromotionConfig
 			layoutRoot: options.layoutRoot,
 			layoutScroll: options.layoutScroll,
-			crossfade: options.crossfade,
+			crossfade: options.crossfade ?? (shouldDisableInitialCrossfade ? false : undefined),
 			onExitComplete: () => {
 				if (!this.projection?.isPresent && this.state.options.layoutId && !this.state.isExiting) {
 					// Defer to avoid re-entrant microtask.read() during projection update().
@@ -54,6 +55,16 @@ export class ProjectionFeature extends Feature {
 				}
 			},
 		});
+	}
+
+	private shouldDisableInitialCrossfade(layoutId?: string) {
+		if (!layoutId || this.state.options.crossfade !== undefined) {
+			return false;
+		}
+
+		// Svelte can replace a layoutId node after the previous lead has already left the DOM.
+		const lead = this.projection?.root?.sharedNodes.get(layoutId)?.lead;
+		return Boolean(lead && (lead.isPresent === false || lead.instance?.isConnected === false));
 	}
 
 	update() {
