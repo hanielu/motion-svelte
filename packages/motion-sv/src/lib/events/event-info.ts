@@ -1,17 +1,17 @@
-import { isPrimaryPointer } from "./utils/index.js";
-import type { EventInfo } from "./types.js";
+import { isPrimaryPointer, type EventInfo } from "motion-dom";
 
 export type EventListenerWithPointInfo = (e: PointerEvent, info: EventInfo) => void;
 
-export function extractEventInfo(event: PointerEvent, pointType: "page" | "client" = "page"): EventInfo {
+export function extractEventInfo(event: PointerEvent): EventInfo {
 	return {
 		point: {
-			x: event[`${pointType}X`],
-			y: event[`${pointType}Y`],
+			x: event.pageX,
+			y: event.pageY,
 		},
 	};
 }
 
-export function addPointerInfo(handler: EventListenerWithPointInfo): EventListener {
-	return (event: PointerEvent) => isPrimaryPointer(event) && handler(event, extractEventInfo(event));
-}
+export const addPointerInfo =
+	(handler: EventListenerWithPointInfo): EventListener =>
+	(event: PointerEvent) =>
+		isPrimaryPointer(event) && handler(event, extractEventInfo(event));

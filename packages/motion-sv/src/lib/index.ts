@@ -13,6 +13,5 @@ export type { MotionStyleProps } from "./types/state.js";
 export * from "./animation/index.js";
 export * from "./utils/index.js";
 export { useDragControls } from "./features/gestures/drag/use-drag-controls.js";
-export type { PanInfo } from "./features/gestures/pan/PanSession.js";
 export { domAnimation, domMax } from "#lib/features/index.js";
 export { motionGlobalConfig } from "./config.js";

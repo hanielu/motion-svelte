@@ -26,8 +26,27 @@ export class DragGesture extends Feature {
 		this.removeListeners = this.controls.addListeners() || noop;
 	}
 
+	update() {
+		const { dragControls } = this.state.visualElement.getProps();
+		const { dragControls: prevDragControls } = this.state.visualElement.prevProps || {};
+
+		if (dragControls !== prevDragControls) {
+			this.removeGroupControls();
+			if (dragControls) {
+				this.removeGroupControls = dragControls.subscribe(this.controls);
+			}
+		}
+	}
+
 	unmount() {
 		this.removeGroupControls();
 		this.removeListeners();
+		/**
+		 * A keyed list reorder can unmount and remount an item mid-drag. Keep the
+		 * pan session alive then; its window listeners end it on pointerup.
+		 */
+		if (!this.controls.isDragging) {
+			this.controls.endPanSession();
+		}
 	}
 }

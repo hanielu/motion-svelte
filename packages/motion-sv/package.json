@@ -47,10 +47,10 @@
 	},
 	"dependencies": {
 		"csstype": "^3.2.3",
-		"framer-motion": "12.42.2",
+		"framer-motion": "14.1.0",
 		"hey-listen": "^1.0.8",
-		"motion-dom": "12.42.2",
-		"motion-utils": "12.39.0"
+		"motion-dom": "14.1.0",
+		"motion-utils": "14.1.0"
 	},
 	"devDependencies": {
 		"@hvniel/vite-plugin-svelte-inline-component": "^0.0.17",

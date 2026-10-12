@@ -128,8 +128,8 @@ test.describe("scroll() animation", () => {
 		await should(async () => {
 			const style = await computedStyle(color);
 
-			// This is animated by animate and thus uses linear RGB mixing
-			expect(style.backgroundColor).toBe("rgb(180, 180, 180)");
+			// backgroundColor is WAAPI-accelerated so the browser interpolates in sRGB
+			expect(style.backgroundColor).toBe("rgb(128, 128, 128)");
 
 			// This is animated by animate mini and thus doesn't use linear RGB mixing
 			expect(style.color).toBe("rgb(128, 128, 128)");
@@ -143,7 +143,7 @@ test.describe("scroll() animation", () => {
 		await wait(page, 200);
 		await should(async () => {
 			const style = await computedStyle(color);
-			expect(style.backgroundColor).toBe("rgb(221, 221, 221)");
+			expect(style.backgroundColor).toBe("rgb(191, 191, 191)");
 			expect(style.color).toBe("rgb(64, 64, 64)");
 		});
 	});

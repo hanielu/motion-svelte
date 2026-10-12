@@ -1,19 +1,16 @@
-import { frame } from "motion-dom";
+import { frame, type PanInfo } from "motion-dom";
 import { noop } from "motion-utils";
-import type { PanInfo } from "./PanSession.js";
 import { PanSession } from "./PanSession.js";
 import { addPointerEvent } from "#lib/events/index.js";
 import { Feature } from "#lib/features/feature.js";
 import { getContextWindow } from "#lib/utils/index.js";
 
 type PanEventHandler = (event: PointerEvent, info: PanInfo) => void;
-function asyncHandler(handler?: PanEventHandler) {
-	return (event: PointerEvent, info: PanInfo) => {
-		if (handler) {
-			frame.postRender(() => handler(event, info));
-		}
-	};
-}
+const asyncHandler = (handler?: PanEventHandler) => (event: PointerEvent, info: PanInfo) => {
+	if (handler) {
+		frame.update(() => handler(event, info), false, true);
+	}
+};
 
 export class PanGesture extends Feature {
 	static key = "pan" as const;
@@ -30,21 +27,13 @@ export class PanGesture extends Feature {
 	}
 
 	createPanHandlers() {
+		const { onPanSessionStart, onPanStart, onPan, onPanEnd } = this.state.options;
+
 		return {
-			onSessionStart: asyncHandler((_, info) => {
-				const { onPanSessionStart } = this.state.options;
-				onPanSessionStart && onPanSessionStart(_, info);
-			}),
-			onStart: asyncHandler((_, info) => {
-				const { onPanStart } = this.state.options;
-				onPanStart && onPanStart(_, info);
-			}),
-			onMove: (event, info) => {
-				const { onPan } = this.state.options;
-				onPan && onPan(event, info);
-			},
+			onSessionStart: asyncHandler(onPanSessionStart),
+			onStart: asyncHandler(onPanStart),
+			onMove: asyncHandler(onPan),
 			onEnd: (event: PointerEvent, info: PanInfo) => {
-				const { onPanEnd } = this.state.options;
 				delete this.session;
 				if (onPanEnd) {
 					frame.postRender(() => onPanEnd(event, info));
@@ -54,11 +43,13 @@ export class PanGesture extends Feature {
 	}
 
 	mount() {
-		this.removePointerDownListener = addPointerEvent(this.state.element!, "pointerdown", this.onPointerDown.bind(this));
+		this.removePointerDownListener = addPointerEvent(this.state.element!, "pointerdown", (event: PointerEvent) =>
+			this.onPointerDown(event)
+		);
 	}
 
 	update() {
-		// this.session && this.session.updateHandlers(this.createPanHandlers())
+		this.session && this.session.updateHandlers(this.createPanHandlers());
 	}
 
 	unmount() {

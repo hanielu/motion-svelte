@@ -28,8 +28,9 @@ test.describe("useScroll + transformed ancestor (regression for #3658)", () => {
 		});
 		expect(animation.length).toBeGreaterThan(0);
 		expect(animation.timeline).toBe("ViewTimeline");
-		expect(animation.rangeStart).toBe("contain");
-		expect(animation.rangeEnd).toBe("contain");
+		// The 200vh target is taller than the viewport, so All runs forwards
+		expect(animation.rangeStart).toBe("exit-crossing");
+		expect(animation.rangeEnd).toBe("entry-crossing");
 	});
 
 	test("WAAPI and JS paths agree on the same target across the scroll range", async ({ page }) => {

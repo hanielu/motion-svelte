@@ -26,10 +26,6 @@ test.describe("Drag Momentum", () => {
 	});
 
 	test("Catch-and-release stops momentum", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: catching a momentum animation (pointerdown/up without a drag) pauses then resumes it instead of stopping it; it keeps travelling ~1300px instead of <50px"
-		);
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag-momentum");
 		await wait(page, 200);

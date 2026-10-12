@@ -1,6 +1,5 @@
 import { Feature } from "#lib/features/feature.js";
-import { type AnimationState, isAnimationControls, microtask } from "motion-dom";
-import { createAnimationState } from "#lib/state/animation-state.js";
+import { createAnimationState, isAnimationControls, microtask } from "motion-dom";
 import type { MotionState } from "#lib/state/motion-state.js";
 
 const STATE_TYPES = [
@@ -24,7 +23,7 @@ export class AnimationFeature extends Feature {
 		super(state);
 		// Create animation state with visualElement (aligned with motion-dom signature)
 		const ve = state.visualElement;
-		ve.animationState ||= createAnimationState(ve) as AnimationState;
+		ve.animationState ||= createAnimationState(ve);
 	}
 
 	updateAnimationControlsSubscription() {

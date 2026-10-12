@@ -12,10 +12,6 @@ import { bbox, should, trigger, visit, wait } from "../../harness/upstream.js";
  */
 test.describe("Drag Input Propagation", () => {
 	test("Should not drag when clicking and dragging on an input inside draggable", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: pointerdown on a child <input> starts the drag (moves to 300,300) instead of being ignored"
-		);
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag-input-propagation");
 		await wait(page, 200);
@@ -45,10 +41,6 @@ test.describe("Drag Input Propagation", () => {
 	});
 
 	test("Should not drag when clicking and dragging on a textarea inside draggable", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: pointerdown on a child <textarea> starts the drag (moves to 300,300) instead of being ignored"
-		);
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag-input-propagation");
 		await wait(page, 200);
@@ -133,10 +125,6 @@ test.describe("Drag Input Propagation", () => {
 	});
 
 	test("Should not drag when clicking and dragging on a select inside draggable", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: pointerdown on a child <select> starts the drag (moves to 300,300) instead of being ignored"
-		);
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag-input-propagation");
 		await wait(page, 200);
@@ -164,10 +152,6 @@ test.describe("Drag Input Propagation", () => {
 	});
 
 	test("Should not drag when clicking and dragging on a checkbox inside a label inside draggable", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: pointerdown on a child checkbox <input> starts the drag (moves to 301,301) instead of being ignored"
-		);
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag-input-propagation");
 		await wait(page, 200);
@@ -195,10 +179,6 @@ test.describe("Drag Input Propagation", () => {
 	});
 
 	test("Should not drag when clicking and dragging on a contenteditable element inside draggable", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: pointerdown on a child contenteditable starts the drag (moves to 300,300) instead of being ignored"
-		);
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag-input-propagation");
 		await wait(page, 200);

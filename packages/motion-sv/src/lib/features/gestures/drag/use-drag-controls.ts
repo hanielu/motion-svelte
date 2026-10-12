@@ -54,6 +54,18 @@ export class DragControls {
 			controls.start(event, options);
 		});
 	}
+
+	cancel() {
+		this.componentControls.forEach((controls) => {
+			controls.cancel();
+		});
+	}
+
+	stop() {
+		this.componentControls.forEach((controls) => {
+			controls.stop();
+		});
+	}
 }
 
 const createDragControls = () => new DragControls();

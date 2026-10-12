@@ -240,10 +240,6 @@ test.describe("Drag", () => {
 	});
 
 	test("Element returns to center on x axis only with dragSnapToOrigin='x'", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: dragSnapToOrigin='x' snaps both axes (only boolean is supported), so top is 0 instead of staying at -10"
-		);
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag&return=x&left=-10&top=-10");
 		await wait(page, 200);
@@ -266,10 +262,6 @@ test.describe("Drag", () => {
 	});
 
 	test("Element returns to center on y axis only with dragSnapToOrigin='y'", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: dragSnapToOrigin='y' snaps both axes (only boolean is supported), so left is 0 instead of staying at -10"
-		);
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag&return=y&left=-10&top=-10");
 		await wait(page, 200);

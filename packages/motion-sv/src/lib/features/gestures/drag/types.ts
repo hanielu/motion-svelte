@@ -113,8 +113,10 @@ export interface DragProps extends DragHandlers {
 	 * with `dragElastic={1}`, but when used together `dragConstraints` can define
 	 * a wider draggable area and `dragSnapToOrigin` will ensure the element
 	 * animates back to its origin on release.
+	 *
+	 * Set to `"x"` or `"y"` to only snap back along that axis.
 	 */
-	dragSnapToOrigin?: boolean;
+	dragSnapToOrigin?: boolean | "x" | "y";
 
 	/**
 	 * If `true`, this will lock dragging to the initially-detected direction. Defaults to `false`.

@@ -12,6 +12,9 @@ import { motionGlobalConfig } from "#lib/config.js";
 // Map to track mounted motion states by element
 export const mountedStates = new WeakMap<Element, MotionState>();
 
+// motion-dom's animation state keys use 'whileTap'; our public prop is 'whilePress'
+const toAnimationType = (name: StateType) => (name === "whilePress" ? "whileTap" : name) as AnimationType;
+
 /**
  * Core class that manages animation state and orchestrates animations.
  * Handles component lifecycle methods in the correct order based on component tree position.
@@ -182,7 +185,7 @@ export class MotionState {
 		if (name === "exit" && isActive) {
 			this.isExiting = true;
 		}
-		this.visualElement?.animationState?.setActive(name as AnimationType, isActive).then(() => {
+		this.visualElement?.animationState?.setActive(toAnimationType(name), isActive).then(() => {
 			if (name === "exit" && isActive) {
 				this.isExiting = false;
 				this.options?.layoutId ? frame.postRender(() => this.tryExitComplete()) : this.tryExitComplete();
@@ -196,7 +199,7 @@ export class MotionState {
 	 * its animate styles until blocking exits have finished.
 	 */
 	setActiveNoAnimate(name: StateType, isActive: boolean) {
-		const typeState = this.visualElement?.animationState?.getState()?.[name];
+		const typeState = this.visualElement?.animationState?.getState()?.[toAnimationType(name)];
 		if (typeState) {
 			typeState.isActive = isActive;
 		}
@@ -228,7 +231,7 @@ export class MotionState {
 	 * Replaces the old `activeStates` record.
 	 */
 	isActive(name: StateType) {
-		return Boolean(this.visualElement?.animationState?.getState()?.[name]?.isActive);
+		return Boolean(this.visualElement?.animationState?.getState()?.[toAnimationType(name)]?.isActive);
 	}
 
 	isMounted() {

@@ -64,7 +64,7 @@ export class ProjectionFeature extends Feature {
 
 		// Svelte can replace a layoutId node after the previous lead has already left the DOM.
 		const lead = this.projection?.root?.sharedNodes.get(layoutId)?.lead;
-		return Boolean(lead && (lead.isPresent === false || lead.instance?.isConnected === false));
+		return Boolean(lead && (lead.isPresent === false || (lead.instance as Element | undefined)?.isConnected === false));
 	}
 
 	update() {

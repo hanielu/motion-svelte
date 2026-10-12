@@ -1,5 +1,5 @@
 import { Feature } from "#lib/features/feature.js";
-import { extractEventInfo } from "#lib/events/event-info.js";
+import { extractEventInfo } from "#lib/events/index.js";
 import { frame, hover } from "motion-dom";
 
 export class HoverGesture extends Feature {

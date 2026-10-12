@@ -31,17 +31,6 @@ export interface VariantType extends DOMKeyframesDefinition {
 	attrScale?: DOMKeyframesDefinition["scale"];
 }
 
-interface BoundingBox {
-	top: number;
-	right: number;
-	bottom: number;
-	left: number;
-}
-export interface DragOptions {
-	constraints?: false | Partial<BoundingBox>;
-	dragSnapToOrigin?: boolean;
-}
-
 type TransformPropertiesWithoutTransition = Omit<TransformProperties, "transition">;
 
 /**

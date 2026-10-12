@@ -11,10 +11,6 @@ import { should, trigger, visit, wait } from "../../harness/upstream.js";
  */
 test.describe("Drag with ref constraints on absolute element after scroll", () => {
 	test("Allows dragging to the visible bottom of the viewport after scroll", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: ref constraints are measured with a stale root scroll (scrollY 0 vs 300), so the box bottom clamps at 200 instead of ~500 (upstream #2829 fix missing)"
-		);
 		const draggable = page.locator("[data-testid='draggable']");
 		await page.setViewportSize({ width: 1000, height: 800 });
 		await visit(page, "?test=drag-ref-constraints-absolute-scrolled&scroll=300");
