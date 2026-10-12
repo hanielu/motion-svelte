@@ -1,4 +1,4 @@
-<script module>
+<script module lang="ts">
 	import type { AsTag } from "@/types/index.js";
 	import type { ItemData } from "./types.js";
 	import { Motion, type MotionProps } from "../motion/index.js";
