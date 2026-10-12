@@ -14,10 +14,6 @@ import { should, trigger, visit, wait } from "../../harness/upstream.js";
  */
 test.describe("Drag Constraints Update on Element Resize", () => {
 	test("Constrains drag correctly before resize", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: a parent motion.div's bind:ref passed as dragConstraints is never applied, so the box drags unconstrained (right 700 vs <=502)"
-		);
 		const box = page.locator("#box");
 		await visit(page, "?test=drag-ref-constraints-element-resize");
 		await wait(page, 200);
@@ -37,10 +33,6 @@ test.describe("Drag Constraints Update on Element Resize", () => {
 	});
 
 	test("Updates drag constraints after draggable element is resized", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: bind:ref dragConstraints never applied (right 900 vs <=502); with a plain-div ref it still keeps the pre-resize 400px travel (no ResizeObserver)"
-		);
 		const box = page.locator("#box");
 		await visit(page, "?test=drag-ref-constraints-element-resize");
 		await wait(page, 200);
@@ -74,10 +66,6 @@ test.describe("Drag Constraints Update on Element Resize", () => {
 	});
 
 	test("Updates drag constraints after draggable element is resized, with existing drag offset", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: bind:ref dragConstraints never applied (right 1000 vs <=502); with a plain-div ref it still keeps the pre-resize 400px travel (no ResizeObserver)"
-		);
 		const box = page.locator("#box");
 		await visit(page, "?test=drag-ref-constraints-element-resize");
 		await wait(page, 200);

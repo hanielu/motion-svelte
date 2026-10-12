@@ -18,10 +18,6 @@ import { should, trigger, visit, wait } from "../../harness/upstream.js";
  */
 test.describe("Drag Constraints Update on Imperative Resize", () => {
 	test("Updates drag constraints when element grows via direct DOM mutation", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: bind:ref dragConstraints never applied (right 900 vs <=502); with a plain-div ref it still keeps the pre-resize 400px travel (no ResizeObserver)"
-		);
 		const box = page.locator("#box");
 		await visit(page, "?test=drag-ref-constraints-resize-handle");
 		await wait(page, 200);

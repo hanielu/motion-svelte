@@ -564,10 +564,6 @@ test.describe("Drag & Layout", () => {
 	test("doesn't reset drag constraints (ref-based), while dragging, on unrelated parent component updates", async ({
 		page,
 	}) => {
-		test.fail(
-			true,
-			"motion-sv: a dragConstraints element bound via bind:ref on a parent motion component never reaches the child's options, so constraints only resolve on a later remeasure; ends at 345 instead of 150 unless a sibling remeasure lands mid-drag"
-		);
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag-ref-constraints&layout=true");
 		await wait(page, 200);
@@ -588,10 +584,6 @@ test.describe("Drag & Layout", () => {
 
 test.describe("Drag Constraints Return", () => {
 	test("Returns to constraints when released outside bounds", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: a dragConstraints element bound via bind:ref on a parent motion component never reaches the child's options, so constraints stay unresolved and the box stays at right 460 instead of returning inside 302"
-		);
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag-constraints-return");
 		await wait(page, 200);
@@ -620,10 +612,6 @@ test.describe("Drag Constraints Return", () => {
 	});
 
 	test("Returns to constraints when released outside and clicked during animation", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: a dragConstraints element bound via bind:ref on a parent motion component never reaches the child's options, so constraints stay unresolved and the box stays at right 460 instead of returning inside 302"
-		);
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag-constraints-return");
 		await wait(page, 200);

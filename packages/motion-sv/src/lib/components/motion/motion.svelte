@@ -264,13 +264,17 @@
 	// they'd kinda flicker when toggling (I guess going from opacity 0->1?)
 	// unless I set `crossfade={false}` on the handle(s) with the `layoutId` prop.
 	// so we're using a watch instead.
+	//
+	// Not lazy: options can change between the state's creation and this watch's first run
+	// (e.g. an element bound by a parent attachment and passed as dragConstraints), and a lazy
+	// first run would swallow that change.
 	watch(
 		() => motionOptions,
 		(options) => {
+			if (options === motionState.options) return;
 			motionState.updateOptions(options);
 			motionState.update();
-		},
-		{ lazy: true }
+		}
 	);
 
 	// In wait mode, entering nodes must not adopt their animate styles until all
