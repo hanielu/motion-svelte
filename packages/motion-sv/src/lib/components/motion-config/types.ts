@@ -6,10 +6,6 @@ import type { Options } from "#lib/types/index.js";
 export interface MotionConfigState {
 	/** Default transition settings for animations */
 	transition?: Options["transition"];
-	/**
-	 * @deprecated Use `reducedMotion` instead
-	 */
-	reduceMotion?: "user" | "never" | "always";
 	/** Controls motion reduction based on user preference or explicit setting */
 	reducedMotion?: "user" | "never" | "always";
 	/** Skip all animations in this subtree, applying final values instantly */

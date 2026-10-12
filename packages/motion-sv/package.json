@@ -43,7 +43,7 @@
 		"#lib/*": "./src/lib/*"
 	},
 	"peerDependencies": {
-		"svelte": "^5.0.0"
+		"svelte": "^5.40.0"
 	},
 	"dependencies": {
 		"csstype": "^3.2.3",
