@@ -6,7 +6,8 @@ export interface PresenceManager {
 	untrackPosition?: (state: MotionState) => void;
 	isWaitBlocked?: () => boolean;
 	onIntroStart?: (el: Element) => void;
-	onOutroStart?: (el: Element) => void;
+	/** Returns whether the element is held until its exit completes. */
+	onOutroStart?: (el: Element) => boolean;
 	onOutroBegin?: (el: Element) => void;
 	onOutroEnd?: (el: Element) => void;
 }

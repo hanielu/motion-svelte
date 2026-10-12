@@ -1,6 +1,6 @@
 import { Feature } from "#lib/features/feature.js";
 import type { MotionState } from "#lib/state/motion-state.js";
-import { addScaleCorrector, frame, globalProjectionState } from "motion-dom";
+import { addScaleCorrector, globalProjectionState } from "motion-dom";
 import { defaultScaleCorrector } from "./config.js";
 import { isDef } from "#lib/vendor/runed/index.js";
 import type { Options } from "#lib/types/index.js";
@@ -15,7 +15,6 @@ let hasTakenAnySnapshot = false;
 
 export class LayoutFeature extends Feature {
 	static key = "layout" as const;
-	private hasMountSettled = false;
 
 	constructor(state: MotionState) {
 		super(state);
@@ -58,18 +57,6 @@ export class LayoutFeature extends Feature {
 		}
 		if (hasTakenAnySnapshot) hasLayoutUpdate = true;
 		this.didUpdate();
-
-		/**
-		 * Allow one render frame for the projection tree and ancestor animations
-		 * to settle before accepting layout snapshots. Children can mount before
-		 * parents, so at this point the projection tree may lack the correct parent
-		 * link, and ancestor elements may be mid-animation (e.g. scale/position),
-		 * which would cause incorrect bounding rect measurements and spurious
-		 * layout deltas.
-		 */
-		frame.postRender(() => {
-			this.hasMountSettled = true;
-		});
 	}
 
 	unmount() {
@@ -94,13 +81,6 @@ export class LayoutFeature extends Feature {
 		const projection = this.state.visualElement.projection;
 		const { drag, layout, layoutId } = newOptions;
 		if (!projection || (!layout && !layoutId && !drag)) {
-			return;
-		}
-
-		/**
-		 * Skip snapshot capture until the mount has settled.
-		 */
-		if (!this.hasMountSettled) {
 			return;
 		}
 

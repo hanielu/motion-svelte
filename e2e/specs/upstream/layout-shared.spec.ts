@@ -44,10 +44,6 @@ test.describe("Shared layout: A -> B transition", () => {
 	test("When performing crossfade animation, removed element isn't removed until animation is complete", async ({
 		page,
 	}) => {
-		test.fail(
-			true,
-			"motion-sv: AnimatePresence removes the outgoing layoutId element (no exit prop) at once, so #shape-0 is gone 50ms in instead of staying for the crossfade (and #shape-1 opacity is 0.5, not 0.433013)"
-		);
 		await visit(page, "?test=layout-shared-animate-presence");
 		await wait(page, 50);
 		await should(async () => expect(await page.locator("#shape-0").evaluate((el) => el.style.opacity)).toBe("1"));
@@ -453,10 +449,6 @@ test.describe("Shared layout:  0 -> A -> AB -> A -> 0 crossfade transition", () 
 
 test.describe("Shared layout: nested crossfade transition", () => {
 	test("Correctly fires layout={true} animations", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: AnimatePresence drops the outgoing keyed subtree (layoutId only, no exit prop) at once, so the old #a follow element is gone instead of crossfading at (top 200, left 200, 200x250)"
-		);
 		await visit(page, "?test=layout-shared-crossfade-nested");
 		await wait(page, 50);
 		await trigger(page.locator("#a"), "click");
@@ -471,10 +463,6 @@ test.describe("Shared layout: nested crossfade transition", () => {
 	test("Correctly fires layout={true} animations when there are divs with `display: contents` in the path", async ({
 		page,
 	}) => {
-		test.fail(
-			true,
-			"motion-sv: AnimatePresence drops the outgoing keyed subtree (layoutId only, no exit prop) at once, so the old #a follow element is gone instead of crossfading at (top 200, left 200, 200x250)"
-		);
 		await visit(page, "?test=layout-shared-crossfade-nested-display-contents");
 		await wait(page, 50);
 		await trigger(page.locator("#a"), "click");

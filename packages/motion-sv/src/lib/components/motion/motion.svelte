@@ -296,16 +296,11 @@
 	});
 
 	const isPresenceTracked = () => isInPresenceContext && !presenceContext.isUnmounting;
-	const shouldAllowExit = () => !!props.exit && isPresenceTracked();
 	/**
-	 * A layoutId element without an exit has nothing to play, but its own outro still means its block is leaving:
-	 * hand the shared layout to the next lead right away, and take it back if the block re-enters.
+	 * Elements with an exit, and layoutId elements without one: their exit is the shared layout handoff to the next
+	 * lead, and they stay until it finishes so it can crossfade from them.
 	 */
-	const isLayoutOnly = () => !props.exit && !!props.layoutId && isPresenceTracked();
-	function setPresent(isPresent: boolean) {
-		motionState.getSnapshot(motionState.options, isPresent);
-		motionState.didUpdate();
-	}
+	const takesPartInExit = () => (!!props.exit || !!props.layoutId) && isPresenceTracked();
 
 	/**
 	 * Svelte transitions only keep the DOM node alive while MotionState plays the exit; motion drives the actual
@@ -321,22 +316,15 @@
 	function motionExit(node: Element) {
 		if (!isInPresenceContext) return null;
 		return () => {
-			if (!shouldAllowExit()) return {};
-			presenceManager.onOutroStart?.(node);
-			return { duration: EXIT_HOLD_LIMIT };
+			if (!takesPartInExit()) return {};
+			return presenceManager.onOutroStart?.(node) ? { duration: EXIT_HOLD_LIMIT } : {};
 		};
 	}
 	const motionEnter = (_node: Element) => ({});
 
-	function onintrostart() {
-		if (shouldAllowExit()) presenceManager.onIntroStart?.(motionState.element!);
-		else if (isLayoutOnly()) setPresent(true);
-	}
-	function onoutrostart() {
-		if (shouldAllowExit()) presenceManager.onOutroBegin?.(motionState.element!);
-		else if (isLayoutOnly()) setPresent(false);
-	}
-	const onoutroend = () => shouldAllowExit() && presenceManager.onOutroEnd?.(motionState.element!);
+	const onintrostart = () => takesPartInExit() && presenceManager.onIntroStart?.(motionState.element!);
+	const onoutrostart = () => takesPartInExit() && presenceManager.onOutroBegin?.(motionState.element!);
+	const onoutroend = () => takesPartInExit() && presenceManager.onOutroEnd?.(motionState.element!);
 
 	const key = createAttachmentKey();
 	const sharedProps = $derived({

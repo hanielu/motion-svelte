@@ -117,14 +117,26 @@
 		state.reenter();
 	}
 
-	/** Called when Svelte starts the outro, in the microtask right after the flush that removed the element. */
-	function handleOutroStart(el: Element) {
+	const isInsideExit = (el: Element) => [...exitDom.keys()].some((exiting) => exiting !== el && exiting.contains(el));
+
+	/**
+	 * Called when Svelte starts the outro, in the microtask right after the flush that removed the element. Returns
+	 * whether the element must be held until its exit completes.
+	 */
+	function handleOutroStart(el: Element): boolean {
 		const state = mountedStates.get(el);
-		if (!state) return;
-		if (exitDom.has(el)) return;
+		if (!state) return false;
+		if (exitDom.has(el)) return true;
+
+		// A layoutId element without an exit inside an exiting element leaves with it: hand the layout on, don't hold.
+		if (!state.options.exit && isInsideExit(el)) {
+			state.getSnapshot(state.options, false);
+			state.didUpdate();
+			return false;
+		}
 
 		snapshotLayoutTree(state);
-		addPopStyle(state);
+		if (state.options.exit) addPopStyle(state);
 
 		const session: ExitSession = { blocksExit: !!state.options.exit, isComplete: false };
 		exitDom.set(el, session);
@@ -136,6 +148,7 @@
 			finishOutro(el);
 		});
 		state.didUpdate();
+		return true;
 	}
 
 	/**

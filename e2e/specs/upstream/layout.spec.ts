@@ -228,10 +228,6 @@ test.describe("Layout animation", () => {
 	});
 
 	test("Disabling crossfade works as expected", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: exit-less layoutId element inside AnimatePresence is removed immediately on toggle-off, so #box is gone instead of staying (opacity 1) for its shared-layout exit"
-		);
 		const opacity = () =>
 			page
 				.locator("#box")
