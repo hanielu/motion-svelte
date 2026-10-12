@@ -11,6 +11,7 @@
 		"dev": "pnpm -F \"./packages/**\" svelte-kit sync && pnpm -r --parallel --reporter append-only --color dev",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
+		"test:e2e": "pnpm -F e2e test",
 		"release": "pnpm build:packages && changeset publish"
 	},
 	"devDependencies": {

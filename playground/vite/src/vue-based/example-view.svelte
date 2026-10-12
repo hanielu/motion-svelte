@@ -31,7 +31,8 @@
 		<div class="flex-1 overflow-y-auto">
 			<div class="mx-auto max-w-7xl px-8 py-8">
 				<!-- Example Container with proper scrolling -->
-				<div class="rounded-xl border border-neutral-800 bg-neutral-900/50 p-8">
+				<!-- data-example-root: the subtree e2e traces record -->
+				<div class="rounded-xl border border-neutral-800 bg-neutral-900/50 p-8" data-example-root>
 					<ExampleComponent />
 				</div>
 

@@ -1,0 +1,151 @@
+/**
+ * Tests for SVG drag behavior with mismatched viewBox and rendered dimensions.
+ *
+ * When an SVG has viewBox="0 0 100 100" but width/height="500",
+ * dragging should correctly transform pointer coordinates to match
+ * the SVG's coordinate system.
+ *
+ * The scale factor is calculated as: viewBoxDimension / renderedDimension
+ * For viewBox 100x100 at 500x500 pixels: scale = 100/500 = 0.2
+ *
+ * So moving the mouse 100 pixels should move the element 20 SVG units.
+ *
+ * Note: framer-motion applies transforms to SVG elements via CSS (style.transform),
+ * not the SVG transform attribute.
+ */
+import { expect, test } from "@playwright/test";
+import { should, trigger, visit, wait } from "../../harness/upstream.js";
+
+/**
+ * Extract translateX and translateY values from a CSS transform string.
+ */
+function parseTranslate(transform: string): { x: number; y: number } {
+	const xMatch = transform.match(/translateX\(([-\d.]+)px\)/);
+	const yMatch = transform.match(/translateY\(([-\d.]+)px\)/);
+	return {
+		x: xMatch ? parseFloat(xMatch[1]) : 0,
+		y: yMatch ? parseFloat(yMatch[1]) : 0,
+	};
+}
+
+/** `expect(actual).to.be.closeTo(expected, delta)` */
+function expectCloseTo(actual: number, expected: number, delta: number) {
+	expect(Math.abs(actual - expected)).toBeLessThanOrEqual(delta);
+}
+
+test.describe("Drag SVG with viewBox", () => {
+	test("Correctly scales drag distance when viewBox differs from rendered size", async ({ page }) => {
+		test.skip(true, "unsupported: MotionConfig has no transformPagePoint prop and transformViewBoxPoint is not exported");
+		// viewBox is 100x100, rendered size is 500x500
+		// Scale factor (screen to SVG): 100/500 = 0.2
+		// Rect starts at SVG coords (10, 10) with size (20, 20)
+		// Screen position = SVG coords * 5 (due to 500/100 ratio)
+		// Initial screen position: (10*5, 10*5) = (50, 50) relative to SVG
+		const draggable = page.locator("[data-testid='draggable']");
+		await visit(page, "?test=drag-svg-viewbox");
+		await wait(page, 50);
+		await should(async () => {
+			// Verify initial position
+			expect(await draggable.getAttribute("x")).toBe("10");
+			expect(await draggable.getAttribute("y")).toBe("10");
+		});
+		await trigger(draggable, "pointerdown", 10, 10);
+		await wait(page, 50);
+		await trigger(draggable, "pointermove", 20, 20); // Move past threshold
+		await wait(page, 50);
+		// Move 100 pixels in screen space
+		// This should translate to 20 SVG units (100 * 0.2)
+		// Final SVG coords: (10+20, 10+20) = (30, 30)
+		// Final screen position: (30*5, 30*5) = (150, 150) relative to SVG
+		await trigger(draggable, "pointermove", 110, 110);
+		await wait(page, 50);
+		await trigger(draggable, "pointerup");
+		await wait(page, 50);
+		await should(async () => {
+			// Check CSS transform which framer-motion uses for SVG elements
+			const { x, y } = parseTranslate(await draggable.evaluate((el) => (el as SVGRectElement).style.transform));
+			// The element should have moved ~20 SVG units (100px * 0.2 scale)
+			// Allow some tolerance for Cypress coordinate handling
+			expectCloseTo(x, 20, 3);
+			expectCloseTo(y, 20, 3);
+		});
+	});
+
+	test("Works correctly when viewBox matches rendered size (no scaling)", async ({ page }) => {
+		// viewBox and rendered size both 500x500 - no scaling needed
+		const draggable = page.locator("[data-testid='draggable']");
+		await visit(page, "?test=drag-svg-viewbox&viewBoxWidth=500&viewBoxHeight=500&svgWidth=500&svgHeight=500");
+		await wait(page, 50);
+		await trigger(draggable, "pointerdown", 10, 10);
+		await wait(page, 50);
+		await trigger(draggable, "pointermove", 20, 20);
+		await wait(page, 50);
+		await trigger(draggable, "pointermove", 110, 110);
+		await wait(page, 50);
+		await trigger(draggable, "pointerup");
+		await wait(page, 50);
+		await should(async () => {
+			const { x, y } = parseTranslate(await draggable.evaluate((el) => (el as SVGRectElement).style.transform));
+			// No scaling - 100px movement = 100 SVG units
+			// Allow ~15% tolerance for Cypress coordinate handling variance
+			expectCloseTo(x, 100, 15);
+			expectCloseTo(y, 100, 15);
+		});
+	});
+
+	test("Handles non-uniform scaling (different x and y scale factors)", async ({ page }) => {
+		test.skip(true, "unsupported: MotionConfig has no transformPagePoint prop and transformViewBoxPoint is not exported");
+		// viewBox is 100x200, rendered is 500x400
+		// X scale: 100/500 = 0.2, Y scale: 200/400 = 0.5
+		const draggable = page.locator("[data-testid='draggable']");
+		await visit(page, "?test=drag-svg-viewbox&viewBoxWidth=100&viewBoxHeight=200&svgWidth=500&svgHeight=400");
+		await wait(page, 50);
+		await trigger(draggable, "pointerdown", 10, 10);
+		await wait(page, 50);
+		await trigger(draggable, "pointermove", 20, 20);
+		await wait(page, 50);
+		// Move 100 pixels in both directions
+		// X: 100 * 0.2 = 20 SVG units
+		// Y: 100 * 0.5 = 50 SVG units
+		await trigger(draggable, "pointermove", 110, 110);
+		await wait(page, 50);
+		await trigger(draggable, "pointerup");
+		await wait(page, 50);
+		await should(async () => {
+			const { x, y } = parseTranslate(await draggable.evaluate((el) => (el as SVGRectElement).style.transform));
+			// Allow some tolerance for Cypress coordinate handling
+			expectCloseTo(x, 20, 3);
+			expectCloseTo(y, 50, 8);
+		});
+	});
+
+	test("Handles viewBox with non-zero origin", async ({ page }) => {
+		test.skip(true, "unsupported: MotionConfig has no transformPagePoint prop and transformViewBoxPoint is not exported");
+		// viewBox starts at (50, 50) with size 100x100, rendered at 500x500
+		// Scale factor: 100/500 = 0.2
+		// The viewBox origin offset shouldn't affect drag deltas
+		const draggable = page.locator("[data-testid='draggable']");
+		await visit(
+			page,
+			"?test=drag-svg-viewbox&viewBoxX=50&viewBoxY=50&viewBoxWidth=100&viewBoxHeight=100&svgWidth=500&svgHeight=500"
+		);
+		await wait(page, 50);
+		await trigger(draggable, "pointerdown", 10, 10);
+		await wait(page, 50);
+		await trigger(draggable, "pointermove", 20, 20); // Move past threshold
+		await wait(page, 50);
+		// Move 100 pixels in screen space
+		// This should translate to 20 SVG units (100 * 0.2)
+		await trigger(draggable, "pointermove", 110, 110);
+		await wait(page, 50);
+		await trigger(draggable, "pointerup");
+		await wait(page, 50);
+		await should(async () => {
+			const { x, y } = parseTranslate(await draggable.evaluate((el) => (el as SVGRectElement).style.transform));
+			// The element should have moved ~20 SVG units (100px * 0.2 scale)
+			// ViewBox origin offset should not affect the drag delta
+			expectCloseTo(x, 20, 3);
+			expectCloseTo(y, 20, 3);
+		});
+	});
+});
