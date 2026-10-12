@@ -5,13 +5,36 @@ import { useMotionConfig } from "../motion-config/index.js";
 
 let popId = 0;
 
+interface PopSize {
+	width: number;
+	height: number;
+	top: number;
+	left: number;
+	right: number;
+	direction: string;
+}
+
+/** The computed size keeps sub-pixel and content-box widths, which offsetWidth/offsetHeight don't. */
+function measure(element: HTMLElement): PopSize {
+	const parent = element.offsetParent;
+	const parentWidth = parent instanceof HTMLElement ? parent.offsetWidth || 0 : 0;
+	const style = getComputedStyle(element);
+	const width = parseFloat(style.width);
+	const left = element.offsetLeft;
+	return {
+		width,
+		height: parseFloat(style.height),
+		top: element.offsetTop,
+		left,
+		right: parentWidth - width - left,
+		direction: style.direction,
+	};
+}
+
 export function usePopLayout(props: AnimatePresenceProps) {
 	const styles = new WeakMap<MotionState, HTMLStyleElement>();
 	// Cache of positions captured continuously via rAF - always has the "stable" position
-	const cachedPositions = new WeakMap<
-		MotionState,
-		{ width: number; height: number; top: number; left: number; right: number }
-	>();
+	const cachedPositions = new WeakMap<MotionState, PopSize>();
 	// Track states that are being monitored
 	const trackedStates = new Set<MotionState>();
 	let rafId: number | null = null;
@@ -22,22 +45,7 @@ export function usePopLayout(props: AnimatePresenceProps) {
 	 * Runs every frame to ensure we always have the latest stable position.
 	 */
 	function updatePositions() {
-		for (const state of trackedStates) {
-			const element = state.element as HTMLElement;
-			if (!element || !element.isConnected) continue;
-
-			const parent = element.offsetParent;
-			const parentWidth = parent instanceof HTMLElement ? parent.offsetWidth || 0 : 0;
-			const size = {
-				height: element.offsetHeight || 0,
-				width: element.offsetWidth || 0,
-				top: element.offsetTop,
-				left: element.offsetLeft,
-				right: 0,
-			};
-			size.right = parentWidth - size.width - size.left;
-			cachedPositions.set(state, size);
-		}
+		for (const state of trackedStates) capturePositionSync(state);
 
 		if (trackedStates.size > 0) {
 			rafId = requestAnimationFrame(updatePositions);
@@ -52,18 +60,7 @@ export function usePopLayout(props: AnimatePresenceProps) {
 	function capturePositionSync(state: MotionState) {
 		const element = state.element as HTMLElement;
 		if (!element || !element.isConnected) return;
-
-		const parent = element.offsetParent;
-		const parentWidth = parent instanceof HTMLElement ? parent.offsetWidth || 0 : 0;
-		const size = {
-			height: element.offsetHeight || 0,
-			width: element.offsetWidth || 0,
-			top: element.offsetTop,
-			left: element.offsetLeft,
-			right: 0,
-		};
-		size.right = parentWidth - size.width - size.left;
-		cachedPositions.set(state, size);
+		cachedPositions.set(state, measure(element));
 	}
 
 	/**
@@ -96,25 +93,13 @@ export function usePopLayout(props: AnimatePresenceProps) {
 		// Stop tracking this element since it's exiting
 		trackedStates.delete(state);
 
-		// Use cached position if available, otherwise measure now (fallback)
-		let size = cachedPositions.get(state);
-		if (!size) {
-			// Fallback: measure now (may be incorrect if DOM has shifted)
-			const parent = element.offsetParent;
-			const parentWidth = parent instanceof HTMLElement ? parent.offsetWidth || 0 : 0;
-			size = {
-				height: element.offsetHeight || 0,
-				width: element.offsetWidth || 0,
-				top: element.offsetTop,
-				left: element.offsetLeft,
-				right: 0,
-			};
-			size.right = parentWidth - size.width - size.left;
-		}
-		// Clear the cache after use
+		// Use the cached position if available, otherwise measure now (may be off if the DOM has shifted)
+		const size = cachedPositions.get(state) ?? measure(element);
 		cachedPositions.delete(state);
 
-		const x = props.anchorX === "left" ? `left: ${size.left}px` : `right: ${size.right}px`;
+		// Anchor to the start edge, which is the right one in RTL.
+		const anchorLeft = (props.anchorX === "left") === (size.direction !== "rtl");
+		const x = anchorLeft ? `left: ${size.left}px` : `right: ${size.right}px`;
 
 		// Use unique pop id for CSS selector
 		const elementPopId = `pop-${popId++}`;
@@ -124,7 +109,7 @@ export function usePopLayout(props: AnimatePresenceProps) {
 			style.nonce = config().nonce;
 		}
 		styles.set(state, style);
-		document.head.appendChild(style);
+		element.ownerDocument.head.appendChild(style);
 		if (style.sheet) {
 			style.sheet.insertRule(`
     [data-motion-pop-id="${elementPopId}"] {
@@ -143,9 +128,7 @@ export function usePopLayout(props: AnimatePresenceProps) {
 		if (!style) return;
 		styles.delete(state);
 		delete (state.element as HTMLElement).dataset.motionPopId;
-		frame.render(() => {
-			document.head.removeChild(style);
-		});
+		frame.render(() => style.remove());
 	}
 
 	return {

@@ -3,10 +3,6 @@ import { bbox, should, visit, wait } from "../../harness/upstream.js";
 
 test.describe("AnimatePresence popLayout subpixel precision", () => {
 	test("preserves sub-pixel width when popping layout", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: popped width is 400 instead of 400.39; popLayout sizes the popped element from integer offsetWidth/offsetHeight instead of computed width/height"
-		);
 		const child = page.locator("#child");
 		await visit(page, "?test=animate-presence-pop-subpixel");
 		await wait(page, 50);
@@ -24,10 +20,6 @@ test.describe("AnimatePresence popLayout subpixel precision", () => {
 	});
 
 	test("preserves width for content-box elements with padding and border", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: popped content-box element grows from 250 to 300; popLayout writes offsetWidth (border-box, 250) as the CSS width instead of the computed content width (200)"
-		);
 		const child = page.locator("#child");
 		await visit(page, "?test=animate-presence-pop-subpixel&padding=true");
 		await wait(page, 50);

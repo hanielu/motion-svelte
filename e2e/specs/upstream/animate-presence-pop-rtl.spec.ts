@@ -3,10 +3,6 @@ import { bbox, should, trigger, visit, wait } from "../../harness/upstream.js";
 
 test.describe("AnimatePresence popLayout RTL", () => {
 	test("correctly pops exiting elements in RTL direction without shifting", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: popped #b shifts from left 800 to 900; popLayout always anchors with `left` and ignores direction: rtl (upstream anchors RTL with `right`)"
-		);
 		const b = page.locator("#b");
 		await visit(page, "?test=animate-presence-pop-rtl");
 		await wait(page, 50);
