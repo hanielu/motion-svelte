@@ -1,8 +1,6 @@
 import type { Component, ComponentProps } from "svelte";
 import Motion from "./motion.svelte";
 import type { FeatureBundle } from "#lib/features/dom-animation.js";
-import type { createVisualElement } from "#lib/state/create-visual-element.js";
-import { updateLazyFeatures } from "#lib/features/lazy-features.js";
 import type { MotionComponent, MotionProps } from "./types.js";
 import type { SvelteHTMLElements } from "svelte/elements";
 import type { MotionHTMLAttributes } from "#lib/types/motion-values.js";
@@ -11,24 +9,27 @@ import { withProp } from "#lib/vendor/runed/index.js";
 
 export interface MotionCreateOptions {
 	forwardMotionProps?: boolean;
-	renderer?: typeof createVisualElement;
 }
 
-const componentMaxCache = new Map<any, Component>();
-const componentMiniCache = new Map<any, Component>();
+// Tag components, per feature bundle (`undefined` for `m`)
+const componentCaches = new Map<FeatureBundle | undefined, Map<string, Component>>();
 
-export function createMotionComponent(component: string | Component, options: MotionCreateOptions = {}) {
+export function createMotionComponent(
+	component: string | Component,
+	options: MotionCreateOptions = {},
+	bundle?: FeatureBundle
+) {
 	const isString = typeof component === "string";
-	const name = isString ? component : component.name || "";
-	const componentCache = options.renderer ? componentMaxCache : componentMiniCache;
-	if (isString && componentCache?.has(component)) {
+	let componentCache = componentCaches.get(bundle);
+	if (!componentCache) componentCaches.set(bundle, (componentCache = new Map()));
+	if (isString && componentCache.has(component)) {
 		return componentCache.get(component);
 	}
 
 	const motionComponent: MotionComponent<typeof component> = (anchor, props) => {
 		const getAs = () => props.as || component || "div";
 		return Motion(anchor, {
-			renderer: options.renderer,
+			bundle,
 			get forwardMotionProps() {
 				return props.forwardMotionProps || options.forwardMotionProps;
 			},
@@ -73,21 +74,14 @@ export type MotionNameSpace = {
 };
 
 export function createMotionComponentWithFeatures(featureBundle?: FeatureBundle) {
-	const renderer = featureBundle?.renderer;
-	updateLazyFeatures(featureBundle?.features || []);
 	return new Proxy({} as unknown as MotionNameSpace, {
 		get(_target, key) {
 			if (key === "create") {
 				return (component: any, options?: MotionCreateOptions) =>
-					createMotionComponent(component, {
-						...options,
-						renderer,
-					});
+					createMotionComponent(component, options, featureBundle);
 			}
 
-			return createMotionComponent(key as string, {
-				renderer,
-			});
+			return createMotionComponent(key as string, {}, featureBundle);
 		},
 	});
 }

@@ -5,7 +5,7 @@ import { frame, isVariantLabel } from "motion-dom";
 import { isSVGElement, resolveInitialValues } from "#lib/state/utils.js";
 import type { Feature, FeatureKey } from "#lib/features/feature.js";
 import type { StateType } from "#lib/features/animation/animation.js";
-import { lazyFeatures } from "#lib/features/lazy-features.js";
+import type { FeatureBundle } from "#lib/features/dom-animation.js";
 import type { PresenceContext } from "#lib/components/animate-presence/presence.svelte.js";
 
 // Map to track mounted motion states by element
@@ -56,6 +56,8 @@ export class MotionState {
 
 	// Feature instances managed by key
 	private features = new Map<FeatureKey, Feature>();
+	// The features this component can use: its own bundle's, or for `m` components the nearest LazyMotion's
+	private featureCtors: ReadonlyArray<typeof Feature> = [];
 
 	// Visual element instance from Framer Motion
 	public visualElement: VisualElement<Element>;
@@ -91,12 +93,21 @@ export class MotionState {
 	}
 
 	/**
-	 * Initialize features from options and global lazy features
+	 * Set (or, for LazyMotion, resolve later) the renderer and features of this component, then sync its features.
+	 */
+	setBundle({ renderer, features }: Partial<FeatureBundle>) {
+		if (renderer) this.initVisualElement(renderer);
+		if (features?.length) this.featureCtors = features;
+		this.updateFeatures();
+	}
+
+	/**
+	 * Create missing features, then mount unmounted ones and update the rest.
 	 * Features are stored by key to avoid duplicate instantiation
 	 */
 	updateFeatures() {
 		if (!this.visualElement) return;
-		for (const FeatureCtor of lazyFeatures) {
+		for (const FeatureCtor of this.featureCtors) {
 			if (!this.features.has(FeatureCtor.key)) {
 				const { enabledBy } = FeatureCtor;
 				if (enabledBy && !enabledBy.some((prop) => this.options[prop])) continue;
@@ -286,7 +297,9 @@ export class MotionState {
 	/**
 	 * Create and attach a visual element using the given renderer.
 	 */
-	initVisualElement(renderer: (tag: string, options: VisualElementOptions<any, any>) => VisualElement<Element>) {
+	private initVisualElement(
+		renderer: (tag: string, options: VisualElementOptions<any, any>) => VisualElement<Element>
+	) {
 		if (this.visualElement) return;
 		this.visualElement = renderer(this.options.as as string, {
 			// @ts-expect-error - presenceContext shape differs from motion-dom's
@@ -308,6 +321,8 @@ export class MotionState {
 		// No parent.addChild() here: visualElement.mount() registers with the parent once `current` is set, so
 		// enteringChildren never holds unmounted children (stagger sorting crashes on them in Firefox).
 		if (this.isMounted()) {
+			// Features loaded after mount (async LazyMotion): animate from initial so changes made meanwhile still run.
+			this.visualElement.manuallyAnimateOnMount = true;
 			this.visualElement.mount(this.element);
 		}
 	}

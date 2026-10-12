@@ -32,7 +32,6 @@
 <script lang="ts">
 	import type { MotionProps } from "./types.js";
 	import type { FeatureBundle } from "#lib/features/dom-animation.js";
-	import type { createVisualElement } from "#lib/state/create-visual-element.js";
 	import { AnimatePresenceContext } from "../animate-presence/presence.svelte.js";
 	import { LayoutGroupContext, MotionStateContext } from "../context.js";
 	import { LayoutMotionScopeContext } from "./layout-motion.svelte";
@@ -46,12 +45,12 @@
 	import { isMotionValue } from "framer-motion/dom";
 	import { isValidMotionProp } from "./valid-prop.js";
 	import { resolveMotionProps } from "#lib/utils/resolve-motion-props.js";
-	import { updateLazyFeatures } from "#lib/features/lazy-features.js";
 	import { untrack, type Component } from "svelte";
 	import { useMotionConfig } from "../motion-config/index.js";
 
 	interface MotionComponentProps {
-		renderer?: typeof createVisualElement;
+		/** The renderer and features of `motion` components; `m` components get theirs from LazyMotion. */
+		bundle?: FeatureBundle;
 		as: string | Component;
 		forwardMotionProps?: boolean;
 		props: MotionProps;
@@ -59,7 +58,7 @@
 	}
 
 	let {
-		renderer,
+		bundle,
 		as: AsComponent,
 		props,
 		ref: externalRef = $bindable(),
@@ -87,8 +86,8 @@
 	 * If we're in development mode, check to make sure we're not rendering a motion component
 	 * as a child of LazyMotion, as this will break the file-size benefits of using it.
 	 */
-	// svelte-ignore state_referenced_locally - a one-time mount check; `renderer` is fixed per motion component
-	if (process.env.NODE_ENV !== "production" && renderer && lazyMotionContext.strict) {
+	// svelte-ignore state_referenced_locally - a one-time mount check; `bundle` is fixed per motion component
+	if (process.env.NODE_ENV !== "production" && bundle && lazyMotionContext.strict) {
 		const strictMessage =
 			"You have rendered a `motion` component within a `LazyMotion` component. This will break tree shaking. Import and render a `m` component instead.";
 		props.ignoreStrict ? warning(false, strictMessage) : invariant(false, strictMessage);
@@ -108,26 +107,15 @@
 	MotionStateContext.set(motionState);
 	layoutMotionScope?.register(motionState);
 
-	// If renderer is provided directly (motion component), use it immediately
-	// svelte-ignore state_referenced_locally - `renderer` is fixed per motion component
-	if (renderer) {
-		motionState.initVisualElement(renderer);
-		motionState.updateFeatures();
-	}
-
-	// Watch for lazy-loaded features (for m component with LazyMotion)
-	watch.pre(
-		() => lazyMotionContext.features(),
-		(bundle) => {
-			if (bundle.features?.length) {
-				updateLazyFeatures(bundle.features);
-			}
-			if (bundle.renderer) {
-				motionState.initVisualElement(bundle.renderer);
-			}
-			motionState.updateFeatures();
-		}
-	);
+	// `motion` components bring their own features. `m` components use the nearest LazyMotion's, which may load
+	// later; they never pick up features another component happened to load.
+	// svelte-ignore state_referenced_locally - `bundle` is fixed per motion component
+	if (bundle) motionState.setBundle(bundle);
+	else
+		watch.pre(
+			() => lazyMotionContext.features(),
+			(lazyBundle) => motionState.setBundle(lazyBundle)
+		);
 
 	const getAttrs = $derived.by(() => {
 		const isSVG = motionState.type === "svg";
