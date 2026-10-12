@@ -97,8 +97,6 @@
 			if (order === newOrder) return;
 
 			isReordering = true;
-			// Snapshot the items before the new order renders, as a React re-render does.
-			layoutMotion.update();
 
 			// Unmeasured items (e.g. exiting with AnimatePresence) keep their positions.
 			const newValues = [...values];
@@ -108,6 +106,8 @@
 			});
 			values = newValues;
 			onReorder?.(newValues);
+			// Snapshot the items before the new order renders, as a React re-render does.
+			layoutMotion.update();
 		},
 	});
 

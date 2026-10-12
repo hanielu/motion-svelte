@@ -2,11 +2,11 @@
 	import Provider from "./layout-motion.svelte";
 	import type { MotionCreateOptions, MotionNameSpace } from "./utils.js";
 	import type { MotionState } from "#lib/state/motion-state.js";
-	import type { Component, Snippet } from "svelte";
+	import { flushSync, type Component, type Snippet } from "svelte";
 	import { withProp } from "#lib/vendor/runed/index.js";
 	import { createOptionalContext } from "#lib/utils/optional-context.js";
 	import { motion } from "./instance.js";
-	import { frame } from "motion-dom";
+	import type { IProjectionNode } from "motion-dom";
 
 	type MotionComponent = Component<Record<string, unknown>>;
 
@@ -50,11 +50,17 @@
 		function update() {
 			// Insertion order, which is parent-first.
 			scope.forEach((state) => state.beforeUpdate());
-			// Usually a motion component whose props change with the update finishes the layout pass. When only plain
-			// markup changes, nothing does, so finish it once the change is in the DOM (a no-op if it already ran).
+
+			// A motion component whose props change with the state change finishes the layout pass when it updates.
+			// When only plain markup changes (e.g. a keyed list reorders), nothing does, so apply the change and finish
+			// the pass in a microtask: before the browser paints the new layout, as React's componentDidUpdate does.
 			const [state] = scope;
-			const root = state?.visualElement?.projection?.root;
-			if (root) frame.read(() => root.didUpdate());
+			const root: IProjectionNode | undefined = state?.visualElement?.projection?.root;
+			if (!root) return;
+			queueMicrotask(() => {
+				flushSync();
+				if (root.isUpdating) root.didUpdate();
+			});
 		}
 
 		update.with =
