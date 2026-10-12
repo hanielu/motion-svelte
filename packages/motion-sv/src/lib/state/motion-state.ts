@@ -136,14 +136,27 @@ export class MotionState {
 		mountedStates.set(element, this);
 		this.element = element;
 		this.features.get("projection")?.update();
-		// A layoutId node snapshots its page box when it mounts. The root's scroll offset is only refreshed during
-		// projection updates, so after a client-side navigation it can still hold the previous page's scroll.
-		if (this.options.layoutId) this.refreshRootScroll();
+		if (this.options.layoutId) {
+			// A layoutId node snapshots its page box when it mounts. The root's scroll offset is only refreshed during
+			// projection updates, so after a client-side navigation it can still hold the previous page's scroll.
+			this.refreshRootScroll();
+			this.snapshotLeadOf(this.options.layoutId);
+		}
 		this.visualElement?.mount(element);
 		this.updateFeatures();
 		// Render once the mount animations have started, as React does, so values they settle without changing (e.g. an
 		// SVG `x: "none"`, which resolves to 0) still reach the element.
 		this.visualElement?.scheduleRenderMicrotask();
+	}
+
+	/**
+	 * Mounting the projection makes this element the lead of its layoutId, taking over from the current one. When that
+	 * one is still on the page (an element shown alongside it, or Svelte mounting the new branch before removing the
+	 * old), measure it first, so this element animates from it.
+	 */
+	private snapshotLeadOf(layoutId: string) {
+		const lead = this.visualElement?.projection?.root?.sharedNodes.get(layoutId)?.lead;
+		if (lead?.instance && !lead.snapshot) lead.willUpdate();
 	}
 
 	private refreshRootScroll() {
