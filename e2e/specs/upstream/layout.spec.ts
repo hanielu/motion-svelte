@@ -109,10 +109,6 @@ test.describe("Layout animation", () => {
 	test("Doesn't animate shared layout components when layoutDependency hasn't changed (issue #1436)", async ({
 		page,
 	}) => {
-		test.fail(
-			true,
-			"motion-sv: layoutId box remounted on section switch (same layoutDependency) still layout-animates (green/blue) instead of staying red"
-		);
 		const box = page.locator("#box");
 		const backgroundColor = () => box.first().evaluate((el) => getComputedStyle(el).backgroundColor);
 		await visit(page, "?test=layout-shared-dependency");

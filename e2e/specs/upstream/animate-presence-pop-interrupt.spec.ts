@@ -3,10 +3,6 @@ import { should, visit, wait } from "../../harness/upstream.js";
 
 test.describe("AnimatePresence popLayout interrupt", () => {
 	test("removes data-motion-pop-id when exit animation is interrupted", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: data-motion-pop-id stays on the element after an interrupted exit re-enters (removePopStyle drops the <style> but never removes the attribute)"
-		);
 		const target = page.locator("#target");
 		const hasPopId = () => target.evaluate((el) => el.hasAttribute("data-motion-pop-id"));
 		await visit(page, "?test=animate-presence-pop-interrupt");

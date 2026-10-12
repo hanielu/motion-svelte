@@ -142,6 +142,7 @@ export function usePopLayout(props: AnimatePresenceProps) {
 		const style = styles.get(state);
 		if (!style) return;
 		styles.delete(state);
+		delete (state.element as HTMLElement).dataset.motionPopId;
 		frame.render(() => {
 			document.head.removeChild(style);
 		});

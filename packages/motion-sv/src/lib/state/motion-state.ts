@@ -7,7 +7,6 @@ import type { Feature, FeatureKey } from "#lib/features/feature.js";
 import type { StateType } from "#lib/features/animation/animation.js";
 import { lazyFeatures } from "#lib/features/lazy-features.js";
 import type { PresenceContext } from "#lib/components/animate-presence/presence.svelte.js";
-import { motionGlobalConfig } from "#lib/config.js";
 
 // Map to track mounted motion states by element
 export const mountedStates = new WeakMap<Element, MotionState>();
@@ -133,13 +132,19 @@ export class MotionState {
 		invariant(Boolean(element), "Animation state must be mounted with valid Element");
 		mountedStates.set(element, this);
 		this.element = element;
-		const presenceId = this.options.presenceContext?.presenceId;
-		if (presenceId !== undefined) {
-			element.setAttribute(motionGlobalConfig.motionAttribute, presenceId);
-		}
 		this.features.get("projection")?.update();
+		// A layoutId node snapshots its page box when it mounts. The root's scroll offset is only refreshed during
+		// projection updates, so after a client-side navigation it can still hold the previous page's scroll.
+		if (this.options.layoutId) this.refreshRootScroll();
 		this.visualElement?.mount(element);
 		this.updateFeatures();
+	}
+
+	private refreshRootScroll() {
+		const root = this.visualElement?.projection?.root;
+		if (!root) return;
+		root.scroll = undefined;
+		root.updateScroll();
 	}
 
 	// Called before unmounting, executes in child-to-parent order

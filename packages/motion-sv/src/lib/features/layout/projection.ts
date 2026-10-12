@@ -42,6 +42,8 @@ export class ProjectionFeature extends Feature {
 			// initialPromotionConfig
 			layoutRoot: options.layoutRoot,
 			layoutScroll: options.layoutScroll,
+			// The node stack skips the shared layout animation between leads with the same layoutDependency.
+			layoutDependency: options.layoutDependency,
 			crossfade: options.crossfade ?? (shouldDisableInitialCrossfade ? false : undefined),
 			onExitComplete: () => {
 				if (!this.projection?.isPresent && this.state.options.layoutId && !this.state.isExiting) {

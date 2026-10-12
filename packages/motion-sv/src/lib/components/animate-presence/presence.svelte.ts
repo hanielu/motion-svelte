@@ -4,7 +4,6 @@ import { Context } from "#lib/vendor/runed/index.js";
 export interface PresenceContext {
 	initial?: boolean;
 	custom?: any;
-	presenceId?: string;
 	/**
 	 * Svelte-specific: true while the AnimatePresence itself is being destroyed (e.g. its route or parent block went
 	 * away). Children then leave without their exit animations, as when an AnimatePresence unmounts in React.
@@ -13,8 +12,6 @@ export interface PresenceContext {
 }
 
 export const AnimatePresenceContext = new Context<PresenceContext>("AnimatePresenceContext");
-
-let apId = 0;
 
 export function useAnimatePresence(props: AnimatePresenceProps) {
 	let hasMounted = false;
@@ -26,7 +23,6 @@ export function useAnimatePresence(props: AnimatePresenceProps) {
 		get custom() {
 			return props.custom;
 		},
-		presenceId: String(apId++),
 		isUnmounting: false,
 	};
 
