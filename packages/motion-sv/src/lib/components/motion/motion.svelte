@@ -207,8 +207,8 @@
 		}
 	});
 
-	// Snapshot the layout before the element goes away. A pre effect is created before the template's attachment,
-	// so this teardown runs first, while the element is still mounted.
+	// Removal bookkeeping for elements that leave without an outro of their own (see `motionExit`): the projection is
+	// marked absent and hands its lead on. By now Svelte has detached the element, so this can't measure it.
 	$effect.pre(() => () => {
 		layoutScope?.delete(motionState);
 		motionState.beforeUnmount();
@@ -250,9 +250,16 @@
 	 * The exit is deferred: Svelte calls the returned function in a microtask right after the flush, on every outro,
 	 * while it only dispatches `outrostart` a frame later. Starting the exit here keeps it in the same layout pass as
 	 * the update that caused it, so running layout animations aren't restarted a frame in.
+	 *
+	 * Outside AnimatePresence the element leaves right away. Svelte calls this as the outro starts, while the element
+	 * is still on the page (it detaches it before running the component's teardowns), so snapshot its layout here: a
+	 * layoutId element replacing it animates from that snapshot.
 	 */
 	function motionExit(node: Element) {
-		if (!presenceManager) return {};
+		if (!presenceManager) {
+			motionState.beforeUnmount();
+			return {};
+		}
 		return () => (takesPartInExit() && presenceManager.onOutroStart(node) ? { duration: EXIT_HOLD_LIMIT } : {});
 	}
 	const motionEnter = (_node: Element) => ({});

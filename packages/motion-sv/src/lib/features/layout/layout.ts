@@ -49,7 +49,15 @@ export class LayoutFeature extends Feature {
 			if (options.layoutId) {
 				const isPresent = !isHidden(this.state.element as HTMLElement);
 				projection.isPresent = isPresent;
-				isPresent ? projection.promote() : projection.relegate();
+				if (isPresent) {
+					// Svelte mounts an element before removing the one it replaces. Snapshot that one while it's still on
+					// the page, before promoting, so this element animates from it as in React.
+					const lead = projection.getStack()?.lead;
+					if (lead && lead !== projection && lead.instance && !lead.snapshot) lead.willUpdate();
+					projection.promote();
+				} else {
+					projection.relegate();
+				}
 				this.updatePrevLead(projection);
 			}
 			layoutGroup?.group?.add(projection);
