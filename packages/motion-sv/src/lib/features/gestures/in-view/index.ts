@@ -4,6 +4,7 @@ import { inView } from "framer-motion/dom";
 
 export class InViewGesture extends Feature {
 	static key = "inView" as const;
+	static enabledBy = ["whileInView", "onViewportEnter", "onViewportLeave"] as const;
 
 	private removeObserver: VoidFunction | undefined;
 

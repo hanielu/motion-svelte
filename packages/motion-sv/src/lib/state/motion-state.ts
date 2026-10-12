@@ -95,6 +95,8 @@ export class MotionState {
 		if (!this.visualElement) return;
 		for (const FeatureCtor of lazyFeatures) {
 			if (!this.features.has(FeatureCtor.key)) {
+				const { enabledBy } = FeatureCtor;
+				if (enabledBy && !enabledBy.some((prop) => this.options[prop])) continue;
 				this.features.set(FeatureCtor.key, new FeatureCtor(this));
 			}
 			const feature = this.features.get(FeatureCtor.key);

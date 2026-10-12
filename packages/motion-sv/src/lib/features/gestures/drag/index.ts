@@ -4,6 +4,7 @@ import { noop } from "motion-utils";
 
 export class DragGesture extends Feature {
 	static key = "drag" as const;
+	static enabledBy = ["drag", "dragControls"] as const;
 
 	controls: VisualElementDragControls;
 

@@ -5,6 +5,11 @@ export type FeatureKey =
 
 export class Feature {
 	static key: FeatureKey;
+	/**
+	 * Props that enable this feature, as in upstream's feature definitions. A component only gets the feature once
+	 * one of them is set (and keeps it after that). Features without any are always enabled.
+	 */
+	static enabledBy?: readonly string[];
 
 	isMount: boolean;
 

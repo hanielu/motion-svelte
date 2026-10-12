@@ -4,6 +4,7 @@ import { frame, hover } from "motion-dom";
 
 export class HoverGesture extends Feature {
 	static key = "hover" as const;
+	static enabledBy = ["whileHover", "onHoverStart", "onHoverEnd"] as const;
 
 	private removeHover: VoidFunction | undefined;
 

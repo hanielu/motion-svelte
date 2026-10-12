@@ -4,6 +4,7 @@ import { Feature } from "#lib/features/feature.js";
 
 export class FocusGesture extends Feature {
 	static key = "focus" as const;
+	static enabledBy = ["whileFocus"] as const;
 
 	private isFocused = false;
 	private removeFocus: VoidFunction | undefined;

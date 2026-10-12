@@ -14,6 +14,7 @@ function extractEventInfo(event: PointerEvent): EventInfo {
 
 export class PressGesture extends Feature {
 	static key = "press" as const;
+	static enabledBy = ["whilePress", "onPress", "onPressStart", "onPressCancel"] as const;
 
 	private removePress: VoidFunction | undefined;
 

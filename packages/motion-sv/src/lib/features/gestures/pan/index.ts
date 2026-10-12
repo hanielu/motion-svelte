@@ -14,6 +14,7 @@ const asyncHandler = (handler?: PanEventHandler) => (event: PointerEvent, info: 
 
 export class PanGesture extends Feature {
 	static key = "pan" as const;
+	static enabledBy = ["onPan", "onPanStart", "onPanSessionStart", "onPanEnd"] as const;
 
 	private session?: PanSession;
 
