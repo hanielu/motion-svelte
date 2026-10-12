@@ -8,6 +8,7 @@
 	import { autoScrollIfNeeded, resetAutoScrollState } from "./auto-scroll.js";
 	import { useTransform } from "#lib/value/index.js";
 	import { watch } from "#lib/vendor/runed/index.js";
+	import type { PanInfo } from "motion-dom";
 
 	export interface GroupItemProps<T extends ElementType = "li", K = unknown, V = unknown> extends MotionProps<T, K> {
 		/**
@@ -31,22 +32,11 @@
 		as = "li",
 		style,
 		value,
-		drag: dragProp,
+		drag,
+		layout = true,
 		onDrag,
 		onDragEnd,
 		children,
-		initial = undefined,
-		animate = undefined,
-		whileHover = undefined,
-		whileInView = undefined,
-		layoutId = undefined,
-		layoutScroll = false,
-		layoutRoot = false,
-		dragListener = true,
-		dragElastic = 0.5,
-		dragMomentum = true,
-		whileDrag = undefined,
-		crossfade = true,
 		ref = $bindable(),
 		...rest
 	}: GroupItemProps<ElementType> & {
@@ -54,93 +44,57 @@
 	} = $props();
 
 	const context = ReorderContext.getOr(null);
+	invariant(Boolean(context), "Reorder.Item must be a child of Reorder.Group");
+	const { registerItem, updateOrder, groupRef } = context!;
+
+	// svelte-ignore state_referenced_locally - the drag motion values are created once, like React's hooks
 	const point = {
 		x: useDefaultMotionValue(style?.x),
 		y: useDefaultMotionValue(style?.y),
 	};
-
 	const zIndex = useTransform([point.x, point.y], ([latestX, latestY]) => (latestX || latestY ? 1 : "unset"));
-	function warning() {
-		invariant(Boolean(context), "Reorder.Item must be a descendant of Reorder.Group");
-	}
 
-	// Call immediately to fail during setup, not render
-	warning();
-
-	const { axis, registerItem, updateOrder, groupRef } = context!;
-
-	const restProps = $derived({
-		...rest,
-		initial,
-		animate,
-		whileHover,
-		whileInView,
-		layoutId,
-		layoutScroll,
-		layoutRoot,
-		dragListener,
-		dragElastic,
-		dragMomentum,
-		whileDrag,
-		crossfade,
-		style: {
-			...style,
-			x: point.x,
-			y: point.y,
-			zIndex,
-		},
-	});
-
-	const drag = $derived.by(() => {
-		if (dragProp) {
-			return dragProp;
-		}
-		return axis.current;
-	});
 	let isDragging = $state(false);
 
-	const layout = createLayoutMotion(motion);
-	const Motion = layout.div;
-
+	const layoutMotion = createLayoutMotion(motion);
+	// svelte-ignore state_referenced_locally - the element type is fixed per item, as in React
+	const Item = layoutMotion[as as "li"];
 	watch.pre(
-		() => [restProps.custom],
-		() => {
-			layout.update();
-		},
+		() => [rest.custom],
+		() => layoutMotion.update(),
 		{ lazy: true }
 	);
 
-	// Track drag position for auto-scroll
-	function handleDrag(event: PointerEvent, gesturePoint: any) {
+	function handleDrag(event: PointerEvent, gesturePoint: PanInfo) {
 		const { velocity, point: pointerPoint } = gesturePoint;
-		const offset = point[axis.current].get();
+		const { axis } = context!;
 
-		// Always attempt to update order - checkReorder handles the logic
-		updateOrder(value, offset, velocity[axis.current]);
+		updateOrder(value, { x: point.x.get(), y: point.y.get() }, velocity);
 
-		autoScrollIfNeeded(groupRef() ?? null, pointerPoint[axis.current], axis.current, velocity[axis.current]);
-		if (!isDragging) isDragging = true;
+		const scrollAxis = axis === "xy" ? (Math.abs(velocity.x) > Math.abs(velocity.y) ? "x" : "y") : axis;
+		autoScrollIfNeeded(groupRef() ?? null, pointerPoint[scrollAxis], scrollAxis, velocity[scrollAxis]);
+
+		isDragging = true;
 		onDrag?.(event, gesturePoint);
 	}
 
-	function handleDragEnd(event: PointerEvent, gesturePoint: any) {
+	function handleDragEnd(event: PointerEvent, gesturePoint: PanInfo) {
 		isDragging = false;
 		resetAutoScrollState();
 		onDragEnd?.(event, gesturePoint);
 	}
 </script>
 
-<layout.div
-	{...restProps}
-	{drag}
+<Item
+	drag={drag ?? (context!.axis === "xy" ? true : context!.axis)}
+	{...rest}
 	dragSnapToOrigin
+	style={{ ...style, x: point.x, y: point.y, zIndex }}
+	{layout}
 	onDrag={handleDrag}
 	onDragEnd={handleDragEnd}
-	onLayoutMeasure={(measured) => {
-		registerItem(value, measured);
-	}}
+	onLayoutMeasure={(measured) => registerItem(value, measured)}
 	bind:ref
-	layout
 >
-	{@render children(isDragging)}
-</layout.div>
+	{@render children?.(isDragging)}
+</Item>

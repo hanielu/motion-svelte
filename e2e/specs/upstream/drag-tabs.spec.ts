@@ -22,10 +22,6 @@ test.describe("Tabs demo", () => {
 	});
 
 	test("First tab doesn't distort when multiple layout animations started", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: ReorderItem renders <div> instead of <li> (drops `as`), so the tab li styles never apply (Tomato label left 265 vs 280); passes with li styles forced onto the divs"
-		);
 		const label = page.locator("#Tomato-label");
 		const addItem = page.locator("button.add-item");
 		await visit(page, "?test=drag-tabs");
@@ -47,10 +43,6 @@ test.describe("Tabs demo", () => {
 	});
 
 	test("Opacity finishes animating on reorder", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: ReorderItem renders <div> not <li>, so the unpositioned close button sits under the tab center and the click deletes Lettuce (#Lettuce-tab disappears); with li styles forced, Tomato can no longer be dragged after the first reorder (left 405 vs 265)"
-		);
 		const lettuce = page.locator("#Lettuce-tab");
 		const tomato = page.locator("#Tomato-tab");
 		await visit(page, "?test=drag-tabs");
@@ -106,10 +98,6 @@ test.describe("Tabs demo", () => {
 	});
 
 	test("Removed tabs don't reappear on reorder", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: ReorderItem renders <div> not <li> (Lettuce left 332.6 vs 475); with li styles forced, Lettuce can no longer be dragged after Tomato is removed (stays at 265 vs 475)"
-		);
 		const lettuce = page.locator("#Lettuce-tab");
 		await visit(page, "?test=drag-tabs");
 		await page.locator("#Tomato-remove").click();

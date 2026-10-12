@@ -1,13 +1,13 @@
-import type { Box } from "motion-utils";
+import type { Box, Point } from "motion-utils";
 import { Context } from "#lib/vendor/runed/index.js";
-import type { Mutable } from "#lib/types/common.js";
+import type { ReorderAxis } from "./types.js";
 
 export interface ReorderContextProps<T> {
-	axis?: Mutable<"x" | "y">;
-	registerItem?: (item: T, layout: Box) => void;
-	updateOrder?: (item: T, offset: number, velocity: number) => void;
-	/** Getter for the group's DOM element, used for drag auto-scroll */
-	groupRef?: () => HTMLElement | SVGElement | null | undefined;
+	readonly axis: ReorderAxis;
+	registerItem: (item: T, layout: Box) => void;
+	updateOrder: (item: T, offset: Point, velocity: Point) => void;
+	/** The group's DOM element, used for drag auto-scroll and text direction */
+	groupRef: () => Element | null | undefined;
 }
 
 export const ReorderContext = new Context<ReorderContextProps<any>>("ReorderContext");
