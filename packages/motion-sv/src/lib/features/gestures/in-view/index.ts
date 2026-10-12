@@ -33,10 +33,10 @@ export class InViewGesture extends Feature {
 				if (onViewportEnter) frame.postRender(() => onViewportEnter(entry));
 				if (once) return;
 
-				return () => {
+				return (leaveEntry) => {
 					this.state.setActive("whileInView", false);
 					const { onViewportLeave } = this.state.options;
-					if (onViewportLeave) frame.postRender(() => onViewportLeave(entry));
+					if (onViewportLeave) frame.postRender(() => onViewportLeave(leaveEntry));
 				};
 			},
 			viewOptions

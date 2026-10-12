@@ -86,12 +86,13 @@ export class MotionState {
 		this.type = isSVGElement(this.options.as ?? "div") ? "svg" : "html";
 	}
 
-	/** The variant labels this component's children inherit: its own, or its parent's. */
+	/** The variant labels this component's children inherit: its own, or its parent's unless `inherit` is false. */
 	get context(): MotionStateContext {
-		const { initial, animate } = this.options;
+		const { initial, animate, inherit } = this.options;
+		const parent = inherit === false ? undefined : this.parent?.context;
 		return {
-			initial: isVariantLabel(initial) || initial === false ? initial : this.parent?.context.initial,
-			animate: isVariantLabel(animate) ? animate : this.parent?.context.animate,
+			initial: isVariantLabel(initial) || initial === false ? initial : parent?.initial,
+			animate: isVariantLabel(animate) ? animate : parent?.animate,
 		};
 	}
 
@@ -319,6 +320,7 @@ export class MotionState {
 				latestValues: { ...this.latestValues } as ResolvedValues,
 			},
 			reducedMotionConfig: this.options.motionConfig?.reducedMotion,
+			skipAnimations: this.options.motionConfig?.skipAnimations,
 		});
 		// No parent.addChild() here: visualElement.mount() registers with the parent once `current` is set, so
 		// enteringChildren never holds unmounted children (stagger sorting crashes on them in Firefox).

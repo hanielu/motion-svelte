@@ -31,6 +31,7 @@ const validMotionProps = new Set<keyof MotionProps>([
 	"onViewportEnter",
 	"onViewportLeave",
 	"inViewOptions",
+	"crossfade",
 	"onPress",
 	"onPressStart",
 	"onPressCancel",

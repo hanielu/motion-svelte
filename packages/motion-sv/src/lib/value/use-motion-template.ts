@@ -31,9 +31,7 @@ export function useMotionTemplate(fragments: TemplateStringsArray, ...values: Ar
 		for (let i = 0; i < numFragments; i++) {
 			output += fragments[i];
 			const value = values[i];
-			if (value) {
-				output += isMotionValue(value) ? value.get() : value;
-			}
+			if (value !== undefined) output += isMotionValue(value) ? value.get() : value;
 		}
 
 		return output;
