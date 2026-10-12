@@ -8,7 +8,8 @@
 	"workspaces": [
 		"packages/*",
 		"playground/*",
-		"e2e"
+		"e2e",
+		"docs"
 	],
 	"scripts": {
 		"build": "bun run --filter motion-sv build",
@@ -18,7 +19,8 @@
 		"lint": "prettier --check .",
 		"test": "bun run --filter motion-sv test",
 		"test:e2e": "bun run --filter e2e test",
-		"release": "bun run build && changeset publish"
+		"release": "bun run build && changeset publish",
+		"docs": "bun run --filter docs dev"
 	},
 	"devDependencies": {
 		"prettier": "^3.9.10",

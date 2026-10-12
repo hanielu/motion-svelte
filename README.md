@@ -4,7 +4,7 @@ This is an attempt to bring a Motion (formerly known as Framer Motion) to Svelte
 
 # Documentation
 
-This project is based on the [Motion for Vue](https://motion.dev/docs/vue) documentation.
+The documentation site lives in [`docs/`](./docs). Run it locally with `bun install` and `bun run docs`.
 
 ## Quick Start
 
@@ -36,96 +36,32 @@ Then import the `motion` component:
 
 - [Animated List](https://svelte.dev/playground/hello-world?version=5.38.6#H4sIAAAAAAAAE71Ze2_bOBL_KlO1WMi3smylaZo6Vu7a3u5dgd3bRYO9BS4KUFoc2UxkSiCpxF5B3_1AUk8_Gm8POOSP2OQMOfObJ8elw8kanZnznrM1UUjhJyaV4zkJS1E6s9vSUdtcE-gFx2vJ89yXj5gqvbYgEg-txxlXyJV0Zs5cxoLlClLCl2HkKBk51xGPFFvnmVDQ3K4vh0Rka4gcf0Lq1XHKpKqPjZyrHl8JsZRQdSyFYqn07-Uu2TpTLOMexAKJwp_INivUz_VaffmvAiXyGLvjLNNYPtrTeKTijEuthGaH8MBp7uiqoytyShRCWDP49vtVxOcTC4eGgM8HyiumUgwj5weuUMAPG6aMRSIHSsteGdzKl5KzPEcF8YqlVCB3S0hYqlAg9UCqbYrSg9oCUI0qzRWpeZHazbCMpXQtna_xHdmDDdEuIowzxUgalglJJVawzqiWMc9yq3vkQMa1rB-zdZ6iwrB0RxBe6_tllqKfZks3clBrE9ckkdO7USuEJF61KgCRwBSuPWCc4gZc_cVntNGjFrQGNmX91UjVGtbaadZqSNAqVEKWk5ip7QymHmxnML70QMYkxRlM_XeXUO1w1j4ZluVwPVLtQYG3u2VO312sb9mnVoJwybQ3zaAEHX4ziByZC8aXkaONy5KEo5QzeDOdekDJOmd8OYPXU6h2TtsVX5vggNZDpT0YikALQeznqR9cQrUHCiWKjK3nlsZQCjfqEE2KfKlWYdmY2bcLO6TWqn_HHDlFHm-_Tn89ZC7_JjSbaHzfeM6O20xav-l74ER7YEs4n-xEQU06nxTptc0G-5HSHle-ZAnsSA1hGMK0J8ncJhifskcYuiyuc7Wt4KCbQlVB54XdRqA39u0LVTVA6Ad9tA_vKQXCTYxBJiBOkQhQK6yF9ntSTjoxO_0mLGlSykGgykmdoCqd7vop7jrijudoD3FmShRYeUdqzKH0P6w2RyhOrzv6Xiihn8H_RdYoc3KwDuxUn5r7ps7ELf03VCpNqDN-oi9u0PpVZLmEOtGY8JqBVDoNXNk1WxFmh-W_jRy7Hzl3NX1TK2aNzPPGnredvXN96wwG-a3xZJ0NGJ0BL9YLFFegrdjIBNVtc08vC8sZfMY4E3RuqTwgfHs9oKvN1Ql1q73y61fd9Y_okt6d_WA3K4trihp9A5_XVkuvKc7VbAfuEF4ZBGwl55GaTOATTxlHG6OQLe4xVrIr81ZPCBvISJ734Esyrn4ka5ZudRYv2FgSLscSBUs8kFupcD0umAdjkucpju2KBze4zBB---TB52yRqcyD3xYFV4UHHwlXRGCaRk6rd04oNSXg7LxdW5PN74yq1QzeXEx7q2LJuBblfJpvgBQq652zIPHDUmQFp5riZfIuIcmiv58JiuIzoayQMwjOehubmxWh2ZPmm0KQb-B1vgGxXBB36pk_f3o56h0VZ2kmzC3Bmf6LHLvTGHOFRKv0WR_ZgkmZzFNikExS3PSOIylb8k8K11JvxqiDqbd9X-iquf3YuJqupyTG8QLVEyLvUVqAPmRKZeueijtiae_Ulr1hf-AMzqYeNMB2NVgY0WFfZliS3NTc3btaVsbzQvWdKMVNv1Vo7R1Md2yjr9HoyyxlFF7iG3yLxy142a5nhdI-rtl5xvGoTzytmMI_YcZFoZTpIo4z7GsVOYF2zuAs3-yJ_q0KPqNGIaQVK8_Yju8UEsUNphirPXQaLXX90bbW_290OuhRQqtW30u8vl8sBaOdX3ReYNPgaRr8b-h0DtXF9P8h2IzCezGWYqKORM6Rm3eRWxFOtRFa7J5sJrwcqnCDaWLEUwJVvDrq9AJzJIrx5VjHCBHjpSCU6eYyuJxSXHo10F6DuE5-HrxMXifnycXwy0W-GR01SJe9uwbOf7cDT90J9BNQcH4oAck1SdMdwjP9KNyNwJaDEr7UTlT2iDA5Pz8_7xEtV5lUH5R5GnRe13j7EDnzkMiJQK705qEw6-Ljor3C9L8983XuedEipBuC99qKB31wGA6UyBX-mXjo1L9YvD27nH6lRibJTjqousbhxnSC8Aak0s3GIyMgCo6y6Ut0hJuWw-y7dRdmG5_Aq3ueyPlQbGHN0oeeESzNWUfzGQkFmsVyj-h1R3SzYjkwtUdy_jzJm-dJLp4nefs8yeXzJO-eJwmmJ9AEJ9CcnUBzAsLBCRAHJ2AcnABycALKwQkwByfgfHYCzmdfwfnODsx0MHDcqE-0i4bzbosKkqhuJ3Iip9u0j5MDu22H3k6VQnhFUbBHpGYsIH2747obM67amMGFr7KfsicUH4lEd-QzHqcFRenWL-PB7mg0vIlQfYl9W_hPTK1cOwirM5kl0poYjXwl2LoeGUaKJeC-UCMQqArBm0UjZsHliiXKrZ9EBqgGUz3dq4lrBL8PIahXGuA0JvZRNJRX4Dp7xA_bT3tid2-vfQUYhNDgx-knPaHrIGTUDDoY7evF4BrGwajmknnKYnSZB8HokFRyVSRJil9DMskEuCaFtrLUU5YxBFeg75teARuPR_3WUx9-DyH8TNTKT9IsE675KAin2dodwV-0qN9DMBq170vzGpW37M6z99ze391BCLfNl2aZ3TXP3-qASnbAckghdyB9CFNz93BE3JsQ9ca2JM_rGeoRgu4N1c5a56vgOOGoui5Nd1HNJ6ug4ZA54Qd4THehOfryVxaM-UQzWdEm9dzouJiiL595-jTY79Oa7W6ct2Cczh5JWmBYGl9vd_KUxLjKUooijBw97tKSNc-TSGX8Abc0e-Jh6WLfsxqXRf8Bt8aV62l85Ix0fLudazRz0EkjvH3tHFDRbowqyHicsvghLAml1fV7SucTu_ftYB0gqlGCPjw2fVUwBOZHsxo58C061HFaXd_YDwNd_txRJj6q64_631FIutnuyT96dOy9n0x6k-Gvj5msox2xhH6mdKY4EoHmITKqrls5atrux5b8AJsJwia27DR9Psk7nmdCUitU1r-YVL1Y7KHZ_7RvphJ8368Pbdp9r7dm3wkan86CNpt1BaX7yeYaPptV6Bm2Px8-bRzcDEyHI-Deam_sixszdE0KHuuZKLQY_bK4rwuCrbLwi5nm-ciVYNgjsnC1_cGtByaM7oyS5iO8CEMoOMWEcaQNw5rkrnv7gNsBw04JKri2r5TNxPE2cur3nn4PRc4fpqTaz_rt9juy5UrZ7_oF-s_ed_OAqUlT3PxDZE_dt5uVYPyhGwC3DVEm1kQppP82moRmlJ0ltWI259mIiBz47jt4MZC4a4kecDuCv8KXV6XhrPLNF5jZU9oba6C_vCofcOsLNPnHndy-H__nbrL0wF0biL6MX5XrYXNVfRlVs1flUNjqS1NlG8jvM8Zd3d6Yrq8aetOd5yjC0ifGqTOzP1_-F3M_Cm30HgAA)
 
-## Key Differences from Framer Motion
+## Key Differences from Motion for React and Vue
 
-Some Framer Motion features cannot be reproduced in Svelte with the same APIs.
+Most of the API is identical. The main differences:
 
-### Layout Animations
+- **Layout animations** need to know when a layout change is coming, because Svelte has no hook that runs before the DOM
+  updates. Render the elements through a namespace from `createLayoutMotion()` and call its `update()` with the state
+  change. Shared layout animations with `layoutId`, exits in `AnimatePresence` and `Reorder` lists work without it.
 
-React uses `getSnapshotBeforeUpdate` and Vue uses `onBeforeUpdate`.
-Svelte has no equivalent, so layout animations require a helper.
+  ```svelte
+  <script lang="ts">
+  	import { createLayoutMotion } from "motion-sv";
 
-Enable them using `createLayoutMotion`:
+  	const layout = createLayoutMotion();
 
-```ts
-import { createLayoutMotion } from "motion-sv";
+  	let isOn = $state(false);
+  	const toggle = layout.update.with(() => (isOn = !isOn));
+  </script>
 
-const layout = createLayoutMotion();
-```
+  <button class={{ on: isOn }} onclick={toggle}>
+  	<layout.div class="handle" />
+  </button>
+  ```
 
-`createLayoutMotion` provides:
+- **`AnimatePresence`** works with Svelte's `{#if}`, `{#each}` and `{#key}` blocks.
+- **Props**: `whilePress` instead of `whileTap`, `inViewOptions` instead of `viewport`, and `bind:ref` for the element.
+- **Hooks** take getters for inputs that change, like elements bound after setup:
+  `useScroll({ get target() { return el } })`.
 
-- `layout.update()` — mark a layout change after state updates.
-- `layout.update.with(fn)` — wrap a state update so layout changes are tracked automatically.
-
-Usage:
-
-```svelte
-<script lang="ts">
-	import { motion, createLayoutMotion } from "motion-sv";
-
-	let isOn = $state(false);
-	const layout = createLayoutMotion();
-
-	const toggle = layout.update.with(() => (isOn = !isOn));
-	// or:
-	// function toggle() {
-	//   isOn = !isOn;
-	//   layout.update();
-	// }
-</script>
-
-<motion.button style={{ ...container, justifyContent: "flex-" + (isOn ? "start" : "end") }} onclick={toggle}>
-	<layout.div
-		style={handle}
-		layoutDependency={isOn}
-		transition={{ type: "spring", visualDuration: 0.2, bounce: 0.2 }}
-	/>
-</motion.button>
-```
-
-> Use `layoutDependency` if the element is not being remounted. This gives motion a reactive trigger for the update.
-
----
-
-### Layout Animations with `layoutId`
-
-Alternatively, use `layoutId` to link elements across renders:
-
-```svelte
-<motion.button style={{ ...container, justifyContent: "flex-" + (isOn ? "start" : "end") }} onclick={toggle}>
-	{#if isOn}
-		<layout.div
-			style={handle}
-			layoutId="handle"
-			transition={{
-				type: "spring",
-				visualDuration: 0.2,
-				bounce: 0.2,
-			}}
-		/>
-	{:else}
-		<layout.div
-			style={handle}
-			layoutId="handle"
-			transition={{
-				type: "spring",
-				visualDuration: 0.2,
-				bounce: 0.2,
-			}}
-		/>
-	{/if}
-</motion.button>
-```
-
----
-
-### Animate Presence (Enter/Exit)
-
-- **React**: implemented with child diffing.
-- **Vue**: uses `Transition` / `TransitionGroup`.
-- **Svelte**: has no equivalent ([issue #8547](https://github.com/sveltejs/svelte/issues/8547)).
-
-Limitations in this port:
-
-- Certiain Variants with `AnimatePresence` (e.g. `when`) may not work.
+The documentation covers all of these in detail.

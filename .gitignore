@@ -29,7 +29,6 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 # Temporary additions
-/docs
 .cursor
 # AGENTS.md
 GEMINI.md
