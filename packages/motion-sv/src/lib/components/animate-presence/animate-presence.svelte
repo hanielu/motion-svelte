@@ -61,14 +61,16 @@
 	/**
 	 * Snapshot every layout-enabled projection node in the tree before the exiting element pops out of flow
 	 * (popLayout) or leaves the DOM (sync), so siblings can FLIP from their pre-shift positions. Nodes already
-	 * snapshotted by createLayoutMotion().update() keep their snapshot; nodes that don't move won't animate. Nodes
-	 * that haven't been measured yet just mounted, and like in React they don't animate their first layout.
+	 * snapshotted by createLayoutMotion().update() keep their snapshot; nodes that don't move won't animate. Elements
+	 * that mounted in this same update don't animate their first layout, as in React.
 	 */
 	function snapshotLayoutTree(state: MotionState) {
 		const root: IProjectionNode | undefined = state.visualElement?.projection?.root;
 		root?.nodes?.forEach((child) => {
 			const node = child as IProjectionNode;
-			if (node.layout && (node.options.layout || node.options.layoutId)) node.willUpdate(false);
+			if (!(node.options.layout || node.options.layoutId)) return;
+			if (node.instance instanceof Element && mountedStates.get(node.instance)?.isNewlyMounted) return;
+			node.willUpdate(false);
 		});
 	}
 

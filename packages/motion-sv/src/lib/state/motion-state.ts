@@ -42,6 +42,11 @@ export class MotionState {
 	// Whether the exit animation is running
 	public isExiting = false;
 	/**
+	 * Set until the element's first frame. An element mounted in the same update as an exit has never been painted, so
+	 * it has no position to animate its layout from (as in React).
+	 */
+	public isNewlyMounted = false;
+	/**
 	 * Bumped by exit() and reenter(). An exit completion from an older generation is a no-op, so an
 	 * exit → reenter → exit sequence can't have the first exit's late settlement end the second one.
 	 */
@@ -135,6 +140,8 @@ export class MotionState {
 		invariant(Boolean(element), "Animation state must be mounted with valid Element");
 		mountedStates.set(element, this);
 		this.element = element;
+		this.isNewlyMounted = true;
+		frame.postRender(() => (this.isNewlyMounted = false));
 		this.features.get("projection")?.update();
 		if (this.options.layoutId) {
 			// A layoutId node snapshots its page box when it mounts. The root's scroll offset is only refreshed during
