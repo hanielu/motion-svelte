@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { bbox, should, trigger, visit, wait, type BoundingBox } from "../../harness/upstream.js";
+import { bbox, nextFrame, should, trigger, visit, wait, type BoundingBox } from "../../harness/upstream.js";
 
 async function expectBbox(element: Locator, expectedBbox: Partial<BoundingBox>) {
 	const box = await bbox(element);
@@ -9,6 +9,12 @@ async function expectBbox(element: Locator, expectedBbox: Partial<BoundingBox>) 
 	if (expectedBbox.height) expect(box.height).toBe(expectedBbox.height);
 }
 
+/**
+ * PanSession applies pointermove on the next animation frame, and pointerup
+ * discards a move that hasn't been applied yet. Cypress also resolves trigger
+ * coordinates against the element's current box. So each pointermove is
+ * followed by nextFrame() rather than a fixed wait, which slow CI can outrun.
+ */
 async function testNestedDrag(page: Page, parentLayout: boolean, childLayout: boolean) {
 	let url = `?test=drag-layout-nested`;
 	if (parentLayout) url += `&parentLayout=true`;
@@ -42,12 +48,14 @@ async function testNestedDrag(page: Page, parentLayout: boolean, childLayout: bo
 			left: 200,
 		})
 	);
+	await nextFrame(page);
+	await nextFrame(page);
 	await trigger(parent, "pointerdown", 5, 5);
 	await wait(page, 50);
 	await trigger(parent, "pointermove", 10, 10); // Gesture will start from first move past threshold
-	await wait(page, 50);
+	await nextFrame(page);
 	await trigger(parent, "pointermove", 50, 50);
-	await wait(page, 50);
+	await nextFrame(page);
 	await trigger(parent, "pointerup");
 	await should(() =>
 		expectBbox(parent, {
@@ -69,9 +77,9 @@ async function testNestedDrag(page: Page, parentLayout: boolean, childLayout: bo
 	await trigger(child, "pointerdown", 5, 5);
 	await wait(page, 50);
 	await trigger(child, "pointermove", 10, 10); // Gesture will start from first move past threshold
-	await wait(page, 50);
+	await nextFrame(page);
 	await trigger(child, "pointermove", 50, 50);
-	await wait(page, 50);
+	await nextFrame(page);
 	await should(() =>
 		expectBbox(parent, {
 			top: 150,
@@ -111,9 +119,9 @@ async function testNestedDrag(page: Page, parentLayout: boolean, childLayout: bo
 	await trigger(parent, "pointerdown", 5, 5);
 	await wait(page, 50);
 	await trigger(parent, "pointermove", 10, 10); // Gesture will start from first move past threshold
-	await wait(page, 50);
+	await nextFrame(page);
 	await trigger(parent, "pointermove", 50, 50);
-	await wait(page, 50);
+	await nextFrame(page);
 	await trigger(parent, "pointerup");
 	await should(() =>
 		expectBbox(parent, {
@@ -152,12 +160,14 @@ async function testNestedDragConstraints(page: Page, parentLayout: boolean, chil
 
 	await visit(page, url);
 	await wait(page, 200);
+	await nextFrame(page);
+	await nextFrame(page);
 	await trigger(parent, "pointerdown", 40, 40);
 	await wait(page, 50);
 	await trigger(parent, "pointermove", 35, 35); // Gesture will start from first move past threshold
-	await wait(page, 50);
+	await nextFrame(page);
 	await trigger(parent, "pointermove", 20, 20);
-	await wait(page, 50);
+	await nextFrame(page);
 	await trigger(parent, "pointerup");
 	await should(() =>
 		// Should have only moved 10 px to the top
@@ -180,9 +190,9 @@ async function testNestedDragConstraints(page: Page, parentLayout: boolean, chil
 	await trigger(parent, "pointerdown", 5, 5);
 	await wait(page, 50);
 	await trigger(parent, "pointermove", 10, 10); // Gesture will start from first move past threshold
-	await wait(page, 50);
+	await nextFrame(page);
 	await trigger(parent, "pointermove", 200, 100);
-	await wait(page, 50);
+	await nextFrame(page);
 	await trigger(parent, "pointerup");
 	await should(() =>
 		expectBbox(parent, {
@@ -204,9 +214,9 @@ async function testNestedDragConstraints(page: Page, parentLayout: boolean, chil
 	await trigger(child, "pointerdown", 5, 5);
 	await wait(page, 50);
 	await trigger(child, "pointermove", 10, 10); // Gesture will start from first move past threshold
-	await wait(page, 50);
+	await nextFrame(page);
 	await trigger(child, "pointermove", 300, 100);
-	await wait(page, 50);
+	await nextFrame(page);
 	await trigger(child, "pointerup");
 	await should(() =>
 		expectBbox(parent, {
@@ -245,12 +255,14 @@ async function testNestedDragConstraintsAndAnimation(page: Page, parentLayout: b
 
 	await visit(page, url);
 	await wait(page, 200);
+	await nextFrame(page);
+	await nextFrame(page);
 	await trigger(parent, "pointerdown", 5, 10);
 	await wait(page, 50);
 	await trigger(parent, "pointermove", 10, 10); // Gesture will start from first move past threshold
-	await wait(page, 50);
+	await nextFrame(page);
 	await trigger(parent, "pointermove", 200, 10);
-	await wait(page, 50);
+	await nextFrame(page);
 	await should(() =>
 		// Should have only moved 10 px to the top
 		expectBbox(parent, {
@@ -292,9 +304,9 @@ async function testNestedDragConstraintsAndAnimation(page: Page, parentLayout: b
 	await trigger(child, "pointerdown", 5, 10);
 	await wait(page, 50);
 	await trigger(child, "pointermove", 10, 10); // Gesture will start from first move past threshold
-	await wait(page, 50);
+	await nextFrame(page);
 	await trigger(child, "pointermove", 200, 10);
-	await wait(page, 70);
+	await nextFrame(page);
 	await should(() =>
 		expectBbox(child, {
 			top: 150,
@@ -326,12 +338,14 @@ async function testAlternateAxes(page: Page, parentLayout: boolean, childLayout:
 
 	await visit(page, url);
 	await wait(page, 200);
+	await nextFrame(page);
+	await nextFrame(page);
 	await trigger(child, "pointerdown", 5, 5);
 	await wait(page, 80);
 	await trigger(child, "pointermove", 10, 10);
-	await wait(page, 80);
+	await nextFrame(page);
 	await trigger(child, "pointermove", 100, 100);
-	await wait(page, 80);
+	await nextFrame(page);
 	await should(() =>
 		expectBbox(child, {
 			top: 250,

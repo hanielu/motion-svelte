@@ -7,8 +7,14 @@ test.describe("AnimatePresence popLayout interrupt", () => {
 		const hasPopId = () => target.evaluate((el) => el.hasAttribute("data-motion-pop-id"));
 		await visit(page, "?test=animate-presence-pop-interrupt");
 		await wait(page, 50);
-		// Initially no pop id
-		await should(async () => expect(await hasPopId()).toBe(false));
+		await should(async () => {
+			// Initially no pop id
+			expect(await hasPopId()).toBe(false);
+			// Let the entry animation finish first. Exiting to opacity 0
+			// before it has rendered has nothing to animate, so the
+			// element would be removed immediately.
+			expect(await target.evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
+		});
 		// Click to start exit (long duration so it won't complete)
 		await page.locator("#toggle").click();
 		await wait(page, 200);

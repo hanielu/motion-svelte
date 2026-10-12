@@ -6,10 +6,6 @@ function runTests(url: string) {
 
 	test.describe(name, () => {
 		test("correctly pops exiting elements out of the DOM", async ({ page }) => {
-			test.fail(
-				url.includes("layout-container"),
-				"motion-sv: when #b re-enters while the layout container is mid-animation, #a/#b/#c render ~10px off (e.g. #b top 189.9 vs 200) until the container's 10s layout animation ends; passes only intermittently"
-			);
 			const b = page.locator("#b");
 			const c = page.locator("#c");
 			await visit(page, url);
@@ -29,10 +25,6 @@ function runTests(url: string) {
 		test("correctly pops exiting elements out of the DOM when they already have an explicit top/left", async ({
 			page,
 		}) => {
-			test.fail(
-				url.includes("layout-container"),
-				"motion-sv: when #b re-enters while the layout container is mid-animation, #a/#b/#c render ~10px off (e.g. #b top 189.9 vs 200) until the container's 10s layout animation ends; passes only intermittently"
-			);
 			const b = page.locator("#b");
 			const c = page.locator("#c");
 			await visit(page, url + "&position=relative");
@@ -50,10 +42,6 @@ function runTests(url: string) {
 		});
 
 		test("correctly pops exiting elements out of the DOM when anchorX is set to right", async ({ page }) => {
-			test.fail(
-				url.includes("layout-container"),
-				"motion-sv: when #b re-enters while the layout container is mid-animation, #a/#b/#c render ~10px off (e.g. #b top 189.9 vs 200) until the container's 10s layout animation ends; passes only intermittently"
-			);
 			const b = page.locator("#b");
 			const c = page.locator("#c");
 			await visit(page, url + "&anchor-x=right");

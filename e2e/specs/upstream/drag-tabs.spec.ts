@@ -1,5 +1,5 @@
 import { expect, test, type Locator } from "@playwright/test";
-import { bbox, should, trigger, visit, wait } from "../../harness/upstream.js";
+import { bbox, nextFrame, should, trigger, visit, wait } from "../../harness/upstream.js";
 
 /** `getBoundingClientRect()`'s `left` and `right`. */
 function horizontalBounds(target: Locator) {
@@ -51,10 +51,14 @@ test.describe("Tabs demo", () => {
 		page.setDefaultTimeout(4000);
 		await wait(page, 50);
 		await lettuce.click();
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(lettuce, "pointerdown", 40, 10);
 		await wait(page, 300);
 		await trigger(lettuce, "pointermove", -40, 10); // Gesture will start from first move past threshold
+		await nextFrame(page);
 		await trigger(lettuce, "pointermove", -100, 300);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(lettuce, "pointerup");
 		await wait(page, 200);
@@ -66,8 +70,10 @@ test.describe("Tabs demo", () => {
 		await wait(page, 200);
 		await trigger(tomato, "pointerdown", 40, 10);
 		await trigger(tomato, "pointermove", -40, 10); // Gesture will start from first move past threshold
+		await nextFrame(page);
 		await wait(page, 20);
 		await trigger(tomato, "pointermove", -100, 300);
+		await nextFrame(page);
 		await wait(page, 100);
 		await trigger(tomato, "pointerup");
 		await wait(page, 350);
@@ -102,11 +108,15 @@ test.describe("Tabs demo", () => {
 		await visit(page, "?test=drag-tabs");
 		await page.locator("#Tomato-remove").click();
 		await wait(page, 400);
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(lettuce, "pointerdown", 40, 10);
 		await wait(page, 30);
 		await trigger(lettuce, "pointermove", 50, 10); // Gesture will start from first move past threshold
+		await nextFrame(page);
 		await wait(page, 40);
 		await trigger(lettuce, "pointermove", 200, 10);
+		await nextFrame(page);
 		await wait(page, 100);
 		await trigger(lettuce, "pointerup");
 		await wait(page, 200);
@@ -121,21 +131,21 @@ test.describe("Tabs demo", () => {
 	});
 
 	test("New items correctly reorderable", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: ReorderItem renders <div> instead of <li> (Carrot left 400.4 vs 475); passes with li styles forced onto the divs"
-		);
 		const carrot = page.locator("#Carrot-tab");
 		await visit(page, "?test=drag-tabs");
 		await wait(page, 50);
 		await page.locator("button.add-item").click();
 		await wait(page, 150);
 		await wait(page, 50);
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(carrot, "pointerdown", 40, 10);
 		await wait(page, 30);
 		await trigger(carrot, "pointermove", -40, 10); // Gesture will start from first move past threshold
+		await nextFrame(page);
 		await wait(page, 100);
 		await trigger(carrot, "pointermove", -10, 10);
+		await nextFrame(page);
 		await wait(page, 100);
 		await trigger(carrot, "pointerup");
 		await wait(page, 200);

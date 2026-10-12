@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { bbox, should, trigger, visit, wait } from "../../harness/upstream.js";
+import { bbox, nextFrame, should, trigger, visit, wait } from "../../harness/upstream.js";
 
 /**
  * Tests for drag behavior with interactive elements inside draggable elements.
@@ -24,10 +24,14 @@ test.describe("Drag Input Propagation", () => {
 
 		// Attempt to drag by clicking on the input
 		const input = page.locator("[data-testid='input']");
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(input, "pointerdown", 5, 5);
 		await trigger(input, "pointermove", 10, 10);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(input, "pointermove", 200, 200);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(input, "pointerup");
 
@@ -52,10 +56,14 @@ test.describe("Drag Input Propagation", () => {
 
 		// Attempt to drag by clicking on the textarea
 		const textarea = page.locator("[data-testid='textarea']");
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(textarea, "pointerdown", 5, 5);
 		await trigger(textarea, "pointermove", 10, 10);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(textarea, "pointermove", 200, 200);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(textarea, "pointerup");
 
@@ -80,10 +88,14 @@ test.describe("Drag Input Propagation", () => {
 
 		// Drag by clicking on the button - buttons don't have click-and-move actions
 		const button = page.locator("[data-testid='button']");
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(button, "pointerdown", 5, 5);
 		await trigger(button, "pointermove", 10, 10);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(button, "pointermove", 200, 200);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(button, "pointerup");
 
@@ -108,10 +120,14 @@ test.describe("Drag Input Propagation", () => {
 
 		// Drag by clicking on the link - links don't have click-and-move actions
 		const link = page.locator("[data-testid='link']");
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(link, "pointerdown", 5, 5);
 		await trigger(link, "pointermove", 10, 10);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(link, "pointermove", 200, 200);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(link, "pointerup");
 
@@ -136,10 +152,14 @@ test.describe("Drag Input Propagation", () => {
 
 		// Attempt to drag by clicking on the select
 		const select = page.locator("[data-testid='select']");
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(select, "pointerdown", 5, 5);
 		await trigger(select, "pointermove", 10, 10);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(select, "pointermove", 200, 200);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(select, "pointerup");
 
@@ -163,10 +183,14 @@ test.describe("Drag Input Propagation", () => {
 
 		// Attempt to drag by clicking on the checkbox (nested inside label)
 		const checkbox = page.locator("[data-testid='checkbox']");
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(checkbox, "pointerdown", 2, 2);
 		await trigger(checkbox, "pointermove", 5, 5);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(checkbox, "pointermove", 200, 200);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(checkbox, "pointerup");
 
@@ -190,10 +214,14 @@ test.describe("Drag Input Propagation", () => {
 
 		// Attempt to drag by clicking on the contenteditable element
 		const contenteditable = page.locator("[data-testid='contenteditable']");
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(contenteditable, "pointerdown", 5, 5);
 		await trigger(contenteditable, "pointermove", 10, 10);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(contenteditable, "pointermove", 200, 200);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(contenteditable, "pointerup");
 
@@ -215,10 +243,14 @@ test.describe("Drag Input Propagation", () => {
 			expect(top).toBe(100);
 		});
 		// Click on edge of draggable, not on interactive elements (at coordinates 5,5 which is top-left corner)
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(draggable, "pointerdown", 5, 5);
 		await trigger(draggable, "pointermove", 10, 10);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(draggable, "pointermove", 200, 200);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(draggable, "pointerup");
 		await should(async () => {

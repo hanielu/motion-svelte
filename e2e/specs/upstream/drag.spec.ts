@@ -1,25 +1,32 @@
 import { expect, test, type Locator } from "@playwright/test";
-import { bbox, should, trigger, visit, wait, triggerInView } from "../../harness/upstream.js";
+import { bbox, nextFrame, should, trigger, visit, wait, triggerInView } from "../../harness/upstream.js";
 
 /**
  * In this test suite there's two sets of each test, one without and one with the `layout` prop.
  * This is because when a component has the layout prop applied, we apply drag to the bounding box
  * and when it isn't, we apply it to the x/y transform.
  *
- * Descrepencies between the expected values in the two sets of tests are *something* to do with how
+ * Discrepancies between the expected values in the two sets of tests are *something* to do with how
  * pointer events are being resolved with Cypress, but a manual check will verify that both drag modes
  * are working visually the same.
+ *
+ * PanSession applies pointermove on the next animation frame, and pointerup
+ * discards a move that hasn't been applied yet. Cypress also resolves trigger
+ * coordinates against the element's current box. So each pointermove is
+ * followed by nextFrame() rather than a fixed wait, which slow CI can outrun.
  */
 test.describe("Drag", () => {
 	test("Drags the element by the defined distance", async ({ page }) => {
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 5, 5);
 		await triggerInView(draggable, "pointermove", 10, 10); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 200, 300);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
 			const { left, top } = await bbox(draggable);
@@ -34,11 +41,13 @@ test.describe("Drag", () => {
 		const draggable = page.locator("[data-testid='draggable-child']");
 		await visit(page, "?test=drag&showChild=true");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 5, 5);
 		await triggerInView(draggable, "pointermove", 10, 10); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 200, 300);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
 			const { left, top } = await bbox(draggable);
@@ -52,11 +61,13 @@ test.describe("Drag", () => {
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag&x=100&y=100");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 5, 5);
 		await triggerInView(draggable, "pointermove", 10, 10); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 200, 300);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
 			const { left, top } = await bbox(draggable);
@@ -74,11 +85,13 @@ test.describe("Drag", () => {
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag&x=200&y=200&percentage=true");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 5, 5);
 		await triggerInView(draggable, "pointermove", 10, 10); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 200, 300);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
 			const { left, top } = await bbox(draggable);
@@ -96,12 +109,14 @@ test.describe("Drag", () => {
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag&axis=x");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 5, 5);
 		await wait(page, 50);
 		await triggerInView(draggable, "pointermove", 10, 10); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 200, 300);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
 			const { left, top } = await bbox(draggable);
@@ -115,11 +130,13 @@ test.describe("Drag", () => {
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag&axis=y");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 5, 5);
 		await triggerInView(draggable, "pointermove", 10, 10); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 200, 300);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
 			const { left, top } = await bbox(draggable);
@@ -158,14 +175,17 @@ test.describe("Drag", () => {
 		await visit(page, "?test=drag&lock=true");
 		await wait(page, 200);
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(draggable, "pointerdown", 5, 5);
 		await wait(page, 50);
 		await trigger(draggable, "pointermove", 10, 10); // Gesture will start from first move past threshold
-		await wait(page, 100);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 10, 200);
-		await wait(page, 100);
+		await nextFrame(page); // Locks the direction without moving
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 200, 10);
-		await wait(page, 100);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
 			const { left, top } = await bbox(draggable);
@@ -180,11 +200,13 @@ test.describe("Drag", () => {
 		await visit(page, "?test=drag&right=100&bottom=100");
 		await wait(page, 200);
 		await wait(page, 100);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 5, 5);
 		await triggerInView(draggable, "pointermove", 10, 10); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 200, 200);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
 			const { left, top } = await bbox(draggable);
@@ -199,11 +221,13 @@ test.describe("Drag", () => {
 		await visit(page, "?test=drag&left=-10&top=-10");
 		await wait(page, 200);
 		await wait(page, 100);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 40, 40);
 		await triggerInView(draggable, "pointermove", 30, 30); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 10, 10);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
 			const { left, top } = await bbox(draggable);
@@ -218,11 +242,13 @@ test.describe("Drag", () => {
 		await visit(page, "?test=drag&return=true&left=-10&top=-10");
 		await wait(page, 200);
 		await wait(page, 100);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 40, 40);
 		await triggerInView(draggable, "pointermove", 30, 30); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 10, 10);
-		await wait(page, 50);
+		await nextFrame(page);
 		await should(async () => {
 			const { left, top } = await bbox(draggable);
 
@@ -244,11 +270,13 @@ test.describe("Drag", () => {
 		await visit(page, "?test=drag&return=x&left=-10&top=-10");
 		await wait(page, 200);
 		await wait(page, 100);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 40, 40);
 		await triggerInView(draggable, "pointermove", 30, 30); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 10, 10);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await wait(page, 300);
 		await should(async () => {
@@ -266,11 +294,13 @@ test.describe("Drag", () => {
 		await visit(page, "?test=drag&return=y&left=-10&top=-10");
 		await wait(page, 200);
 		await wait(page, 100);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 40, 40);
 		await triggerInView(draggable, "pointermove", 30, 30); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 10, 10);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await wait(page, 300);
 		await should(async () => {
@@ -289,11 +319,13 @@ test.describe("Drag", () => {
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag-ref-constraints");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 10, 10);
 		await triggerInView(draggable, "pointermove", 15, 15);
-		await wait(page, 200);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 300, 300);
-		await wait(page, 200);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
 			const { left, top } = await bbox(draggable);
@@ -328,15 +360,17 @@ test.describe("Drag", () => {
 			expect(right).toBe(600);
 			expect(bottom).toBe(250);
 		});
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(box, "pointerdown", 5, 5);
 		await triggerInView(box, "pointermove", 10, 10); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(box, "pointermove", 200, 200);
-		await wait(page, 100);
+		await nextFrame(page);
 		await trigger(box, "pointerup", undefined, undefined, { isPrimary: true });
 		await wait(page, 50);
 		await trigger(box, "pointermove", 500, 500);
-		await wait(page, 200);
+		await nextFrame(page);
 		await should(async () => {
 			const { left, top, right, bottom } = await rect(box);
 			expect(left).toBe(550);
@@ -391,6 +425,8 @@ test.describe("Drag", () => {
 			expect(bottom).toBe(500);
 			expect(left).toBe(240);
 		});
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(page.locator("#scroll-trigger"), "pointerdown", 5, 5);
 		await wait(page, 50);
 		await should(async () => {
@@ -408,11 +444,13 @@ test.describe("Drag & Layout", () => {
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag&layout=true");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 5, 5);
 		await triggerInView(draggable, "pointermove", 10, 10); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 200, 300);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
 			const { left, top } = await bbox(draggable);
@@ -426,11 +464,13 @@ test.describe("Drag & Layout", () => {
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag&x=100&y=100&layout=true");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 5, 5);
 		await triggerInView(draggable, "pointermove", 10, 10); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 200, 300);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
 			const { left, top } = await bbox(draggable);
@@ -448,11 +488,13 @@ test.describe("Drag & Layout", () => {
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag&axis=x&layout=true");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 5, 5);
 		await triggerInView(draggable, "pointermove", 10, 10); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 200, 300);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
 			const { left, top } = await bbox(draggable);
@@ -466,11 +508,13 @@ test.describe("Drag & Layout", () => {
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag&axis=y&layout=true");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 5, 5);
 		await triggerInView(draggable, "pointermove", 10, 10); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 200, 300);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
 			const { left, top } = await bbox(draggable);
@@ -509,13 +553,16 @@ test.describe("Drag & Layout", () => {
 		await visit(page, "?test=drag&lock=true&layout=true");
 		await wait(page, 100);
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(draggable, "pointerdown", 5, 5);
 		await trigger(draggable, "pointermove", 10, 10); // Gesture will start from first move past threshold
-		await wait(page, 100);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 10, 200);
-		await wait(page, 100);
+		await nextFrame(page); // Locks the direction without moving
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 200, 10);
-		await wait(page, 100);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
 			const { left, top } = await bbox(draggable);
@@ -529,11 +576,13 @@ test.describe("Drag & Layout", () => {
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag&right=100&bottom=100&layout=true");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 5, 5);
 		await triggerInView(draggable, "pointermove", 10, 10); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 200, 200);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
 			const { left, top } = await bbox(draggable);
@@ -547,11 +596,13 @@ test.describe("Drag & Layout", () => {
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag&left=-10&top=-10&layout=true");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 40, 40);
 		await triggerInView(draggable, "pointermove", 30, 30); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 10, 10);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
 			const { left, top } = await bbox(draggable);
@@ -567,11 +618,13 @@ test.describe("Drag & Layout", () => {
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag-ref-constraints&layout=true");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 10, 10);
 		await triggerInView(draggable, "pointermove", 15, 15);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 300, 300);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
 			const { left, top } = await bbox(draggable);
@@ -588,12 +641,14 @@ test.describe("Drag Constraints Return", () => {
 		await visit(page, "?test=drag-constraints-return");
 		await wait(page, 200);
 		await wait(page, 100);
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(draggable, "pointerdown", 50, 50);
 		await trigger(draggable, "pointermove", 60, 60); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		// Drag outside constraints (to bottom-right)
 		await trigger(draggable, "pointermove", 400, 400);
-		await wait(page, 50);
+		await nextFrame(page);
 		// Release - element should animate back
 		await trigger(draggable, "pointerup");
 		await wait(page, 2000); // Wait for animation to complete
@@ -616,12 +671,14 @@ test.describe("Drag Constraints Return", () => {
 		await visit(page, "?test=drag-constraints-return");
 		await wait(page, 200);
 		await wait(page, 100);
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(draggable, "pointerdown", 50, 50);
 		await trigger(draggable, "pointermove", 60, 60); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		// Drag outside constraints (to bottom-right)
 		await trigger(draggable, "pointermove", 400, 400);
-		await wait(page, 50);
+		await nextFrame(page);
 		// Release - element should start animating back
 		await trigger(draggable, "pointerup");
 		// Immediately click on element while it's animating back
@@ -645,19 +702,20 @@ test.describe("Drag Constraints Return", () => {
 	});
 
 	test("Does not jump when dragged again during animation", async ({ page }) => {
-		let positionBeforeRelease = { right: 0, bottom: 0 };
 		const draggable = page.locator("[data-testid='draggable']");
 		const rect = () => draggable.first().evaluate((el) => el.getBoundingClientRect().toJSON());
 
 		await visit(page, "?test=drag-constraints-return");
 		await wait(page, 200);
 		await wait(page, 100);
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(draggable, "pointerdown", 50, 50);
 		await trigger(draggable, "pointermove", 60, 60); // Gesture will start from first move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		// Drag outside constraints (to bottom-right)
 		await trigger(draggable, "pointermove", 400, 400);
-		await wait(page, 50);
+		await nextFrame(page);
 		// Release - element should start animating back
 		await trigger(draggable, "pointerup");
 		await wait(page, 50);
@@ -672,24 +730,28 @@ test.describe("Drag Constraints Return", () => {
 		// The bug causes a jump proportional to drag size
 		await trigger(draggable, "pointerdown", 50, 50);
 		await trigger(draggable, "pointermove", 60, 60); // Start gesture
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 250, 250); // Drag by ~200px
-		await wait(page, 50);
-		// Record position before release
-		{
-			const { right, bottom } = await rect();
-			positionBeforeRelease = { right, bottom };
-		}
-		// Release again
-		await trigger(draggable, "pointerup");
-		await wait(page, 16); // One frame
-		// Verify element hasn't jumped - position should be close to where it was before release
-		await should(async () => {
-			const { right, bottom } = await rect();
-			// Allow small movement from animation starting, but no large jump (max 30px)
-			// Bug: without fix, element jumps back towards first drag end position
-			expect(Math.abs(right - positionBeforeRelease.right)).toBeLessThan(30);
-			expect(Math.abs(bottom - positionBeforeRelease.bottom)).toBeLessThan(30);
+		await nextFrame(page);
+		// Release again and measure on the very next frame. The element
+		// legitimately springs back towards the constraints after that,
+		// so a wall-clock wait would let it move too far on slow CI.
+		const { before, after } = await draggable.first().evaluate(async (draggable) => {
+			const before = draggable.getBoundingClientRect().toJSON();
+			draggable.dispatchEvent(
+				new PointerEvent("pointerup", {
+					clientX: before.left + 50,
+					clientY: before.top + 50,
+					isPrimary: true,
+					bubbles: true,
+				})
+			);
+			await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+			return { before, after: draggable.getBoundingClientRect().toJSON() };
 		});
+		// Allow small movement from animation starting, but no large jump (max 30px)
+		// Bug: without fix, element jumps back towards first drag end position
+		expect(Math.abs(after.right - before.right)).toBeLessThan(30);
+		expect(Math.abs(after.bottom - before.bottom)).toBeLessThan(30);
 	});
 });

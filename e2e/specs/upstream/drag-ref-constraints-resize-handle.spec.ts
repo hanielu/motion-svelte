@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { should, trigger, visit, wait } from "../../harness/upstream.js";
+import { nextFrame, should, trigger, visit, wait } from "../../harness/upstream.js";
 
 /**
  * Tests for issue #2903: Drag constraints should update when the
@@ -31,10 +31,14 @@ test.describe("Drag Constraints Update on Imperative Resize", () => {
 			expect(height).toBe(300);
 		});
 
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(box, "pointerdown", 5, 5);
 		await trigger(box, "pointermove", 10, 10);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(box, "pointermove", 600, 600);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(box, "pointerup");
 		await wait(page, 50);

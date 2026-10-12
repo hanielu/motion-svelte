@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { bbox, should, trigger, visit, wait } from "../../harness/upstream.js";
+import { bbox, nextFrame, should, trigger, visit, wait } from "../../harness/upstream.js";
 
 /**
  * Drag + dragSnapToOrigin + AnimatePresence exit interaction (companion
@@ -19,10 +19,14 @@ test.describe("drag + dragSnapToOrigin + AnimatePresence exit", () => {
 		// re-entered instance to it later.
 		const initial = await bbox(tile);
 		// Drag the tile and release — dragSnapToOrigin animation kicks in.
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(tile, "pointerdown", 10, 10);
 		await trigger(tile, "pointermove", 20, 10);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(tile, "pointermove", 60, 10);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(tile, "pointerup", 60, 10);
 		// Toggle off mid-snap to trigger AnimatePresence exit while

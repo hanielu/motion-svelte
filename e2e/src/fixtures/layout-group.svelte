@@ -4,7 +4,7 @@
 	const transition: Transition = {
 		layout: {
 			type: "tween",
-			duration: 0.2,
+			duration: 1,
 		},
 	};
 

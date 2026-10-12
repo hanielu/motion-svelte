@@ -10,13 +10,10 @@ test.describe("Layout animation", () => {
 		await wait(page, 50);
 		await expectBbox(box, { top: 0, left: 0, width: 100, height: 200 });
 		await trigger(box, "click");
-		await wait(page, 50);
 		// onLayoutAnimationStart fires
 		await should(async () => expect(await box.evaluate((el) => el.style.backgroundColor)).toBe("green"));
-		await wait(page, 50);
 		await expectBbox(box, { top: 50, left: 100, width: 200, height: 250 });
 		// onLayoutAnimationComplete fires
-		await wait(page, 1000);
 		await should(async () => expect(await box.evaluate((el) => el.style.backgroundColor)).toBe("blue"));
 	});
 
@@ -30,7 +27,6 @@ test.describe("Layout animation", () => {
 		await wait(page, 50);
 		await expectBbox(box, { top: 0, left: 0, width: 100, height: 200 });
 		await trigger(box, "click");
-		await wait(page, 50);
 		await expectBbox(box, { top: 50, left: 100, width: 300, height: 300 });
 	});
 
@@ -44,7 +40,6 @@ test.describe("Layout animation", () => {
 		await wait(page, 50);
 		await expectBbox(box, { top: 0, left: 0, width: 100, height: 200 });
 		await trigger(box, "click");
-		await wait(page, 100);
 		await expectBbox(box, { top: 100, left: 200, width: 200, height: 250 });
 	});
 
@@ -54,7 +49,6 @@ test.describe("Layout animation", () => {
 		await wait(page, 50);
 		await expectBbox(box, { top: 0, left: 0, width: 100, height: 200 });
 		await trigger(box, "click");
-		await wait(page, 50);
 		await expectBbox(box, { top: 50, left: 100, width: 200, height: 250 });
 		/**
 		 * The easing curve is set to always return t=0.5, so if this box moves it means
@@ -92,6 +86,10 @@ test.describe("Layout animation", () => {
 		await visit(page, "?test=layout-dependency-child");
 		await wait(page, 50);
 		await should(async () => {
+			// Wait for the entry animation to start. Before its first
+			// frame opacity is still 0, so exiting to opacity 0 has
+			// nothing to animate and the child is removed immediately.
+			expect(await page.locator("#child").evaluate((el) => getComputedStyle(el).opacity)).toBe("0.5");
 			initialBbox = await bbox(page.locator("#child"));
 		});
 		await trigger(page.locator("button"), "click");
@@ -144,7 +142,6 @@ test.describe("Layout animation", () => {
 		await wait(page, 50);
 		await expectBbox(box, { height: 100, left: 200, top: 150, width: 100 });
 		await trigger(box, "click");
-		await wait(page, 50);
 		await expectBbox(box, { height: 100, left: 225, top: 150, width: 75 });
 	});
 
@@ -214,7 +211,6 @@ test.describe("Layout animation", () => {
 		await wait(page, 50);
 		await expectBbox(box, { top: 0, left: 0, width: 100, height: 200 });
 		await trigger(box, "click");
-		await wait(page, 50);
 		await expectBbox(box, { top: 100, left: 100, width: 200, height: 300 });
 	});
 
@@ -228,7 +224,6 @@ test.describe("Layout animation", () => {
 		await wait(page, 50);
 		await expectBbox(box, { top: 0, left: 0, width: 100, height: 200 });
 		await trigger(box, "click");
-		await wait(page, 50);
 		await expectBbox(box, { top: 50, left: 200, width: 300, height: 250 });
 	});
 

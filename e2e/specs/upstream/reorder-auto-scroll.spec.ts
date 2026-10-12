@@ -4,7 +4,7 @@
  * container, the container automatically scrolls.
  */
 import { expect, test } from "@playwright/test";
-import { scrollToTop, should, trigger, visit, wait } from "../../harness/upstream.js";
+import { nextFrame, scrollToTop, should, trigger, visit, wait } from "../../harness/upstream.js";
 
 test.describe("Reorder auto-scroll", () => {
 	test.describe("with scrollable container", () => {
@@ -18,12 +18,16 @@ test.describe("Reorder auto-scroll", () => {
 			const containerRect = await container.evaluate((el) => el.getBoundingClientRect().toJSON());
 			const nearBottom = containerRect.bottom - containerRect.top - 20;
 
+			await nextFrame(page);
+			await nextFrame(page);
 			await scrollToTop(item);
 			await trigger(item, "pointerdown", 50, 25);
 			await wait(page, 50);
 			await trigger(item, "pointermove", 50, 30);
+			await nextFrame(page);
 			await wait(page, 50);
 			await trigger(item, "pointermove", 50, nearBottom);
+			await nextFrame(page);
 			await wait(page, 300);
 			expect(await container.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
 			await trigger(item, "pointerup");
@@ -37,12 +41,16 @@ test.describe("Reorder auto-scroll", () => {
 			await container.evaluate((el) => (el.scrollTop = 200));
 			await wait(page, 100);
 			await should(async () => expect(await container.evaluate((el) => el.scrollTop)).toBe(200));
+			await nextFrame(page);
+			await nextFrame(page);
 			await scrollToTop(item);
 			await trigger(item, "pointerdown", 50, 25);
 			await wait(page, 50);
 			await trigger(item, "pointermove", 50, 20);
+			await nextFrame(page);
 			await wait(page, 50);
 			await trigger(item, "pointermove", 50, -100);
+			await nextFrame(page);
 			await wait(page, 300);
 			expect(await container.evaluate((el) => el.scrollTop)).toBeLessThan(200);
 			await trigger(item, "pointerup");
@@ -63,12 +71,16 @@ test.describe("Reorder auto-scroll", () => {
 			const containerRect = await container.evaluate((el) => el.getBoundingClientRect().toJSON());
 			const nearBottom = containerRect.bottom - containerRect.top - 20;
 
+			await nextFrame(page);
+			await nextFrame(page);
 			await scrollToTop(item);
 			await trigger(item, "pointerdown", 50, 25);
 			await wait(page, 50);
 			await trigger(item, "pointermove", 50, 30);
+			await nextFrame(page);
 			await wait(page, 50);
 			await trigger(item, "pointermove", 50, nearBottom);
+			await nextFrame(page);
 			await wait(page, 300);
 			expect(await container.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
 			await trigger(item, "pointerup");
@@ -86,12 +98,16 @@ test.describe("Reorder auto-scroll", () => {
 
 			const nearBottom = await page.evaluate(() => window.innerHeight - window.screenTop - 20);
 
+			await nextFrame(page);
+			await nextFrame(page);
 			await scrollToTop(item);
 			await trigger(item, "pointerdown", 50, 25);
 			await wait(page, 50);
 			await trigger(item, "pointermove", 50, 30);
+			await nextFrame(page);
 			await wait(page, 50);
 			await trigger(item, "pointermove", 50, nearBottom);
+			await nextFrame(page);
 			await wait(page, 300);
 			expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
 			await trigger(item, "pointerup");

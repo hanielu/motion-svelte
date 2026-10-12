@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { bbox, should, trigger, visit, wait } from "../../harness/upstream.js";
+import { bbox, nextFrame, should, trigger, visit, wait } from "../../harness/upstream.js";
 
 /**
  * Test for issue #3169: Drag + layout + React 19 StrictMode
@@ -17,12 +17,16 @@ test.describe("Drag layout reorder in StrictMode", () => {
 		await visit(page, "?test=drag-layout-reorder-strict");
 		await wait(page, 200);
 		// Start dragging File1 downward
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(file1, "pointerdown", 100, 15);
 		await wait(page, 50);
 		await trigger(file1, "pointermove", 100, 20);
+		await nextFrame(page);
 		await wait(page, 50);
 		// Drag down slightly
 		await trigger(file1, "pointermove", 100, 80);
+		await nextFrame(page);
 		await wait(page, 200);
 		// Record position before expanding Folder1
 		const preExpandTop = (await bbox(file1)).top;
@@ -57,11 +61,15 @@ test.describe("Drag layout reorder in StrictMode", () => {
 		const file1 = page.locator("[data-testid='file-File1']");
 		await visit(page, "?test=drag-layout-reorder-strict");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(file1, "pointerdown", 100, 15);
 		await wait(page, 50);
 		await trigger(file1, "pointermove", 100, 20);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(file1, "pointermove", 100, 80);
+		await nextFrame(page);
 		await wait(page, 200);
 		const preHoverTop = (await bbox(file1)).top;
 

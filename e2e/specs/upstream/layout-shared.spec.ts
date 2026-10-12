@@ -460,7 +460,6 @@ test.describe("Shared layout: nested crossfade transition", () => {
 		await visit(page, "?test=layout-shared-crossfade-nested");
 		await wait(page, 50);
 		await trigger(page.locator("#a"), "click");
-		await wait(page, 50);
 		await expectBbox(page.locator("#a"), { top: 200, left: 200, width: 200, height: 250 });
 		await expectBbox(page.locator("#child"), { top: 200, left: 200, width: 100, height: 100 });
 		await trigger(page.locator("#b"), "click");
@@ -483,7 +482,6 @@ test.describe("Shared layout: nested crossfade transition", () => {
 		await expectBbox(page.locator("#a"), { top: 200, left: 200, width: 200, height: 250 });
 		await expectBbox(page.locator("#child"), { top: 200, left: 200, width: 100, height: 100 });
 		await trigger(page.locator("#b"), "click");
-		await wait(page, 250);
 		await expectBbox(page.locator("#b"), { top: 150, left: 200, width: 150, height: 225 });
 		await expectBbox(page.locator("#child"), { top: 150, left: 200, width: 100, height: 100 });
 	});
@@ -571,17 +569,15 @@ test.describe("Shared layout: Works with queueMicrotasks", () => {
 
 test.describe("Shared layout: Measures rotated elements correctly when animation is interrupted", () => {
 	test("Measures correctly", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: interrupting a rotated layoutId element snapshots its rotated bounding box, so the box jumps to a 300x300 bbox instead of staying at the 212.13x212.13 bbox (150px box)"
-		);
 		let boundingBox: BoundingBox;
 		await visit(page, "?test=layout-shared-rotate");
 		await wait(page, 50);
 		await trigger(page.locator("#box"), "click");
-		await wait(page, 50);
 		await should(async () => {
 			boundingBox = await bbox(page.locator("#box"));
+			// Only record once the animation is running, frozen halfway
+			// between the 200px and 100px rotated boxes.
+			expect(Math.abs(boundingBox.width - 150 * Math.SQRT2)).toBeLessThanOrEqual(1);
 		});
 		await trigger(page.locator("#box"), "click");
 		await wait(page, 50);

@@ -406,10 +406,6 @@
 		},
 		"12:svg": {
 			"0": {"box":[726.53,249,26.94,32],"opacity":1,"transform":"matrix(0, 1, -1, 0, 0, 0)","backgroundColor":"rgba(0, 0, 0, 0)","color":"oklab(0.999994 0.0000455678 0.0000200868)","borderRadius":"0px","clipPath":"none","filter":"none","boxShadow":"none","visibility":"visible","fill":"none","stroke":"none","strokeDasharray":"none","strokeDashoffset":"0px"},
-			"20": {"box":[724,251.53,32,26.94],"transform":"none"},
-			"21": {"box":[726.53,249,26.94,32],"transform":"matrix(0, 1, -1, 0, 0, 0)"},
-			"60": {"box":[724,251.53,32,26.94],"transform":"none"},
-			"61": {"box":[726.53,249,26.94,32],"transform":"matrix(0, 1, -1, 0, 0, 0)"},
 			"100": {"box":[725.24,247.93,29.53,34.15],"transform":"matrix(0.0839771, 0.996468, -0.996468, 0.0839771, 0, 0)"},
 			"101": {"box":[722.8,246.02,34.4,37.96],"transform":"matrix(0.262893, 0.964825, -0.964825, 0.262893, 0, 0)"},
 			"102": {"box":[720.69,244.6,38.63,40.8],"transform":"matrix(0.459444, 0.888207, -0.888207, 0.459444, 0, 0)"},
@@ -438,10 +434,6 @@
 		},
 		"13:path": {
 			"0": {"box":[727.34,249.01,25.31,31.18],"opacity":1,"transform":"none","backgroundColor":"rgba(0, 0, 0, 0)","color":"oklab(0.999994 0.0000455678 0.0000200868)","borderRadius":"0px","clipPath":"none","filter":"none","boxShadow":"none","visibility":"visible","fill":"oklab(0.999994 0.0000455678 0.0000200868)","stroke":"none","strokeDasharray":"none","strokeDashoffset":"0px","geometry":[0,0.48,18.52,15.04,68.96]},
-			"20": {"box":[724.01,252.34,31.18,25.31]},
-			"21": {"box":[727.34,249.01,25.31,31.18]},
-			"60": {"box":[724.01,252.34,31.18,25.31]},
-			"61": {"box":[727.34,249.01,25.31,31.18]},
 			"100": {"box":[726.04,248,27.84,33.19]},
 			"101": {"box":[723.58,246.24,32.62,36.73]},
 			"102": {"box":[721.41,244.98,36.81,39.32]},

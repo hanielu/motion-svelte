@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { bbox, scrollToTop, should, trigger, visit, wait } from "../../harness/upstream.js";
+import { bbox, nextFrame, scrollToTop, should, trigger, visit, wait } from "../../harness/upstream.js";
 
 /**
  * Tests for scroll-while-drag feature.
@@ -17,12 +17,16 @@ test.describe("Drag with element scroll during drag", () => {
 
 		await visit(page, "?test=drag-scroll-while-drag");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await scrollToTop(draggable);
 		await trigger(draggable, "pointerdown", 50, 50);
 		await scrollToTop(draggable);
 		await trigger(draggable, "pointermove", 55, 55); // Start gesture
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(draggable, "pointermove", 100, 100);
+		await nextFrame(page);
 		await wait(page, 50);
 		const { rectBefore, rectAfter } = await page.evaluate((scrollAmount) => {
 			const el = document.querySelector("[data-testid='draggable']") as HTMLElement;
@@ -50,12 +54,16 @@ test.describe("Drag with element scroll during drag", () => {
 
 		await visit(page, "?test=drag-scroll-while-drag");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await scrollToTop(draggable);
 		await trigger(draggable, "pointerdown", 50, 50);
 		await scrollToTop(draggable);
 		await trigger(draggable, "pointermove", 55, 55); // Start gesture
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(draggable, "pointermove", 100, 100);
+		await nextFrame(page);
 		await wait(page, 50);
 		// Scroll the container during drag
 		await page.evaluate((scrollAmount) => {
@@ -65,6 +73,7 @@ test.describe("Drag with element scroll during drag", () => {
 		await wait(page, 100);
 		// Continue dragging - move to the same position
 		await trigger(draggable, "pointermove", 100, 100);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
@@ -83,12 +92,16 @@ test.describe("Drag with element scroll during drag", () => {
 
 		await visit(page, "?test=drag-scroll-while-drag");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await scrollToTop(draggable);
 		await trigger(draggable, "pointerdown", 50, 50);
 		await scrollToTop(draggable);
 		await trigger(draggable, "pointermove", 55, 55);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(draggable, "pointermove", 100, 100);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
@@ -117,12 +130,16 @@ test.describe("Drag with window scroll during drag", () => {
 
 		await visit(page, "?test=drag-scroll-while-drag&window=true");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await scrollToTop(draggable);
 		await trigger(draggable, "pointerdown", 50, 50);
 		await scrollToTop(draggable);
 		await trigger(draggable, "pointermove", 55, 55); // Start gesture
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(draggable, "pointermove", 100, 100);
+		await nextFrame(page);
 		await wait(page, 50);
 		const { rectAfter } = await page.evaluate((scrollAmount) => {
 			const el = document.querySelector("[data-testid='draggable']") as HTMLElement;
@@ -155,18 +172,23 @@ test.describe("Drag with window scroll during drag", () => {
 
 		await visit(page, "?test=drag-scroll-while-drag&window=true");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await scrollToTop(draggable);
 		await trigger(draggable, "pointerdown", 50, 50);
 		await scrollToTop(draggable);
 		await trigger(draggable, "pointermove", 55, 55); // Start gesture
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(draggable, "pointermove", 100, 100);
+		await nextFrame(page);
 		await wait(page, 50);
 		// Scroll the window during drag
 		await page.evaluate((scrollAmount) => window.scrollTo(0, scrollAmount), scrollAmount);
 		await wait(page, 100);
 		// Continue dragging - move to the same position
 		await trigger(draggable, "pointermove", 100, 100);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
@@ -186,12 +208,16 @@ test.describe("Drag with window scroll during drag", () => {
 
 		await visit(page, "?test=drag-scroll-while-drag&window=true");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await scrollToTop(draggable);
 		await trigger(draggable, "pointerdown", 50, 50);
 		await scrollToTop(draggable);
 		await trigger(draggable, "pointermove", 55, 55);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(draggable, "pointermove", 100, 100);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(draggable, "pointerup");
 		await should(async () => {

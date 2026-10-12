@@ -15,8 +15,8 @@
 	}
 
 	const transition = {
-		default: { duration: 0.2, ease: () => 0.5 },
-		opacity: { duration: 0.2, ease: () => 0.1 },
+		default: { duration: 10, ease: () => 0.5 },
+		opacity: { duration: 10, ease: () => 0.1 },
 	};
 
 	const startTransition = useInstantLayoutTransition();

@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { should, trigger, visit, wait } from "../../harness/upstream.js";
+import { nextFrame, should, trigger, visit, wait } from "../../harness/upstream.js";
 
 /**
  * Tests for issue #2829: Drag with ref-based constraints on a viewport-sized
@@ -16,10 +16,14 @@ test.describe("Drag with ref constraints on absolute element after scroll", () =
 		await visit(page, "?test=drag-ref-constraints-absolute-scrolled&scroll=300");
 		await wait(page, 300);
 		expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(draggable, "pointerdown", 5, 5);
 		await trigger(draggable, "pointermove", 10, 10);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(draggable, "pointermove", 900, 1500);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(draggable, "pointerup");
 		await wait(page, 100);

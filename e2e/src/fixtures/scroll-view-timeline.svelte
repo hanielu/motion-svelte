@@ -4,7 +4,7 @@
 	// DefaultTarget, EnterTarget and StringOffsetTarget are inlined (one instance each).
 
 	/**
-	 * Default offset (All preset / contain range)
+	 * Default offset (All preset)
 	 */
 	let defaultRef = $state<HTMLDivElement>();
 	const defaultScroll = useScroll({
@@ -30,7 +30,7 @@
 	const enterOpacity = useTransform(enterScroll.scrollYProgress, [0, 1], [0, 1]);
 
 	/**
-	 * String offset — should NOT accelerate
+	 * String offset - maps to the cover range
 	 */
 	let stringRef = $state<HTMLDivElement>();
 	const stringScroll = useScroll({

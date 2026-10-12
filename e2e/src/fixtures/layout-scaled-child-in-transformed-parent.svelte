@@ -56,7 +56,7 @@
 				data-testid="box"
 				style={hover ? b : a}
 				onclick={layout.update.with(() => (hover = hover ? false : true))}
-				transition={{ duration: 0.2, ease: () => 0.5 }}
+				transition={{ duration: 10, ease: () => 0.5 }}
 			/>
 		</layout.div>
 	</layout.div>

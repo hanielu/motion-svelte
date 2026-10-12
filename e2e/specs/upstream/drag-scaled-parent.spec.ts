@@ -1,5 +1,5 @@
 import { expect, test, type Locator } from "@playwright/test";
-import { bbox, should, trigger, visit, wait, triggerInView } from "../../harness/upstream.js";
+import { bbox, nextFrame, should, trigger, visit, wait, triggerInView } from "../../harness/upstream.js";
 
 test.describe("Drag with scaled parent", () => {
 	test("Element follows cursor when parent has scale(0.5)", async ({ page }) => {
@@ -8,10 +8,14 @@ test.describe("Drag with scaled parent", () => {
 		await visit(page, "?test=drag-scaled-parent");
 		await wait(page, 200);
 		await wait(page, 100);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 10, 10);
 		await triggerInView(draggable, "pointermove", 15, 15); // Past threshold
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(draggable, "pointermove", 110, 110);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(draggable, "pointerup");
 		await should(async () => {
@@ -39,10 +43,14 @@ test.describe("Drag with scaled parent", () => {
 		await visit(page, "?test=drag-scaled-parent&scale=2");
 		await wait(page, 200);
 		await wait(page, 100);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 10, 10);
 		await triggerInView(draggable, "pointermove", 15, 15); // Past threshold
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(draggable, "pointermove", 110, 110);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(draggable, "pointerup");
 		await should(async () => {

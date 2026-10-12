@@ -33,7 +33,7 @@
 
 	$effect(() => {
 		if (!ref) return;
-		// 2-arg callback forces the JS scrollInfo path (see attach-function.ts).
+		// Callbacks always use the JS scrollInfo path.
 		return scroll(
 			(_progress, info) => {
 				if (jsRef) jsRef.innerText = info.y.progress.toFixed(4);

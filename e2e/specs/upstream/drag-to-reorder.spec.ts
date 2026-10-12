@@ -1,5 +1,5 @@
 import { expect, test, type Locator } from "@playwright/test";
-import { bbox, should, trigger, visit, wait, type BoundingBox } from "../../harness/upstream.js";
+import { bbox, nextFrame, should, trigger, visit, wait, type BoundingBox } from "../../harness/upstream.js";
 
 /** This spec's own `expectBbox` (not the harness' exact one): ±2px, retried like `.should`. */
 function expectBbox(element: Locator, expectedBbox: BoundingBox) {
@@ -21,10 +21,6 @@ function expectBbox(element: Locator, expectedBbox: BoundingBox) {
 
 test.describe("Drag to reorder", () => {
 	test("Y axis", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: ReorderItem renders <div> instead of <li> (drops `as`), so li styles don't apply (Tomato 300x45 at top 240 vs 340x68 at 174); with li styles forced, the dragged item still isn't offset-compensated on reorder (top 405 vs 249) and no item can be dragged after the first reorder"
-		);
 		const tomato = page.locator("#Tomato");
 		const cucumber = page.locator("#Cucumber");
 		await visit(page, "?test=drag-to-reorder");
@@ -41,13 +37,18 @@ test.describe("Drag to reorder", () => {
 			top: 253,
 			width: 340,
 		});
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(tomato, "pointerdown", 360, 175);
 		await wait(page, 50);
 		await trigger(tomato, "pointermove", 360, 180);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(tomato, "pointermove", 360, 200);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(tomato, "pointermove", 360, 220);
+		await nextFrame(page);
 		await wait(page, 100);
 		await expectBbox(tomato, {
 			height: 68,
@@ -72,10 +73,13 @@ test.describe("Drag to reorder", () => {
 		await trigger(cucumber, "pointerdown", 360, 175);
 		await wait(page, 50);
 		await trigger(cucumber, "pointermove", 360, 180);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(cucumber, "pointermove", 360, 200);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(cucumber, "pointermove", 360, 220);
+		await nextFrame(page);
 		await wait(page, 100);
 		await expectBbox(cucumber, {
 			height: 68,
@@ -93,6 +97,7 @@ test.describe("Drag to reorder", () => {
 		await trigger(tomato, "pointerdown", 360, 0);
 		await wait(page, 100);
 		await trigger(tomato, "pointermove", 360, -100);
+		await nextFrame(page);
 		await wait(page, 100);
 		await trigger(tomato, "pointerup", 360, -100);
 		await wait(page, 20);
@@ -109,10 +114,6 @@ test.describe("Drag to reorder", () => {
 	});
 
 	test("X axis", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: ReorderItem renders <div> instead of <li> (Tomato 78x73 at top 293.5 vs 340x68 at 291); with li styles forced, the dragged item isn't offset-compensated when it reorders (left 1215 vs 535)"
-		);
 		const tomato = page.locator("#Tomato");
 		const cucumber = page.locator("#Cucumber");
 		await visit(page, "?test=drag-to-reorder&axis=x");
@@ -129,13 +130,18 @@ test.describe("Drag to reorder", () => {
 			top: 291,
 			width: 340,
 		});
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(tomato, "pointerdown", 360, 175);
 		await wait(page, 50);
 		await trigger(tomato, "pointermove", 365, 175);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(tomato, "pointermove", 425, 175);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(tomato, "pointermove", 475, 175);
+		await nextFrame(page);
 		await wait(page, 100);
 		await expectBbox(tomato, {
 			height: 68,
@@ -152,10 +158,6 @@ test.describe("Drag to reorder", () => {
 	});
 
 	test("Move around", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: ReorderItem renders <div> instead of <li> (Tomato top 240 vs 174); with li styles forced, the dragged item isn't offset-compensated on reorder and ends in slot 2 (top 252 vs 174)"
-		);
 		const tomato = page.locator("#Tomato");
 
 		const checkBox = () =>
@@ -169,6 +171,8 @@ test.describe("Drag to reorder", () => {
 		const moveAround = async (steps: number[]) => {
 			const baseY = 175;
 			const delta = 20;
+			await nextFrame(page);
+			await nextFrame(page);
 			await trigger(tomato, "pointerdown", 360, baseY);
 			await wait(page, 150);
 
@@ -176,6 +180,7 @@ test.describe("Drag to reorder", () => {
 				for (let i = 0; i < Math.abs(step); i++) {
 					const y = step > 0 ? delta : -delta;
 					await trigger(tomato, "pointermove", 360, baseY + y);
+					await nextFrame(page);
 					await wait(page, 150);
 				}
 			}
@@ -187,6 +192,11 @@ test.describe("Drag to reorder", () => {
 		await wait(page, 50);
 		await checkBox();
 
+		/**
+		 * Re-query so the check retries: the snap back to origin needs two
+		 * frames after release, which slow CI can take longer than
+		 * moveAround's 150ms wait to produce.
+		 */
 		await moveAround([-4, 14, -8, 4, -5, 2, -6]);
 		await checkBox();
 	});

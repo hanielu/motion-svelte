@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { should, trigger, visit, wait } from "../../harness/upstream.js";
+import { nextFrame, should, trigger, visit, wait } from "../../harness/upstream.js";
 
 /**
  * Tests for issue #2458: Drag constraints should update when the
@@ -17,10 +17,14 @@ test.describe("Drag Constraints Update on Element Resize", () => {
 		const box = page.locator("#box");
 		await visit(page, "?test=drag-ref-constraints-element-resize");
 		await wait(page, 200);
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(box, "pointerdown", 5, 5);
 		await trigger(box, "pointermove", 10, 10);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(box, "pointermove", 600, 600);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(box, "pointerup");
 		await wait(page, 50);
@@ -49,10 +53,14 @@ test.describe("Drag Constraints Update on Element Resize", () => {
 		});
 
 		// Now drag to the far bottom-right
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(box, "pointerdown", 5, 5);
 		await trigger(box, "pointermove", 10, 10);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(box, "pointermove", 600, 600);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(box, "pointerup");
 		await wait(page, 50);
@@ -71,10 +79,14 @@ test.describe("Drag Constraints Update on Element Resize", () => {
 		await wait(page, 200);
 
 		// First drag to an intermediate position
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(box, "pointerdown", 5, 5);
 		await trigger(box, "pointermove", 10, 10);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(box, "pointermove", 100, 100);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(box, "pointerup");
 		await wait(page, 50);
@@ -86,8 +98,10 @@ test.describe("Drag Constraints Update on Element Resize", () => {
 		// Now drag far to the bottom-right
 		await trigger(box, "pointerdown", 5, 5);
 		await trigger(box, "pointermove", 10, 10);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(box, "pointermove", 600, 600);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(box, "pointerup");
 		await wait(page, 50);

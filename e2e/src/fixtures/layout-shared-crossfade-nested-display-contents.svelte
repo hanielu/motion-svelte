@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { AnimatePresence, createLayoutMotion, motion } from "motion-sv";
 
-	const transition = { duration: 0.5, ease: () => 0.5 };
+	const transition = { duration: 10, ease: () => 0.5 };
 
 	const params = new URLSearchParams(window.location.search);
 	const type = params.get("type") || true;

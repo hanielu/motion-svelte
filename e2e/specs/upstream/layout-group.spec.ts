@@ -1,7 +1,35 @@
 import { expect, test, type Page } from "@playwright/test";
-import { bbox, visit, wait } from "../../harness/upstream.js";
+import { bbox, should, visit, wait } from "../../harness/upstream.js";
 
-const buttonTop = async (page: Page) => Math.round((await bbox(page.locator("#button"))).top);
+/**
+ * The button's top is recorded on every animation frame, so the "doesn't
+ * jump" checks see every rendered position rather than a single sample
+ * taken after a fixed wait, which slow CI can overshoot.
+ */
+async function recordButtonTops(page: Page) {
+	await page.locator("#button").evaluate((button) => {
+		const tops: number[] = ((window as any).buttonTops = []);
+		const record = () => {
+			tops.push(Math.round(button.getBoundingClientRect().top));
+			requestAnimationFrame(record);
+		};
+		record();
+	});
+	return () => page.evaluate(() => (window as any).buttonTops as number[]);
+}
+
+/**
+ * Unrounded, so this waits for the layout animation to finish rather than
+ * its eased tail.
+ */
+function expectButtonToSettleAt(page: Page, top: number) {
+	return should(async () => expect((await bbox(page.locator("#button"))).top).toBe(top));
+}
+
+function expectFramesBetween(tops: number[], from: number, to: number) {
+	const between = tops.filter((top) => top !== from && top !== to);
+	expect(between, `frames other than ${from} and ${to}: ${tops}`).not.toHaveLength(0);
+}
 
 test.describe(`LayoutGroup inherit="id"`, () => {
 	test("relative children should not instantly jump to new layout", async ({ page }) => {
@@ -9,25 +37,13 @@ test.describe(`LayoutGroup inherit="id"`, () => {
 		await visit(page, "?test=layout-group");
 		await wait(page, 250);
 
-		// Measure initial position
-		const initialTop = await buttonTop(page);
-
-		// Click expander
+		const tops = await recordButtonTops(page);
 		await page.locator("#expander").click();
+		await expectButtonToSettleAt(page, 104);
 
-		// Measure position after 100ms
-		await wait(page, 100);
-		const top100ms = await buttonTop(page);
-		// Should not be in original or final position
-		expect(top100ms).not.toBe(104);
-		expect(top100ms).not.toBe(initialTop);
-
-		// Measure position after another 200ms for animation to finish
-		await wait(page, 200);
-		const top200ms = await buttonTop(page);
-		expect(top200ms).toBe(104);
-		expect(top200ms).not.toBe(initialTop);
-		expect(top200ms).not.toBe(top100ms);
+		// Should have rendered positions between the original and final
+		const recorded = await tops();
+		expectFramesBetween(recorded, recorded[0], 104);
 	});
 
 	test("relative children should not instantly jump to new layout, after performing their own layout animation", async ({
@@ -37,32 +53,15 @@ test.describe(`LayoutGroup inherit="id"`, () => {
 		await visit(page, "?test=layout-group");
 		await wait(page, 250);
 
-		// Click button first, then wait 50ms
+		// Click button first and let it finish its own layout animation
 		await page.locator("#button").click();
-		await wait(page, 50);
+		await expectButtonToSettleAt(page, 129);
 
-		// Measure initial position
-		const initialTop = await buttonTop(page);
-
-		// Click expander
-		await wait(page, 300);
+		const tops = await recordButtonTops(page);
 		await page.locator("#expander").click();
+		await expectButtonToSettleAt(page, 204);
 
-		// Measure position after 100ms
-		await wait(page, 100);
-		const top100ms = await buttonTop(page);
-
-		// Don't be in final or original position
-		expect(top100ms).not.toBe(204);
-		expect(top100ms).not.toBe(initialTop);
-
-		// Measure position after another 100ms (200ms total)
-		await wait(page, 200);
-		const top200ms = await buttonTop(page);
-		// Should not be in either previous measurement
-		expect(top200ms).toBe(204);
-		expect(top200ms).not.toBe(initialTop);
-		expect(top200ms).not.toBe(top100ms);
+		expectFramesBetween(await tops(), 129, 204);
 	});
 
 	test("should return to original state when expander is clicked twice with delay", async ({ page }) => {
@@ -70,27 +69,18 @@ test.describe(`LayoutGroup inherit="id"`, () => {
 		await visit(page, "?test=layout-group");
 		await wait(page, 250);
 
-		// Measure initial position
-		const initialTop = await buttonTop(page);
-
-		// Click expander
+		const tops = await recordButtonTops(page);
 		await page.locator("#expander").click();
 
-		// Measure position after 100ms
-		await wait(page, 100);
-		const top100ms = await buttonTop(page);
-		// Should not be in original or final position
-		expect(top100ms).not.toBe(104);
-		expect(top100ms).not.toBe(initialTop);
-
-		// Wait 50ms, then click expander again
+		// Click the expander again once the button is mid-animation
+		await should(async () => {
+			const recorded = await tops();
+			expectFramesBetween(recorded, recorded[0], 104);
+		});
 		await wait(page, 50);
 		await page.locator("#expander").click();
 
-		// Measure position after animation finishes
-		await wait(page, 300);
-		const finalTop = await buttonTop(page);
 		// Should be back to original state
-		expect(finalTop).toBe(initialTop);
+		await expectButtonToSettleAt(page, (await tops())[0]);
 	});
 });

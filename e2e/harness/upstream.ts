@@ -23,6 +23,14 @@ export function wait(page: Page, ms: number) {
 }
 
 /**
+ * `.nextFrame()`: resolves after the app's next animation frame. Motion processes pointer input on the next frame,
+ * so upstream calls it after every pointermove in gesture specs.
+ */
+export function nextFrame(page: Page) {
+	return page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
+}
+
+/**
  * `.should(callback)`: Cypress re-runs the callback every frame until it passes or 4s elapse, so assertions can
  * catch transient values. Use for every `.should`; `.then` callbacks run once and translate to plain assertions.
  */

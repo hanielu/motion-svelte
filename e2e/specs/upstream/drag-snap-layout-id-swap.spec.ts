@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { bbox, should, trigger, visit, wait } from "../../harness/upstream.js";
+import { bbox, nextFrame, should, trigger, visit, wait } from "../../harness/upstream.js";
 
 /**
  * Regression test for issue #3315.
@@ -23,10 +23,14 @@ test.describe("drag + dragSnapToOrigin + layoutId horizontal swap", () => {
 		// Pointermoves are element-relative; we keep the move small so
 		// the recomputed-as-element-moves coordinate system still lands
 		// the pointer on tile-1.
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(tile0, "pointerdown", 5, 5);
 		await trigger(tile0, "pointermove", 10, 5);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(tile0, "pointermove", 35, 5);
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(tile0, "pointerup", 35, 5);
 		await wait(page, 2000);

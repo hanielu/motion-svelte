@@ -1,5 +1,14 @@
 import { expect, test, type Locator } from "@playwright/test";
-import { bbox, should, trigger, visit, wait, type BoundingBox, triggerInView } from "../../harness/upstream.js";
+import {
+	bbox,
+	nextFrame,
+	should,
+	trigger,
+	visit,
+	wait,
+	type BoundingBox,
+	triggerInView,
+} from "../../harness/upstream.js";
 
 /** Upstream's local `expectBbox`: checks left/top, and width/height only when given. */
 async function expectBbox(element: Locator, expectedBbox: Partial<BoundingBox>) {
@@ -21,10 +30,14 @@ test.describe("Nested Scroll/Page", () => {
 				left: 110,
 			});
 		});
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(a, "pointerdown", 60, 60);
 		await trigger(a, "pointermove", 50, 50); // Gesture will start from first move past threshold
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(a, "pointermove", 10, 10);
+		await nextFrame(page);
 		await wait(page, 200);
 		await triggerInView(a, "pointerup");
 		await wait(page, 70);

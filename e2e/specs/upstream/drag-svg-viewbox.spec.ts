@@ -14,7 +14,7 @@
  * not the SVG transform attribute.
  */
 import { expect, test } from "@playwright/test";
-import { should, trigger, visit, wait } from "../../harness/upstream.js";
+import { nextFrame, should, trigger, visit, wait } from "../../harness/upstream.js";
 
 /**
  * Extract translateX and translateY values from a CSS transform string.
@@ -33,6 +33,16 @@ function expectCloseTo(actual: number, expected: number, delta: number) {
 	expect(Math.abs(actual - expected)).toBeLessThanOrEqual(delta);
 }
 
+/**
+ * PanSession applies pointermove on the next animation frame, and pointerup
+ * discards a move that hasn't been applied yet. Cypress also resolves trigger
+ * coordinates against the element's current box. So each pointermove is
+ * followed by nextFrame() rather than a fixed wait, which slow CI can outrun.
+ *
+ * Gestures that start straight after the page loads first wait two frames:
+ * React 19 StrictMode remounts refs after the first paint, which cancels a
+ * gesture started before then.
+ */
 test.describe("Drag SVG with viewBox", () => {
 	test("Correctly scales drag distance when viewBox differs from rendered size", async ({ page }) => {
 		test.skip(
@@ -52,16 +62,18 @@ test.describe("Drag SVG with viewBox", () => {
 			expect(await draggable.getAttribute("x")).toBe("10");
 			expect(await draggable.getAttribute("y")).toBe("10");
 		});
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(draggable, "pointerdown", 10, 10);
 		await wait(page, 50);
 		await trigger(draggable, "pointermove", 20, 20); // Move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		// Move 100 pixels in screen space
 		// This should translate to 20 SVG units (100 * 0.2)
 		// Final SVG coords: (10+20, 10+20) = (30, 30)
 		// Final screen position: (30*5, 30*5) = (150, 150) relative to SVG
 		await trigger(draggable, "pointermove", 110, 110);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await wait(page, 50);
 		await should(async () => {
@@ -79,12 +91,14 @@ test.describe("Drag SVG with viewBox", () => {
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag-svg-viewbox&viewBoxWidth=500&viewBoxHeight=500&svgWidth=500&svgHeight=500");
 		await wait(page, 50);
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(draggable, "pointerdown", 10, 10);
 		await wait(page, 50);
 		await trigger(draggable, "pointermove", 20, 20);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointermove", 110, 110);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await wait(page, 50);
 		await should(async () => {
@@ -106,15 +120,17 @@ test.describe("Drag SVG with viewBox", () => {
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag-svg-viewbox&viewBoxWidth=100&viewBoxHeight=200&svgWidth=500&svgHeight=400");
 		await wait(page, 50);
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(draggable, "pointerdown", 10, 10);
 		await wait(page, 50);
 		await trigger(draggable, "pointermove", 20, 20);
-		await wait(page, 50);
+		await nextFrame(page);
 		// Move 100 pixels in both directions
 		// X: 100 * 0.2 = 20 SVG units
 		// Y: 100 * 0.5 = 50 SVG units
 		await trigger(draggable, "pointermove", 110, 110);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await wait(page, 50);
 		await should(async () => {
@@ -139,14 +155,16 @@ test.describe("Drag SVG with viewBox", () => {
 			"?test=drag-svg-viewbox&viewBoxX=50&viewBoxY=50&viewBoxWidth=100&viewBoxHeight=100&svgWidth=500&svgHeight=500"
 		);
 		await wait(page, 50);
+		await nextFrame(page);
+		await nextFrame(page);
 		await trigger(draggable, "pointerdown", 10, 10);
 		await wait(page, 50);
 		await trigger(draggable, "pointermove", 20, 20); // Move past threshold
-		await wait(page, 50);
+		await nextFrame(page);
 		// Move 100 pixels in screen space
 		// This should translate to 20 SVG units (100 * 0.2)
 		await trigger(draggable, "pointermove", 110, 110);
-		await wait(page, 50);
+		await nextFrame(page);
 		await trigger(draggable, "pointerup");
 		await wait(page, 50);
 		await should(async () => {

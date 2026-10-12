@@ -28,7 +28,6 @@ test.describe("Unit conversion", () => {
 		});
 		// First click: 0 -> calc(3 * var(--width)) = 300px
 		await trigger(box, "click");
-		await wait(page, 300);
 		await should(async () => {
 			// Computed position should be 300px
 			expect(await getTranslateX()).toBe(300);
@@ -37,7 +36,6 @@ test.describe("Unit conversion", () => {
 		});
 		// Second click: calc(300px) -> 0
 		await trigger(box, "click");
-		await wait(page, 300);
 		await should(async () => {
 			// Computed position should be back to 0
 			expect(await getTranslateX()).toBe(0);
@@ -51,7 +49,6 @@ test.describe("Unit conversion", () => {
 		await visit(page, "?test=unit-conversion");
 		await wait(page, 100);
 		await trigger(box, "click");
-		await wait(page, 100);
 		await should(async () => {
 			const { left } = await bbox(box);
 			expect(left).toBe(150);
@@ -63,7 +60,6 @@ test.describe("Unit conversion", () => {
 		await visit(page, "?test=unit-conversion&use-motion-value=true");
 		await wait(page, 100);
 		await trigger(box, "click");
-		await wait(page, 100);
 		await should(async () => {
 			const { left } = await bbox(box);
 			expect(left).toBe(150);
@@ -94,6 +90,21 @@ test.describe("Unit conversion", () => {
 			expect(transform).toBe("rotate(45deg)");
 			expect(textContent).toBe("Success");
 		});
+	});
+
+	test("Measures the used width, not the bounding box, on bordered elements", async ({ page }) => {
+		const box = page.locator("#box");
+		await page.setViewportSize({ width: 600, height: 400 });
+		await visit(page, "?test=unit-conversion-border");
+		await wait(page, 200);
+		const { width, textContent } = await box.evaluate((el) => ({
+			width: parseFloat(getComputedStyle(el).width),
+			textContent: el.textContent,
+		}));
+		// 10s linear from 100px to 200px: barely moved after 200ms
+		expect(width).toBeGreaterThan(99);
+		expect(width).toBeLessThan(110);
+		expect(textContent).toBe("Success");
 	});
 
 	test("Coerces none keyframes before measuring", async ({ page }) => {

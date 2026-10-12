@@ -1,5 +1,5 @@
 import { expect, test, type Locator } from "@playwright/test";
-import { bbox, should, trigger, visit, wait, triggerInView } from "../../harness/upstream.js";
+import { bbox, nextFrame, should, trigger, visit, wait, triggerInView } from "../../harness/upstream.js";
 
 test.describe("Drag with rotated parent", () => {
 	test("Element follows cursor when parent is rotated 180deg", async ({ page }) => {
@@ -8,10 +8,14 @@ test.describe("Drag with rotated parent", () => {
 		await visit(page, "?test=drag-rotated-parent");
 		await wait(page, 200);
 		await wait(page, 100);
+		await nextFrame(page);
+		await nextFrame(page);
 		await triggerInView(draggable, "pointerdown", 50, 50);
 		await triggerInView(draggable, "pointermove", 55, 55); // Past threshold
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(draggable, "pointermove", 150, 50); // Move right
+		await nextFrame(page);
 		await wait(page, 50);
 		await trigger(draggable, "pointerup");
 		await should(async () => {

@@ -25,16 +25,13 @@ async function scrollToBottom(page: Page, duration: number) {
 const innerText = (locator: Locator) => locator.first().evaluate((el) => (el as HTMLElement).innerText);
 const opacity = (locator: Locator) => locator.first().evaluate((el) => parseFloat(getComputedStyle(el).opacity));
 
-test.describe("useScroll with target does not set accelerate", () => {
-	test("Does not set accelerate when target is provided", async ({ page }) => {
-		test.fail(
-			true,
-			"motion-sv: useScroll picks its accelerate config at construction, before the target element is bound, so a target with a non-ViewTimeline offset still gets the window ScrollTimeline config: accelerate is 'true', expected 'false'"
-		);
+test.describe("useScroll with target only sets accelerate with ViewTimeline", () => {
+	test("Only sets accelerate when target is provided if ViewTimeline is supported", async ({ page }) => {
 		await visit(page, "?test=scroll-target-transform");
 		await wait(page, 200);
 		await should(async () => {
-			expect(await innerText(page.locator("#has-accelerate"))).toBe("false");
+			const expected = (await page.evaluate(() => !!(window as any).ViewTimeline)) ? "true" : "false";
+			expect(await innerText(page.locator("#has-accelerate"))).toBe(expected);
 		});
 	});
 
