@@ -95,7 +95,7 @@
 		});
 	}
 
-	useAnimatePresence(
+	const presenceContext = useAnimatePresence(
 		{
 			mode,
 			initial,
@@ -194,6 +194,16 @@
 		}
 	}
 
+	function presenceIntro() {
+		presenceContext.isUnmounting = false;
+		return {};
+	}
+
+	function presenceOutro() {
+		presenceContext.isUnmounting = true;
+		return {};
+	}
+
 	// Provide PopLayout + exit registry + wait gate to Motion children
 	PresenceManagerContext.set({
 		trackPosition,
@@ -206,4 +216,13 @@
 	});
 </script>
 
+<!--
+	Children exit through `|global` transitions, which Svelte also plays when any ancestor block is destroyed, so they
+	would keep a destroyed route or parent on screen until their exits finish (#18). Svelte runs this sentinel's outro
+	only when AnimatePresence itself is being destroyed, and before its children's, so they skip their exits. It lives
+	in <head> so it never affects the surrounding markup.
+-->
+<svelte:head>
+	<template data-motion-presence in:presenceIntro|global out:presenceOutro|global></template>
+</svelte:head>
 {@render children()}

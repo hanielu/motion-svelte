@@ -35,6 +35,16 @@ export default defineConfig({
 				trace: "retain-on-failure",
 			},
 		},
+		{
+			// Regression tests for motion-sv GitHub issues, on the same fixture app.
+			name: "issues",
+			testDir: "./specs/issues",
+			use: {
+				baseURL: `http://localhost:${FIXTURES_PORT}`,
+				viewport: { width: 1000, height: 660 },
+				actionTimeout: 4000,
+			},
+		},
 	],
 	webServer: [
 		{

@@ -14,6 +14,11 @@ export interface PresenceContext {
 	 * to keep the DOM node alive for the duration of the exit animation.
 	 */
 	transition?: typeof motionExit;
+	/**
+	 * Svelte-specific: true while the AnimatePresence itself is being destroyed (e.g. its route or parent block went
+	 * away). Children then leave without their exit animations, as when an AnimatePresence unmounts in React.
+	 */
+	isUnmounting?: boolean;
 }
 
 export const AnimatePresenceContext = new Context<PresenceContext>("AnimatePresenceContext");
@@ -30,6 +35,7 @@ export function useAnimatePresence(
 		presenceId: String(apId++),
 		onMotionExitComplete,
 		transition: motionExit,
+		isUnmounting: false,
 	};
 
 	$effect.pre(() => {

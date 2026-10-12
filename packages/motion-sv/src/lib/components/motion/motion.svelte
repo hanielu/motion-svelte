@@ -339,7 +339,7 @@
 	// We pass this in only when we're in a presence context,
 	// this way users not using presence don't need to deal with the added bundle size.
 	const motionExitTransition = presenceContext.transition;
-	const shouldAllowExit = () => !!props.exit && isInPresenceContext;
+	const shouldAllowExit = () => !!props.exit && isInPresenceContext && !presenceContext.isUnmounting;
 
 	function motionExit(node: Element) {
 		if (!shouldAllowExit()) return null;
