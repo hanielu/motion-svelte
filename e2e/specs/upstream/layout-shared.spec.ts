@@ -94,10 +94,6 @@ test.describe("Shared layout: A -> B transition", () => {
 	});
 
 	test(`It correctly fires layout="position" animations`, async ({ page }) => {
-		test.skip(
-			true,
-			'unsupported: layout.* (createLayoutMotion) forces layout={true}, so a top-level layout="position" element can\'t be expressed'
-		);
 		await visit(page, "?test=layout-shared-switch-a-b&type=position");
 		await wait(page, 50);
 		await expectBbox(page.locator("#a"), { top: 0, left: 0, width: 100, height: 200 });
@@ -221,10 +217,6 @@ test.describe("Shared layout: A -> B crossfade transition", () => {
 	});
 
 	test(`It correctly fires layout="position" animations`, async ({ page }) => {
-		test.skip(
-			true,
-			'unsupported: layout.* (createLayoutMotion) forces layout={true}, so a top-level layout="position" element can\'t be expressed'
-		);
 		await visit(page, "?test=layout-shared-switch-a-b&type=position");
 		await wait(page, 50);
 		await expectBbox(page.locator("#a"), { top: 0, left: 0, width: 100, height: 200 });
@@ -286,10 +278,6 @@ test.describe("Shared layout: A -> AB -> A crossfade transition", () => {
 	});
 
 	test(`It correctly fires layout="position" animations`, async ({ page }) => {
-		test.skip(
-			true,
-			'unsupported: layout.* (createLayoutMotion) forces layout={true}, so a top-level layout="position" element can\'t be expressed'
-		);
 		await visit(page, "?test=layout-shared-crossfade-a-ab&type=position");
 		await wait(page, 50);
 		await expectBbox(page.locator("#a"), { top: 0, left: 0, width: 100, height: 200 });

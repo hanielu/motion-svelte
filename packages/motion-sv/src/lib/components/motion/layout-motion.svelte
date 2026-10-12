@@ -3,12 +3,21 @@
 	import type { MotionCreateOptions, MotionNameSpace } from "./utils.js";
 	import type { MotionState } from "#lib/state/motion-state.js";
 	import { flushSync, type Component, type Snippet } from "svelte";
-	import { withProp } from "#lib/vendor/runed/index.js";
 	import { createOptionalContext } from "#lib/utils/optional-context.js";
 	import { motion } from "./instance.js";
 	import type { IProjectionNode } from "motion-dom";
 
 	type MotionComponent = Component<Record<string, unknown>>;
+
+	/** The props, with a live `layout` that defaults to `true`. */
+	const withLayout = (props: Record<string, unknown>) =>
+		Object.defineProperties(
+			{},
+			{
+				...Object.getOwnPropertyDescriptors(props),
+				layout: { get: () => props.layout ?? true, enumerable: true, configurable: true },
+			}
+		) as Record<string, unknown>;
 
 	/** The motion states rendered through one createLayoutMotion() namespace, which its update() snapshots. */
 	export const [getLayoutMotionScope, setLayoutMotionScope] = createOptionalContext<Set<MotionState>>();
@@ -71,14 +80,13 @@
 				return result;
 			};
 
-		/** Render the component with `layout`, inside this namespace's scope. */
+		/** Render the component inside this namespace's scope, with `layout` on unless it's set (e.g. to "position"). */
 		const withScope =
 			(component: MotionComponent): MotionComponent =>
 			(anchor, props) =>
 				Provider(anchor, {
 					scope,
-					children: ((childAnchor: typeof anchor) =>
-						component(childAnchor, withProp(props, "layout", true))) as Snippet,
+					children: ((childAnchor: typeof anchor) => component(childAnchor, withLayout(props))) as Snippet,
 				});
 
 		const components = new Map<PropertyKey, MotionComponent>();
