@@ -7,13 +7,15 @@ const fixtures = import.meta.glob<{ default: Component }>("./fixtures/*.svelte")
 const nameOf = (path: string) => path.slice("./fixtures/".length, -".svelte".length);
 
 const target = document.getElementById("root")!;
-const test = new URLSearchParams(location.search).get("test");
+const params = new URLSearchParams(location.search);
+const test = params.get("test");
 
 if (test) {
 	const load = fixtures[`./fixtures/${test}.svelte`];
 	if (!load) throw new Error(`Unknown fixture "${test}"`);
 	const { default: Fixture } = await load();
-	mount(Fixture, { target });
+	// `&intro=false` mounts without intro transitions, like SvelteKit's initial page load.
+	mount(Fixture, { target, intro: params.get("intro") !== "false" });
 	document.documentElement.dataset.fixture = "mounted";
 } else {
 	target.innerHTML = `<ul>${Object.keys(fixtures)

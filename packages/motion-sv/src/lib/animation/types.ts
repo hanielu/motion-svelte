@@ -12,6 +12,4 @@ export interface MotionExitDefinition extends DOMKeyframesDefinition {
 export interface MotionTransitionParamsShape {
 	definition: MotionExitDefinition | undefined;
 	state: MotionState;
-	allowIntro: boolean;
-	setAllowIntro(value: boolean): void;
 }

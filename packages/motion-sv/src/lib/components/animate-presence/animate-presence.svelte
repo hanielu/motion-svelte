@@ -97,13 +97,10 @@
 
 	const presenceContext = useAnimatePresence(
 		{
-			mode,
+			// svelte-ignore state_referenced_locally - `initial` only applies to children present at mount
 			initial,
 			get custom() {
 				return custom;
-			},
-			get anchorX() {
-				return anchorX;
 			},
 		},
 		handleMotionExitComplete
@@ -194,12 +191,12 @@
 		}
 	}
 
-	function presenceIntro() {
+	function presenceIntro(_node: Element) {
 		presenceContext.isUnmounting = false;
 		return {};
 	}
 
-	function presenceOutro() {
+	function presenceOutro(_node: Element) {
 		presenceContext.isUnmounting = true;
 		return {};
 	}

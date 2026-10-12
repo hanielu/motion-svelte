@@ -85,6 +85,7 @@
 	 * If we're in development mode, check to make sure we're not rendering a motion component
 	 * as a child of LazyMotion, as this will break the file-size benefits of using it.
 	 */
+	// svelte-ignore state_referenced_locally - a one-time mount check; `renderer` is fixed per motion component
 	if (process.env.NODE_ENV !== "production" && renderer && lazyMotionContext.strict) {
 		const strictMessage =
 			"You have rendered a `motion` component within a `LazyMotion` component. This will break tree shaking. Import and render a `m` component instead.";
@@ -106,6 +107,7 @@
 	layoutMotionScope?.register(motionState);
 
 	// If renderer is provided directly (motion component), use it immediately
+	// svelte-ignore state_referenced_locally - `renderer` is fixed per motion component
 	if (renderer) {
 		motionState.initVisualElement(renderer);
 		motionState.updateFeatures();
@@ -292,18 +294,6 @@
 		};
 	}
 
-	/**
-	 * Controls whether Svelte's built-in intro transition plays on first mount.
-	 *
-	 * When false:
-	 * - Allows MotionState to handle the initial mount animation
-	 * - If an exit prop is present, enables the exit animation to play
-	 * - Supports interrupting and reversing animations from their current state
-	 *
-	 * This approach provides better animation control and interruptibility compared to
-	 * using Svelte's native transitions alone.
-	 */
-	let allowIntro = false;
 	let wasWaitBlocked = presenceManager.isWaitBlocked?.() === true;
 
 	$effect.pre(() => {
@@ -341,31 +331,21 @@
 	const motionExitTransition = presenceContext.transition;
 	const shouldAllowExit = () => !!props.exit && isInPresenceContext && !presenceContext.isUnmounting;
 
+	/**
+	 * Svelte transitions only keep the DOM node alive while MotionState plays the exit; motion drives the actual
+	 * animations. Exits and entries use separate `out:`/`in:` directives so the exit always knows it is one (a
+	 * bidirectional `transition:` gets `direction: "both"`). Entering needs no hold: `motionEnter` only exists so
+	 * `introstart` fires, e.g. when an exiting element comes back.
+	 */
 	function motionExit(node: Element) {
 		if (!shouldAllowExit()) return null;
-		return motionExitTransition(node, {
-			definition: exitDefinition,
-			state: motionState,
-			allowIntro,
-			setAllowIntro: (v) => (allowIntro = v),
-		});
+		return motionExitTransition(node, { definition: exitDefinition, state: motionState });
 	}
-
-	// Mark element as exiting so motionExit can distinguish intro from outro
-	const EXITING_KEY = "__motion_exiting__";
+	const motionEnter = (_node: Element) => ({});
 
 	const onintrostart = () => shouldAllowExit() && presenceManager.onIntroStart?.(motionState.element!);
-	const onoutrostart = () => {
-		if (!shouldAllowExit()) return;
-		// Mark the element as exiting BEFORE the transition function is called
-		(motionState.element as any)[EXITING_KEY] = true;
-		presenceManager.onOutroStart?.(motionState.element!);
-	};
-	const onoutroend = () => {
-		if (!shouldAllowExit()) return;
-		delete (motionState.element as any)[EXITING_KEY];
-		presenceManager.onOutroEnd?.(motionState.element!);
-	};
+	const onoutrostart = () => shouldAllowExit() && presenceManager.onOutroStart?.(motionState.element!);
+	const onoutroend = () => shouldAllowExit() && presenceManager.onOutroEnd?.(motionState.element!);
 
 	const key = createAttachmentKey();
 	const sharedProps = $derived({
@@ -379,13 +359,14 @@
 
 {#if typeof AsComponent === "string"}
 	{#if VOID_TAGS.has(AsComponent)}
-		<svelte:element this={AsComponent} {...sharedProps} transition:motionExit|global />
+		<svelte:element this={AsComponent} {...sharedProps} in:motionEnter|global out:motionExit|global />
 	{:else}
 		<svelte:element
 			this={AsComponent}
 			{...sharedProps}
 			xmlns={motionState.type === "svg" ? "http://www.w3.org/2000/svg" : undefined}
-			transition:motionExit|global
+			in:motionEnter|global
+			out:motionExit|global
 		>
 			{@render props.children?.()}
 		</svelte:element>

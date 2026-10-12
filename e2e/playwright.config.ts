@@ -36,9 +36,9 @@ export default defineConfig({
 			},
 		},
 		{
-			// Regression tests for motion-sv GitHub issues, on the same fixture app.
-			name: "issues",
-			testDir: "./specs/issues",
+			// Regression tests for motion-sv bugs (GitHub issues and others), on the same fixture app.
+			name: "regressions",
+			testDir: "./specs/regressions",
 			use: {
 				baseURL: `http://localhost:${FIXTURES_PORT}`,
 				viewport: { width: 1000, height: 660 },
