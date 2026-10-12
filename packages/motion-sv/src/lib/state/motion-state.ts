@@ -141,6 +141,9 @@ export class MotionState {
 		if (this.options.layoutId) this.refreshRootScroll();
 		this.visualElement?.mount(element);
 		this.updateFeatures();
+		// Render once the mount animations have started, as React does, so values they settle without changing (e.g. an
+		// SVG `x: "none"`, which resolves to 0) still reach the element.
+		this.visualElement?.scheduleRenderMicrotask();
 	}
 
 	private refreshRootScroll() {
@@ -164,20 +167,7 @@ export class MotionState {
 			// A later mount() re-mounts it, restoring its listeners
 			feature.isMount = false;
 		});
-
-		const projection = this.visualElement?.projection;
-		const shouldDeferProjectionUnmount = Boolean(this.options.layoutId && projection);
-
-		if (shouldDeferProjectionUnmount) {
-			this.visualElement.projection = undefined;
-		}
-
 		this.visualElement?.unmount();
-
-		if (shouldDeferProjectionUnmount && projection) {
-			this.visualElement.projection = projection;
-			frame.postRender(() => projection.unmount());
-		}
 	}
 
 	// Called before updating, executes in parent-to-child order

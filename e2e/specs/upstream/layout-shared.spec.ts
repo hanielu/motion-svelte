@@ -62,10 +62,6 @@ test.describe("Shared layout: A -> B transition", () => {
 	test("Correctly fires layout={true} animations and fires onLayoutAnimationStart and onLayoutAnimationComplete", async ({
 		page,
 	}) => {
-		test.fail(
-			true,
-			"motion-sv: #b computed opacity is 1 mid-animation instead of 0.7; the lead's opacity isn't mixed from the removed #a's style opacity (0.4)"
-		);
 		await visit(page, "?test=layout-shared-switch-a-b");
 		await wait(page, 50);
 		await should(async () => {

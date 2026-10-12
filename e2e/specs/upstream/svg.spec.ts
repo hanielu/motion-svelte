@@ -79,10 +79,6 @@ test.describe("SVG", () => {
 
 test.describe("SVG origin", () => {
 	test("Correctly animates origin", async ({ page }) => {
-		test.fail(
-			true,
-			'motion-sv: SVG rect with animate={{ x: "none" }} gets no inline transform (style.transform "") instead of "none"'
-		);
 		await visit(page, "?test=svg-origin");
 		await wait(page, 100);
 		await should(async () => {
