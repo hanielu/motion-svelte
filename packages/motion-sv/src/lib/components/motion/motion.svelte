@@ -24,6 +24,9 @@
 		"track",
 		"wbr",
 	]);
+
+	/** The longest Svelte keeps an exiting element if its exit never reports completion. */
+	const EXIT_HOLD_LIMIT = 10_000;
 </script>
 
 <script lang="ts">
@@ -42,7 +45,6 @@
 	import { invariant, warning } from "hey-listen";
 	import { isMotionValue } from "framer-motion/dom";
 	import { isValidMotionProp } from "./valid-prop.js";
-	import { resolveVariantValue } from "#lib/state/utils.js";
 	import { resolveMotionProps } from "#lib/utils/resolve-motion-props.js";
 	import { updateLazyFeatures } from "#lib/features/lazy-features.js";
 	import { untrack, type Component } from "svelte";
@@ -215,39 +217,12 @@
 		return attrsProps;
 	});
 
-	// Resolve exit variant (including its transition) to size the Svelte out transition
-	const exitDefinition = $derived.by(() => {
-		const customValue = props.custom ?? presenceContext.custom;
-		return resolveVariantValue(props.exit, props.variants, customValue);
-	});
-
 	// onBeforeUnmount
 	$effect.pre(() => {
 		return () => {
 			layoutMotionScope?.unregister(motionState);
 			motionState.beforeUnmount();
 		};
-	});
-
-	// For layout-only elements in presence context, subscribe to exit start notifications.
-	// This ensures the layout animation runs in parallel with exit animations, not after they complete.
-	$effect(() => {
-		if (!props.layoutId || props.exit || !isInPresenceContext) return;
-
-		const unsubscribe = presenceManager.subscribeToExitStart?.((exitingEl) => {
-			// Skip if we're a descendant of the exiting element - we'll fade out naturally with our parent
-			if (motionState.element && exitingEl.contains(motionState.element)) {
-				return;
-			}
-
-			// Trigger layout animation immediately when a blocking exit starts
-			motionState.unmount();
-			if (motionState.element) {
-				motionState.element.style.visibility = "hidden";
-			}
-		});
-
-		return () => unsubscribe?.();
 	});
 
 	// onBeforeUpdate (not really, svelte doesn't have a beforeUpdate hook)
@@ -330,25 +305,47 @@
 		};
 	});
 
-	// We pass this in only when we're in a presence context,
-	// this way users not using presence don't need to deal with the added bundle size.
-	const motionExitTransition = presenceContext.transition;
-	const shouldAllowExit = () => !!props.exit && isInPresenceContext && !presenceContext.isUnmounting;
+	const isPresenceTracked = () => isInPresenceContext && !presenceContext.isUnmounting;
+	const shouldAllowExit = () => !!props.exit && isPresenceTracked();
+	/**
+	 * A layoutId element without an exit has nothing to play, but its own outro still means its block is leaving:
+	 * hand the shared layout to the next lead right away, and take it back if the block re-enters.
+	 */
+	const isLayoutOnly = () => !props.exit && !!props.layoutId && isPresenceTracked();
+	function setPresent(isPresent: boolean) {
+		motionState.getSnapshot(motionState.options, isPresent);
+		motionState.didUpdate();
+	}
 
 	/**
 	 * Svelte transitions only keep the DOM node alive while MotionState plays the exit; motion drives the actual
-	 * animations. Exits and entries use separate `out:`/`in:` directives so the exit always knows it is one (a
-	 * bidirectional `transition:` gets `direction: "both"`). Entering needs no hold: `motionEnter` only exists so
-	 * `introstart` fires, e.g. when an exiting element comes back.
+	 * animations, and AnimatePresence finishes the outro once the exit completes. The duration is only a safety cap.
+	 * Exits and entries use separate `out:`/`in:` directives so the exit always knows it is one (a bidirectional
+	 * `transition:` gets `direction: "both"`). Entering needs no hold: `motionEnter` only exists so `introstart`
+	 * fires, e.g. when an exiting element comes back.
+	 *
+	 * The exit is deferred: Svelte calls the returned function in a microtask right after the flush, on every outro,
+	 * while it only dispatches `outrostart` a frame later. Starting the exit here keeps it in the same layout pass as
+	 * the update that caused it, so running layout animations aren't restarted a frame in.
 	 */
 	function motionExit(node: Element) {
-		if (!shouldAllowExit()) return null;
-		return motionExitTransition(node, { definition: exitDefinition, state: motionState });
+		if (!isInPresenceContext) return null;
+		return () => {
+			if (!shouldAllowExit()) return {};
+			presenceManager.onOutroStart?.(node);
+			return { duration: EXIT_HOLD_LIMIT };
+		};
 	}
 	const motionEnter = (_node: Element) => ({});
 
-	const onintrostart = () => shouldAllowExit() && presenceManager.onIntroStart?.(motionState.element!);
-	const onoutrostart = () => shouldAllowExit() && presenceManager.onOutroStart?.(motionState.element!);
+	function onintrostart() {
+		if (shouldAllowExit()) presenceManager.onIntroStart?.(motionState.element!);
+		else if (isLayoutOnly()) setPresent(true);
+	}
+	function onoutrostart() {
+		if (shouldAllowExit()) presenceManager.onOutroBegin?.(motionState.element!);
+		else if (isLayoutOnly()) setPresent(false);
+	}
 	const onoutroend = () => shouldAllowExit() && presenceManager.onOutroEnd?.(motionState.element!);
 
 	const key = createAttachmentKey();

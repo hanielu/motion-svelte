@@ -49,9 +49,7 @@ export class ProjectionFeature extends Feature {
 					// notifyLayoutUpdate can call this synchronously while the microtask batcher
 					// is processing; a direct root.didUpdate() call here would be permanently lost
 					// because the microtask batcher's allowKeepAlive=false skips follow-up batches.
-					queueMicrotask(() => {
-						this.state.options.presenceContext?.onMotionExitComplete?.(this.state.presenceContainer, this.state);
-					});
+					queueMicrotask(() => this.state.completeExitFromProjection());
 				}
 			},
 		});

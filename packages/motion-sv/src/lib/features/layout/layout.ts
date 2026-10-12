@@ -7,6 +7,11 @@ import type { Options } from "#lib/types/index.js";
 import { isHidden } from "#lib/utils/is-hidden.js";
 
 let hasLayoutUpdate = false;
+/**
+ * Set by the first snapshot or unmount. From then on newly mounted nodes are measured right away, so a later layout
+ * change has a layout to animate from (as in upstream's MeasureLayout).
+ */
+let hasTakenAnySnapshot = false;
 
 export class LayoutFeature extends Feature {
 	static key = "layout" as const;
@@ -51,6 +56,7 @@ export class LayoutFeature extends Feature {
 			layoutGroup?.group?.add(projection);
 			globalProjectionState.hasEverUpdated = true;
 		}
+		if (hasTakenAnySnapshot) hasLayoutUpdate = true;
 		this.didUpdate();
 
 		/**
@@ -67,6 +73,7 @@ export class LayoutFeature extends Feature {
 	}
 
 	unmount() {
+		hasTakenAnySnapshot = true;
 		const layoutGroup = this.state.options.layoutGroup;
 		const projection = this.state.visualElement.projection;
 
@@ -97,7 +104,7 @@ export class LayoutFeature extends Feature {
 			return;
 		}
 
-		hasLayoutUpdate = true;
+		hasLayoutUpdate = hasTakenAnySnapshot = true;
 
 		/**
 		 * Snapshot the current layout.
@@ -111,10 +118,6 @@ export class LayoutFeature extends Feature {
 		 */
 		if (drag || !isDef(isPresent) || projection.isPresent !== isPresent) {
 			projection.willUpdate();
-			if (layoutId && (projection.instance as Element | undefined)?.isConnected) {
-				// Replace stale shared-layout snapshots while the old node is still measurable.
-				projection.snapshot = projection.measure();
-			}
 		}
 
 		/**
@@ -123,10 +126,12 @@ export class LayoutFeature extends Feature {
 		 */
 		if (isDef(isPresent) && isPresent !== projection.isPresent) {
 			projection.isPresent = isPresent;
+			// Only the lead hands the layout on, and only a follower takes it back: a relegating follower would hand
+			// the lead to another member, and repeated open/close cycles would drift the stack.
 			if (isPresent) {
-				projection.promote();
+				if (!projection.isLead()) projection.promote();
 				this.updatePrevLead(projection);
-			} else {
+			} else if (projection.isLead()) {
 				projection.relegate();
 			}
 		}

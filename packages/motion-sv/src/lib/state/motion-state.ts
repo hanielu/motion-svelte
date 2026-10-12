@@ -25,10 +25,14 @@ export class MotionState {
 	// Parent reference for handling component tree relationships
 	public parent?: MotionState;
 
-	// Whether the element is exiting
+	// Whether the exit animation is running
 	public isExiting = false;
-	// The AnimatePresence container this motion component belongs to
-	public presenceContainer: HTMLElement | null = null;
+	/**
+	 * Bumped by exit() and reenter(). An exit completion from an older generation is a no-op, so an
+	 * exit → reenter → exit sequence can't have the first exit's late settlement end the second one.
+	 */
+	private exitGeneration = 0;
+	private settlePendingExit?: VoidFunction;
 	/**
 	 * Svelte-specific: set by the Motion component when inside an AnimatePresence
 	 * wait-mode gate. While it returns true, the entering element holds its
@@ -144,6 +148,7 @@ export class MotionState {
 	}
 
 	unmount() {
+		this.settleExit();
 		this.parent?.children?.delete(this);
 		mountedStates.delete(this.element);
 		this.features.forEach((f) => f.unmount?.());
@@ -174,25 +179,58 @@ export class MotionState {
 		this.didUpdate();
 	}
 
-	tryExitComplete() {
-		if (this.isExiting) return;
-		if (this.options?.layoutId && this.visualElement.projection?.currentAnimation?.state === "running") {
-			return;
-		}
-		this.options.presenceContext?.onMotionExitComplete?.(this.presenceContainer, this);
-	}
-
 	// Set animation state active status and propagate to children
 	setActive(name: StateType, isActive: boolean) {
-		if (name === "exit" && isActive) {
-			this.isExiting = true;
-		}
-		this.visualElement?.animationState?.setActive(toAnimationType(name), isActive).then(() => {
-			if (name === "exit" && isActive) {
-				this.isExiting = false;
-				this.options?.layoutId ? frame.postRender(() => this.tryExitComplete()) : this.tryExitComplete();
-			}
-		});
+		return this.visualElement?.animationState?.setActive(toAnimationType(name), isActive);
+	}
+
+	/**
+	 * Play the AnimatePresence exit. Resolves once it is complete, including the layoutId handoff to the next lead,
+	 * which ProjectionFeature reports through completeExitFromProjection().
+	 */
+	exit(): Promise<void> {
+		const generation = ++this.exitGeneration;
+		this.isExiting = true;
+		const completion = new Promise<void>((resolve) => (this.settlePendingExit = resolve));
+
+		const exitAnimation = this.setActive("exit", true);
+		const onAnimationComplete = () => {
+			if (generation !== this.exitGeneration) return;
+			this.isExiting = false;
+			// The layoutId handoff animation starts asynchronously, so check for it once the projection has run.
+			this.options.layoutId
+				? frame.postRender(() => this.tryCompleteExit(generation))
+				: this.tryCompleteExit(generation);
+		};
+		exitAnimation ? exitAnimation.then(onAnimationComplete) : onAnimationComplete();
+
+		this.getSnapshot(this.options, false);
+		return completion;
+	}
+
+	/** Come back while an exit is in flight; the abandoned exit settles silently. */
+	reenter() {
+		this.exitGeneration++;
+		this.settleExit();
+		this.isExiting = false;
+		this.setActive("exit", false);
+		this.getSnapshot(this.options, true);
+	}
+
+	completeExitFromProjection() {
+		this.tryCompleteExit(this.exitGeneration);
+	}
+
+	private tryCompleteExit(generation: number) {
+		if (generation !== this.exitGeneration || this.isExiting) return;
+		// Removing the element mid-handoff would cut the shared layout animation short.
+		if (this.options.layoutId && this.visualElement.projection?.currentAnimation?.state === "running") return;
+		this.settleExit();
+	}
+
+	private settleExit() {
+		this.settlePendingExit?.();
+		this.settlePendingExit = undefined;
 	}
 
 	/**
@@ -262,7 +300,8 @@ export class MotionState {
 			},
 			reducedMotionConfig: this.options.motionConfig?.reducedMotion,
 		});
-		this.visualElement.parent?.addChild(this.visualElement);
+		// No parent.addChild() here: visualElement.mount() registers with the parent once `current` is set, so
+		// enteringChildren never holds unmounted children (stagger sorting crashes on them in Firefox).
 		if (this.isMounted()) {
 			this.visualElement.mount(this.element);
 		}

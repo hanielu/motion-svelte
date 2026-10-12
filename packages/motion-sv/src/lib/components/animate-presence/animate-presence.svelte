@@ -6,7 +6,6 @@
 	import { PresenceManagerContext } from "./index.js";
 	import { mountedStates } from "#lib/state/motion-state.js";
 	import type { MotionState } from "#lib/state/motion-state.js";
-	import { delay } from "#lib/utils/delay.js";
 
 	let {
 		mode = "sync",
@@ -27,14 +26,15 @@
 		},
 	});
 
-	/**
-	 * Track elements that are actively exiting.
-	 * Key: The DOM element exiting.
-	 * Value: { blocksExit: boolean } - whether this exit should block "wait" mode.
-	 *
-	 * This prevents double-handling of exit events and allows tracking specific element status.
-	 */
-	const exitDom = new Map<Element, { blocksExit: boolean }>();
+	interface ExitSession {
+		/** Whether this exit blocks "wait" mode. */
+		blocksExit: boolean;
+		/** The exit animation (and any layoutId handoff) has finished. */
+		isComplete: boolean;
+	}
+
+	/** Elements that are exiting. Guards against double handling; re-entry deletes the session. */
+	const exitDom = new Map<Element, ExitSession>();
 
 	/**
 	 * Track elements that are actively exiting AND blocking (have actual exit animations).
@@ -48,63 +48,54 @@
 	 */
 	let blockingExitCount = $state(0);
 
-	// Subscribers to be notified when a blocking exit starts
-	const exitStartSubscribers = new Set<(exitingEl: Element) => void>();
-	function subscribeToExitStart(callback: (exitingEl: Element) => void): () => void {
-		exitStartSubscribers.add(callback);
-		return () => exitStartSubscribers.delete(callback);
-	}
-	const notifyExitStart = (exitingEl: Element) => exitStartSubscribers.forEach((cb) => cb(exitingEl));
-
 	$effect.pre(() => () => {
 		exitDom.clear();
 		blockingExitCount = 0;
-		exitStartSubscribers.clear();
 	});
 
 	const isWaitBlocked = () => mode === "wait" && blockingExitCount > 0;
 
 	/**
-	 * Called by MotionState (via ProjectionFeature / setActive("exit", true) promise)
-	 * when a motion component's exit animation truly completes. Used for popLayout
-	 * style cleanup and layout bookkeeping — DOM removal timing stays with Svelte's outro.
-	 */
-	function handleMotionExitComplete(container: HTMLElement | null, state: MotionState) {
-		if (styles.has(state)) {
-			removePopStyle(state);
-		}
-	}
-
-	/**
-	 * Snapshot every layout-enabled projection node in the tree.
-	 *
-	 * Svelte dispatches `outrostart`/`outroend` a frame after the flush (behind a
-	 * 0-duration WAAPI placeholder), so by the time an exiting element pops out of
-	 * flow (popLayout) or is removed from the DOM (sync), the regular pre-update
-	 * snapshots have already been consumed by an earlier didUpdate pass. Re-snapshot
-	 * here so siblings can FLIP from their pre-shift positions; nodes that don't
-	 * move resolve to zero deltas and won't animate.
+	 * Snapshot every layout-enabled projection node in the tree before the exiting element pops out of flow
+	 * (popLayout) or leaves the DOM (sync), so siblings can FLIP from their pre-shift positions. Nodes already
+	 * snapshotted by createLayoutMotion().update() keep their snapshot; nodes that don't move won't animate. Nodes
+	 * that haven't been measured yet just mounted, and like in React they don't animate their first layout.
 	 */
 	function snapshotLayoutTree(state: MotionState) {
 		const root = state.visualElement?.projection?.root;
 		if (!root) return;
 		(root as any).nodes?.forEach((node: any) => {
-			if (node.options.layout || node.options.layoutId) {
+			if (node.layout && (node.options.layout || node.options.layoutId)) {
 				node.willUpdate(false);
 			}
 		});
 	}
 
-	const presenceContext = useAnimatePresence(
-		{
-			// svelte-ignore state_referenced_locally - `initial` only applies to children present at mount
-			initial,
-			get custom() {
-				return custom;
-			},
+	const presenceContext = useAnimatePresence({
+		get initial() {
+			return initial;
 		},
-		handleMotionExitComplete
-	);
+		get custom() {
+			return custom;
+		},
+	});
+
+	/**
+	 * Svelte keeps an exiting element until its outro's duration has passed. Finish that outro as soon as the exit is
+	 * complete, so the element leaves exactly when its animation ends, as in React.
+	 */
+	function finishOutro(el: Element) {
+		for (const animation of el.getAnimations()) {
+			const effect = animation.effect as KeyframeEffect | null;
+			// Svelte's outro animates no keyframes; motion's own animations on the element always do.
+			if (effect?.getKeyframes().length !== 0 || !(Number(effect.getTiming().duration) > 0)) continue;
+			// Run Svelte's finish handler now instead of on the next frame's finish event.
+			const onfinish = animation.onfinish;
+			animation.onfinish = null;
+			animation.finish();
+			onfinish?.call(animation, new AnimationPlaybackEvent("finish"));
+		}
+	}
 
 	function handleIntroStart(el: Element) {
 		const state = mountedStates.get(el);
@@ -123,44 +114,36 @@
 		// Re-track position for popLayout mode since element is re-entering
 		trackPosition(state);
 
-		// Resume enter animation from current values
-		state.setActive("exit", false);
-		state.getSnapshot(state.options, true);
+		state.reenter();
 	}
 
+	/** Called when Svelte starts the outro, in the microtask right after the flush that removed the element. */
 	function handleOutroStart(el: Element) {
 		const state = mountedStates.get(el);
 		if (!state) return;
 		if (exitDom.has(el)) return;
 
-		// Capture pre-exit positions of the whole layout tree BEFORE popLayout pulls
-		// this element out of flow, so siblings can FLIP to their new positions.
 		snapshotLayoutTree(state);
-
 		addPopStyle(state);
 
-		// Only elements with an actual exit animation should block.
-		// Elements with only layoutId (no exit) should run their layout animation
-		// in parallel without blocking other animations.
-		const blocksExit = !!state.options.exit;
+		const session: ExitSession = { blocksExit: !!state.options.exit, isComplete: false };
+		exitDom.set(el, session);
+		if (session.blocksExit) blockingExitCount++;
 
-		exitDom.set(el, { blocksExit });
-
-		// Only increment the blocking counter for elements that should block
-		if (blocksExit) {
-			blockingExitCount++;
-			// Notify layout-only elements to start their animations in parallel
-			notifyExitStart(el);
-		}
-
-		state.presenceContainer = el as HTMLElement;
-
-		// Defer to next microtask to ensure updated layout/values
-		delay(() => {
-			state.setActive("exit", true);
-			state.getSnapshot(state.options, false);
-			state.didUpdate();
+		state.exit().then(() => {
+			if (exitDom.get(el) !== session) return;
+			session.isComplete = true;
+			finishOutro(el);
 		});
+		state.didUpdate();
+	}
+
+	/**
+	 * Svelte creates the outro animation a frame after starting it, right after `outrostart`. An exit that completed
+	 * before then finishes it here.
+	 */
+	function handleOutroBegin(el: Element) {
+		if (exitDom.get(el)?.isComplete) queueMicrotask(() => finishOutro(el));
 	}
 
 	function handleOutroEnd(el: Element) {
@@ -206,9 +189,9 @@
 		trackPosition,
 		untrackPosition,
 		isWaitBlocked,
-		subscribeToExitStart,
 		onIntroStart: handleIntroStart,
 		onOutroStart: handleOutroStart,
+		onOutroBegin: handleOutroBegin,
 		onOutroEnd: handleOutroEnd,
 	});
 </script>

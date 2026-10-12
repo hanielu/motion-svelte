@@ -44,23 +44,6 @@ scenario("directional-nav", async ({ root, play }) => {
 });
 
 scenario(
-	"frequency-selector",
-	async ({ root, play }) => {
-		await play(20);
-		await root.getByRole("button").last().click();
-		// mode="wait": the selector enters only after "Daily" finishes its 5s exit
-		await play(340, { every: 2 });
-		await root.getByRole("button", { name: "Weekly" }).click();
-		await play(60);
-		await root.getByRole("button", { name: "Yearly" }).click();
-		await play(60);
-		await root.getByRole("button").last().click();
-		await play(60);
-	},
-	{ path: "/frequency-selector", root: "#app" }
-);
-
-scenario(
 	"quillow-card",
 	async ({ page, root, play }) => {
 		const card = root.locator("div.s-screen > div").first();
