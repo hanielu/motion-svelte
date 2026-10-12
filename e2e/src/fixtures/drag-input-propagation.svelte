@@ -41,14 +41,15 @@
 			<option value="2">Option 2</option>
 			<option value="3">Option 3</option>
 		</select>
-		<label
-			data-testid="label"
-			style="display: flex; align-items: center; gap: 5px; background: white; padding: 5px"
-		>
+		<label data-testid="label" style="display: flex; align-items: center; gap: 5px; background: white; padding: 5px">
 			<input type="checkbox" data-testid="checkbox" />
 			Check
 		</label>
-		<div contenteditable="true" data-testid="contenteditable" style="width: 80px; height: 30px; padding: 5px; background: white">
+		<div
+			contenteditable="true"
+			data-testid="contenteditable"
+			style="width: 80px; height: 30px; padding: 5px; background: white"
+		>
 			Edit me
 		</div>
 	</motion.div>

@@ -240,7 +240,10 @@ test.describe("Drag", () => {
 	});
 
 	test("Element returns to center on x axis only with dragSnapToOrigin='x'", async ({ page }) => {
-		test.fail(true, "motion-sv: dragSnapToOrigin='x' snaps both axes (only boolean is supported), so top is 0 instead of staying at -10");
+		test.fail(
+			true,
+			"motion-sv: dragSnapToOrigin='x' snaps both axes (only boolean is supported), so top is 0 instead of staying at -10"
+		);
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag&return=x&left=-10&top=-10");
 		await wait(page, 200);
@@ -263,7 +266,10 @@ test.describe("Drag", () => {
 	});
 
 	test("Element returns to center on y axis only with dragSnapToOrigin='y'", async ({ page }) => {
-		test.fail(true, "motion-sv: dragSnapToOrigin='y' snaps both axes (only boolean is supported), so left is 0 instead of staying at -10");
+		test.fail(
+			true,
+			"motion-sv: dragSnapToOrigin='y' snaps both axes (only boolean is supported), so left is 0 instead of staying at -10"
+		);
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag&return=y&left=-10&top=-10");
 		await wait(page, 200);
@@ -566,7 +572,10 @@ test.describe("Drag & Layout", () => {
 	test("doesn't reset drag constraints (ref-based), while dragging, on unrelated parent component updates", async ({
 		page,
 	}) => {
-		test.fail(true, "motion-sv: a dragConstraints element bound via bind:ref on a parent motion component never reaches the child's options, so constraints only resolve on a later remeasure; ends at 345 instead of 150 unless a sibling remeasure lands mid-drag");
+		test.fail(
+			true,
+			"motion-sv: a dragConstraints element bound via bind:ref on a parent motion component never reaches the child's options, so constraints only resolve on a later remeasure; ends at 345 instead of 150 unless a sibling remeasure lands mid-drag"
+		);
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag-ref-constraints&layout=true");
 		await wait(page, 200);
@@ -587,7 +596,10 @@ test.describe("Drag & Layout", () => {
 
 test.describe("Drag Constraints Return", () => {
 	test("Returns to constraints when released outside bounds", async ({ page }) => {
-		test.fail(true, "motion-sv: a dragConstraints element bound via bind:ref on a parent motion component never reaches the child's options, so constraints stay unresolved and the box stays at right 460 instead of returning inside 302");
+		test.fail(
+			true,
+			"motion-sv: a dragConstraints element bound via bind:ref on a parent motion component never reaches the child's options, so constraints stay unresolved and the box stays at right 460 instead of returning inside 302"
+		);
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag-constraints-return");
 		await wait(page, 200);
@@ -602,7 +614,9 @@ test.describe("Drag Constraints Return", () => {
 		await trigger(draggable, "pointerup");
 		await wait(page, 2000); // Wait for animation to complete
 		await should(async () => {
-			const { left, top, right, bottom } = await draggable.first().evaluate((el) => el.getBoundingClientRect().toJSON());
+			const { left, top, right, bottom } = await draggable
+				.first()
+				.evaluate((el) => el.getBoundingClientRect().toJSON());
 
 			// Constraints box is 300x300, element is 100x100
 			// Element should be within the constraints (max position: 200, 200)
@@ -614,7 +628,10 @@ test.describe("Drag Constraints Return", () => {
 	});
 
 	test("Returns to constraints when released outside and clicked during animation", async ({ page }) => {
-		test.fail(true, "motion-sv: a dragConstraints element bound via bind:ref on a parent motion component never reaches the child's options, so constraints stay unresolved and the box stays at right 460 instead of returning inside 302");
+		test.fail(
+			true,
+			"motion-sv: a dragConstraints element bound via bind:ref on a parent motion component never reaches the child's options, so constraints stay unresolved and the box stays at right 460 instead of returning inside 302"
+		);
 		const draggable = page.locator("[data-testid='draggable']");
 		await visit(page, "?test=drag-constraints-return");
 		await wait(page, 200);
@@ -634,7 +651,9 @@ test.describe("Drag Constraints Return", () => {
 		await trigger(draggable, "pointerup");
 		await wait(page, 2000); // Wait for animation to complete
 		await should(async () => {
-			const { left, top, right, bottom } = await draggable.first().evaluate((el) => el.getBoundingClientRect().toJSON());
+			const { left, top, right, bottom } = await draggable
+				.first()
+				.evaluate((el) => el.getBoundingClientRect().toJSON());
 
 			// Constraints box is 300x300, element is 100x100
 			// Element should be within the constraints (max position: 200, 200)

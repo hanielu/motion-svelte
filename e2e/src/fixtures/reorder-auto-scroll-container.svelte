@@ -46,6 +46,7 @@
 <div style="height: 500px; background: #222">
 	<p style="color: #fff; padding: 20px">Bottom spacer</p>
 </div>
+
 <style>
 	:global {
 		html,

@@ -14,11 +14,7 @@
 	<div id="accordion" style="width: 400px">
 		{#each items as item (item.id)}
 			<div>
-				<button
-					class="trigger"
-					data-id={item.id}
-					onclick={() => (openId = openId === item.id ? null : item.id)}
-				>
+				<button class="trigger" data-id={item.id} onclick={() => (openId = openId === item.id ? null : item.id)}>
 					{item.title}
 				</button>
 				<AnimatePresence initial={false}>

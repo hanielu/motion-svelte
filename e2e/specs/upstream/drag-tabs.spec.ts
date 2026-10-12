@@ -67,9 +67,9 @@ test.describe("Tabs demo", () => {
 		await trigger(lettuce, "pointerup");
 		await wait(page, 200);
 		await should(async () => {
-			expect(await page.locator("#Lettuce-content").evaluate((content) => window.getComputedStyle(content).opacity)).toBe(
-				"1"
-			);
+			expect(
+				await page.locator("#Lettuce-content").evaluate((content) => window.getComputedStyle(content).opacity)
+			).toBe("1");
 		});
 		await wait(page, 200);
 		await trigger(tomato, "pointerdown", 40, 10);

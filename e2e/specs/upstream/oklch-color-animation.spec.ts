@@ -3,7 +3,10 @@ import { should, visit, wait } from "../../harness/upstream.js";
 
 test.describe("oklch color animation", () => {
 	test("animates to the correct oklch target color", async ({ page }) => {
-		test.skip(true, "env: upstream only passes under old Electron. Chromium supports oklch, so the branch upstream skips under Electron runs and reads the mount-time onAnimationComplete result rgb(255, 255, 255) (and computed oklch() never serializes as rgb)");
+		test.skip(
+			true,
+			"env: upstream only passes under old Electron. Chromium supports oklch, so the branch upstream skips under Electron runs and reads the mount-time onAnimationComplete result rgb(255, 255, 255) (and computed oklch() never serializes as rgb)"
+		);
 		const result = page.locator("#result");
 		await visit(page, "?test=oklch-color-animation");
 		await wait(page, 200);

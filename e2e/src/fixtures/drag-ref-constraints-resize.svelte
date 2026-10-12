@@ -16,11 +16,5 @@
 </script>
 
 <div bind:this={ref} style={container} id="constraints">
-	<motion.div
-		drag
-		dragConstraints={ref}
-		style={child}
-		onclick={() => (count = count + 1)}
-		id="box"
-	/>
+	<motion.div drag dragConstraints={ref} style={child} onclick={() => (count = count + 1)} id="box" />
 </div>

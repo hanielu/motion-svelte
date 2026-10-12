@@ -107,7 +107,10 @@ function virtualizeAnimations() {
 			return value === null ? null : value - Number(document.timeline.currentTime) + performance.now();
 		},
 		set(value: number | null) {
-			startTime.set!.call(this, value === null ? null : value - performance.now() + Number(document.timeline.currentTime));
+			startTime.set!.call(
+				this,
+				value === null ? null : value - performance.now() + Number(document.timeline.currentTime)
+			);
 		},
 	});
 

@@ -7,7 +7,10 @@
 
 	$effect(() => {
 		if (step < 2) {
-			const timeout = setTimeout(layout.update.with(() => (step = step + 1)), 100);
+			const timeout = setTimeout(
+				layout.update.with(() => (step = step + 1)),
+				100
+			);
 
 			return () => clearTimeout(timeout);
 		}

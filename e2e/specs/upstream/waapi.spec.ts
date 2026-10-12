@@ -65,7 +65,9 @@ test.describe("waapi", () => {
 	});
 
 	// Skipping in CI as it's flaky
-	test.skip("Should match WAAPI and main thread startTimes, and allow explicitly setting startTime", async ({ page }) => {
+	test.skip("Should match WAAPI and main thread startTimes, and allow explicitly setting startTime", async ({
+		page,
+	}) => {
 		const html = (selector: string) => page.locator(selector).evaluateAll((els) => els.map((el) => el.innerHTML));
 
 		await visit(page, "?test=waapi-sync");

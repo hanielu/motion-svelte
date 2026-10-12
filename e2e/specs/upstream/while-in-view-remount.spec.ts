@@ -43,7 +43,11 @@ test.describe("whileInView remount (#3079)", () => {
 	});
 
 	test("Fires onViewportEnter after remount", async ({ page }) => {
-		const inView = () => page.locator("#card1").first().evaluate((el) => (el as HTMLElement).dataset.inView);
+		const inView = () =>
+			page
+				.locator("#card1")
+				.first()
+				.evaluate((el) => (el as HTMLElement).dataset.inView);
 
 		// Start on projects page
 		await visit(page, "?test=while-in-view-remount");

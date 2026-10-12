@@ -15,9 +15,7 @@
 
 <!-- Spacer to make page scrollable -->
 <div style="height: 300px; background: #222">
-	<p style="color: #fff; padding: 20px">
-		Scroll down to see the reorder list. The page is scrollable.
-	</p>
+	<p style="color: #fff; padding: 20px">Scroll down to see the reorder list. The page is scrollable.</p>
 </div>
 <div data-testid="scroll-container" style="margin: 0 auto; width: 300px; background: #444">
 	<ReorderGroup axis="y" onReorder={(newOrder) => (items = newOrder)} values={items}>
@@ -43,6 +41,7 @@
 <div style="height: 500px; background: #222">
 	<p style="color: #fff; padding: 20px">Bottom spacer</p>
 </div>
+
 <style>
 	:global {
 		html,

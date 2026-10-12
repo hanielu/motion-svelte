@@ -28,27 +28,13 @@
 {#if useWindowScroll}
 	<!-- Window scroll test: draggable in a tall document -->
 	<div style={windowContentStyle}>
-		<motion.div
-			id="draggable"
-			data-testid="draggable"
-			drag
-			dragElastic={0}
-			dragMomentum={false}
-			style={boxStyle}
-		/>
+		<motion.div id="draggable" data-testid="draggable" drag dragElastic={0} dragMomentum={false} style={boxStyle} />
 	</div>
 {:else}
 	<!-- Element scroll test: draggable in a scrollable container -->
 	<div id="scrollable" data-testid="scrollable" style={scrollableStyle}>
 		<div style={contentStyle}>
-			<motion.div
-				id="draggable"
-				data-testid="draggable"
-				drag
-				dragElastic={0}
-				dragMomentum={false}
-				style={boxStyle}
-			/>
+			<motion.div id="draggable" data-testid="draggable" drag dragElastic={0} dragMomentum={false} style={boxStyle} />
 		</div>
 	</div>
 {/if}

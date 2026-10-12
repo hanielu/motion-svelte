@@ -12,7 +12,9 @@ import { should, visit, wait } from "../../harness/upstream.js";
  */
 test.describe("Variant propagation to lazy-loaded Suspense children", () => {
 	const opacityOf = (page: Page) =>
-		page.locator("#child").evaluate((el) => parseFloat((el as HTMLElement).style.opacity), undefined, { timeout: 2000 });
+		page
+			.locator("#child")
+			.evaluate((el) => parseFloat((el as HTMLElement).style.opacity), undefined, { timeout: 2000 });
 
 	test("child should animate from initial variant, not jump to animate values", async ({ page }) => {
 		await visit(page, "?test=variant-propagation-suspense");

@@ -21,10 +21,6 @@
 </script>
 
 <div style={page}>
-	<div
-		style={container}
-		onpointerdown={(e) => dragControls.start(e, { snapToCursor: true })}
-		id="scroll-trigger"
-	></div>
+	<div style={container} onpointerdown={(e) => dragControls.start(e, { snapToCursor: true })} id="scroll-trigger"></div>
 	<motion.div drag {dragControls} whilePress={{ scale: 0.95 }} style={child} id="scrollable" />
 </div>

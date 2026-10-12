@@ -33,7 +33,9 @@ test.describe("Drag layout reorder in StrictMode", () => {
 		await wait(page, 500);
 
 		// Verify expansion happened
-		await should(async () => expect(await page.locator("[data-testid='placeholder-Existing1a']").count()).toBeGreaterThan(0));
+		await should(async () =>
+			expect(await page.locator("[data-testid='placeholder-Existing1a']").count()).toBeGreaterThan(0)
+		);
 
 		// The dragged file MUST stay near its pre-expand position.
 		// Without the fix, the file would jump down by ~105px

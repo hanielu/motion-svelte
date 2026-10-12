@@ -3,7 +3,10 @@ import { should, trigger, visit, wait } from "../../harness/upstream.js";
 
 test.describe("Reorder with virtualized list (@tanstack/react-virtual)", () => {
 	test("Preserves all items after reorder", async ({ page }) => {
-		test.fail(true, "motion-sv: ReorderGroup calls onReorder with only the measured (rendered) items, so 50 items drop to 6; upstream swaps within the full values array");
+		test.fail(
+			true,
+			"motion-sv: ReorderGroup calls onReorder with only the measured (rendered) items, so 50 items drop to 6; upstream swaps within the full values array"
+		);
 		const item1 = page.locator("#Item-1");
 		await visit(page, "?test=reorder-virtualized");
 		await wait(page, 200);

@@ -31,9 +31,7 @@ test.describe("Animation resume after Suspense", () => {
 			// Right after remount, opacity should be reset to initial (0),
 			// not stuck at an intermediate value from before suspension.
 			// Use getComputedStyle since the inline style may not be set yet.
-			const opacity = parseFloat(
-				await page.locator("#target").evaluate((el) => window.getComputedStyle(el).opacity)
-			);
+			const opacity = parseFloat(await page.locator("#target").evaluate((el) => window.getComputedStyle(el).opacity));
 			expect(opacity).toBeLessThan(0.3);
 		});
 	});

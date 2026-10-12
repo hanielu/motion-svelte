@@ -42,7 +42,8 @@
 	const stringOpacity = useTransform(stringScroll.scrollYProgress, [0, 1], [1, 0]);
 
 	const spacer = "height: 100vh";
-	const targetStyle = "height: 100vh; display: flex; align-items: center; justify-content: center; flex-direction: column";
+	const targetStyle =
+		"height: 100vh; display: flex; align-items: center; justify-content: center; flex-direction: column";
 	const box = {
 		width: 100,
 		height: 100,

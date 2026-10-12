@@ -35,7 +35,10 @@ function expectCloseTo(actual: number, expected: number, delta: number) {
 
 test.describe("Drag SVG with viewBox", () => {
 	test("Correctly scales drag distance when viewBox differs from rendered size", async ({ page }) => {
-		test.skip(true, "unsupported: MotionConfig has no transformPagePoint prop and transformViewBoxPoint is not exported");
+		test.skip(
+			true,
+			"unsupported: MotionConfig has no transformPagePoint prop and transformViewBoxPoint is not exported"
+		);
 		// viewBox is 100x100, rendered size is 500x500
 		// Scale factor (screen to SVG): 100/500 = 0.2
 		// Rect starts at SVG coords (10, 10) with size (20, 20)
@@ -94,7 +97,10 @@ test.describe("Drag SVG with viewBox", () => {
 	});
 
 	test("Handles non-uniform scaling (different x and y scale factors)", async ({ page }) => {
-		test.skip(true, "unsupported: MotionConfig has no transformPagePoint prop and transformViewBoxPoint is not exported");
+		test.skip(
+			true,
+			"unsupported: MotionConfig has no transformPagePoint prop and transformViewBoxPoint is not exported"
+		);
 		// viewBox is 100x200, rendered is 500x400
 		// X scale: 100/500 = 0.2, Y scale: 200/400 = 0.5
 		const draggable = page.locator("[data-testid='draggable']");
@@ -120,7 +126,10 @@ test.describe("Drag SVG with viewBox", () => {
 	});
 
 	test("Handles viewBox with non-zero origin", async ({ page }) => {
-		test.skip(true, "unsupported: MotionConfig has no transformPagePoint prop and transformViewBoxPoint is not exported");
+		test.skip(
+			true,
+			"unsupported: MotionConfig has no transformPagePoint prop and transformViewBoxPoint is not exported"
+		);
 		// viewBox starts at (50, 50) with size 100x100, rendered at 500x500
 		// Scale factor: 100/500 = 0.2
 		// The viewBox origin offset shouldn't affect drag deltas

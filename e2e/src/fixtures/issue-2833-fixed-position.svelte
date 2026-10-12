@@ -17,7 +17,10 @@
 </script>
 
 {#snippet child()}
-	<div id="fixed-child" style="position: fixed; top: 10px; left: 10px; width: 50px; height: 50px; background: red"></div>
+	<div
+		id="fixed-child"
+		style="position: fixed; top: 10px; left: 10px; width: 50px; height: 50px; background: red"
+	></div>
 {/snippet}
 
 <div style="padding: 200px">

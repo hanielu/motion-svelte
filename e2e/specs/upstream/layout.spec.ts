@@ -21,7 +21,10 @@ test.describe("Layout animation", () => {
 	});
 
 	test(`It correctly fires layout="position" animations`, async ({ page }) => {
-		test.skip(true, `unsupported: <layout.*> forces layout={true}, so layout="position" can't be combined with layout.update()`);
+		test.skip(
+			true,
+			`unsupported: <layout.*> forces layout={true}, so layout="position" can't be combined with layout.update()`
+		);
 		const box = page.locator("#box");
 		await visit(page, "?test=layout&type=position");
 		await wait(page, 50);
@@ -32,7 +35,10 @@ test.describe("Layout animation", () => {
 	});
 
 	test(`It correctly fires layout="size" animations`, async ({ page }) => {
-		test.skip(true, `unsupported: <layout.*> forces layout={true}, so layout="size" can't be combined with layout.update()`);
+		test.skip(
+			true,
+			`unsupported: <layout.*> forces layout={true}, so layout="size" can't be combined with layout.update()`
+		);
 		const box = page.locator("#box");
 		await visit(page, "?test=layout&type=size");
 		await wait(page, 50);
@@ -203,7 +209,10 @@ test.describe("Layout animation", () => {
 	});
 
 	test(`It correctly fires layout="x" animations, only animating the x axis`, async ({ page }) => {
-		test.skip(true, `unsupported: <layout.*> forces layout={true}, so layout="x" can't be combined with layout.update()`);
+		test.skip(
+			true,
+			`unsupported: <layout.*> forces layout={true}, so layout="x" can't be combined with layout.update()`
+		);
 		const box = page.locator("#box");
 		await visit(page, "?test=layout&type=x");
 		await wait(page, 50);
@@ -214,7 +223,10 @@ test.describe("Layout animation", () => {
 	});
 
 	test(`It correctly fires layout="y" animations, only animating the y axis`, async ({ page }) => {
-		test.skip(true, `unsupported: <layout.*> forces layout={true}, so layout="y" can't be combined with layout.update()`);
+		test.skip(
+			true,
+			`unsupported: <layout.*> forces layout={true}, so layout="y" can't be combined with layout.update()`
+		);
 		const box = page.locator("#box");
 		await visit(page, "?test=layout&type=y");
 		await wait(page, 50);
@@ -229,7 +241,11 @@ test.describe("Layout animation", () => {
 			true,
 			"motion-sv: exit-less layoutId element inside AnimatePresence is removed immediately on toggle-off, so #box is gone instead of staying (opacity 1) for its shared-layout exit"
 		);
-		const opacity = () => page.locator("#box").first().evaluate((el) => (el as HTMLElement).style.opacity);
+		const opacity = () =>
+			page
+				.locator("#box")
+				.first()
+				.evaluate((el) => (el as HTMLElement).style.opacity);
 		await visit(page, "?test=layout-crossfade");
 		await wait(page, 50);
 		await trigger(page.locator("button"), "click");

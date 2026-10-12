@@ -14,7 +14,13 @@
 	<button id="remove" onclick={() => (range = range.slice(0, -1))}>Remove</button>
 	<AnimatePresence>
 		{#each range as i (i)}
-			<motion.div id={`box-${i}`} class="box" style={boxStyles} transition={{ duration: 0.5 }} exit={{ opacity: 0.5 }} />
+			<motion.div
+				id={`box-${i}`}
+				class="box"
+				style={boxStyles}
+				transition={{ duration: 0.5 }}
+				exit={{ opacity: 0.5 }}
+			/>
 		{/each}
 	</AnimatePresence>
 </div>

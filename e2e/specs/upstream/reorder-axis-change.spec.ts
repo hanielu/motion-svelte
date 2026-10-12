@@ -33,7 +33,10 @@ test.describe("Reorder axis change on resize", () => {
 	});
 
 	test("Reorders correctly after axis changes via resize", async ({ page }) => {
-		test.fail(true, "motion-sv: once ReorderGroup's axis changes after mount (y->x via matchMedia here), ReorderItem drags never start again, so the order never changes");
+		test.fail(
+			true,
+			"motion-sv: once ReorderGroup's axis changes after mount (y->x via matchMedia here), ReorderItem drags never start again, so the order never changes"
+		);
 		const tomato = page.locator("[data-testid='Tomato']");
 		// Start wide so axis='x'
 		await page.setViewportSize({ width: 600, height: 600 });

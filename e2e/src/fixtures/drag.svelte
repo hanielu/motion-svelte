@@ -22,7 +22,8 @@
 	const bottom = parseFloat(params.get("bottom")!) || undefined;
 	const showChild = Boolean(params.get("showChild"));
 	const returnParam = params.get("return");
-	const snapToOrigin: boolean | "x" | "y" = returnParam === "x" || returnParam === "y" ? returnParam : Boolean(returnParam);
+	const snapToOrigin: boolean | "x" | "y" =
+		returnParam === "x" || returnParam === "y" ? returnParam : Boolean(returnParam);
 	const x = getValueParam(params, "x", isPercentage);
 	const y = getValueParam(params, "y", isPercentage);
 	const layout = params.get("layout") || undefined;

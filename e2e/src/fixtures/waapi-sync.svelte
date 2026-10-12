@@ -27,7 +27,11 @@
 
 		const startTime = 101;
 
-		const waapiExplicitAnimation = animate(waapiRef, { filter: ["blur(0px)", "blur(1px)"] }, { ...settings, startTime });
+		const waapiExplicitAnimation = animate(
+			waapiRef,
+			{ filter: ["blur(0px)", "blur(1px)"] },
+			{ ...settings, startTime }
+		);
 		const syncExplicitAnimation = animate(syncRef, { x: [0, 100] }, { ...settings, startTime });
 
 		const timeout = setTimeout(() => {

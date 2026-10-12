@@ -25,9 +25,7 @@
 	});
 </script>
 
-<div
-	style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #E0E0E0"
->
+<div style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #E0E0E0">
 	<div
 		id="scroll-container"
 		bind:this={scrollContainerRef}

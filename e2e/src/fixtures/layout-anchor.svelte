@@ -89,7 +89,9 @@
 					anchorX = preset.x;
 					anchorY = preset.y;
 				}}
-				style="padding: 4px 8px; border: {active ? '2px solid #007aff' : '1px solid #ccc'}; border-radius: 4px; background: {active
+				style="padding: 4px 8px; border: {active
+					? '2px solid #007aff'
+					: '1px solid #ccc'}; border-radius: 4px; background: {active
 					? '#e8f0fe'
 					: '#fff'}; cursor: pointer; font-size: 12px"
 			>

@@ -9,7 +9,10 @@ import { scrollToTop, should, trigger, visit, wait } from "../../harness/upstrea
 test.describe("Reorder auto-scroll", () => {
 	test.describe("with scrollable container", () => {
 		test("Auto-scrolls down when dragging near bottom edge", async ({ page }) => {
-			test.fail(true, "motion-sv: ReorderItem ignores `as` and renders <div> not <li>, so the li styles (60px tall) never apply and the list never overflows");
+			test.fail(
+				true,
+				"motion-sv: ReorderItem ignores `as` and renders <div> not <li>, so the li styles (60px tall) never apply and the list never overflows"
+			);
 			const container = page.locator("[data-testid='scroll-container']");
 			const item = page.locator("[data-testid='0']");
 			await visit(page, "?test=reorder-auto-scroll");
@@ -31,7 +34,10 @@ test.describe("Reorder auto-scroll", () => {
 		});
 
 		test("Auto-scrolls up when dragging near top edge", async ({ page }) => {
-			test.fail(true, "motion-sv: ReorderItem ignores `as` and renders <div> not <li>, so the li styles (60px tall) never apply and the list never overflows");
+			test.fail(
+				true,
+				"motion-sv: ReorderItem ignores `as` and renders <div> not <li>, so the li styles (60px tall) never apply and the list never overflows"
+			);
 			const container = page.locator("[data-testid='scroll-container']");
 			const item = page.locator("[data-testid='8']");
 			await visit(page, "?test=reorder-auto-scroll");
@@ -53,7 +59,10 @@ test.describe("Reorder auto-scroll", () => {
 
 	test.describe("with scrollable container inside scrollable page", () => {
 		test("Auto-scrolls container after page has been scrolled", async ({ page }) => {
-			test.fail(true, "motion-sv: ReorderItem ignores `as` and renders <div> not <li>, so the li styles (60px tall) never apply and the list never overflows");
+			test.fail(
+				true,
+				"motion-sv: ReorderItem ignores `as` and renders <div> not <li>, so the li styles (60px tall) never apply and the list never overflows"
+			);
 			const container = page.locator("[data-testid='scroll-container']");
 			const item = page.locator("[data-testid='0']");
 			await visit(page, "?test=reorder-auto-scroll-container");

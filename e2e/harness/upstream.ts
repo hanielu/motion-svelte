@@ -34,7 +34,13 @@ export function should(callback: () => Promise<void>) {
  * `.trigger(type, x?, y?, options?)`: dispatches a synthetic event on the element itself, at (x, y) from its
  * top-left corner (its center by default), without scrolling or actionability checks. `init` adds event properties.
  */
-export async function trigger(target: Locator, type: string, x?: number, y?: number, init: Record<string, unknown> = {}) {
+export async function trigger(
+	target: Locator,
+	type: string,
+	x?: number,
+	y?: number,
+	init: Record<string, unknown> = {}
+) {
 	await target.first().evaluate(
 		(el, { type, x, y, init }) => {
 			const rect = el.getBoundingClientRect();

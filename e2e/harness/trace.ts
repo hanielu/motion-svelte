@@ -26,7 +26,17 @@ const BASELINES_DIR = join(import.meta.dirname, "..", "baselines", process.platf
 
 /** Samples every element under `rootSelector`. Runs in the page, so it must be self-contained. */
 export function sampleFrame(rootSelector: string): Frame {
-	const STYLES = ["opacity", "transform", "backgroundColor", "color", "borderRadius", "clipPath", "filter", "boxShadow", "visibility"];
+	const STYLES = [
+		"opacity",
+		"transform",
+		"backgroundColor",
+		"color",
+		"borderRadius",
+		"clipPath",
+		"filter",
+		"boxShadow",
+		"visibility",
+	];
 	const SVG_STYLES = ["fill", "stroke", "strokeDasharray", "strokeDashoffset"];
 
 	const root = document.querySelector(rootSelector);
@@ -61,7 +71,13 @@ export function sampleFrame(rootSelector: string): Frame {
 		// Path data can be thousands of characters (morphing); its bounds and length change whenever the shape does.
 		if (el instanceof SVGGeometryElement) {
 			const bounds = el.getBBox();
-			state.geometry = [round(bounds.x), round(bounds.y), round(bounds.width), round(bounds.height), round(el.getTotalLength())];
+			state.geometry = [
+				round(bounds.x),
+				round(bounds.y),
+				round(bounds.width),
+				round(bounds.height),
+				round(el.getTotalLength()),
+			];
 		}
 		frame[key] = state;
 	}
@@ -133,7 +149,9 @@ function decode(trace: Trace): Map<string, (ElementState | null)[]> {
 /** One line per element-frame entry, so baselines diff readably in git. */
 function serialize(trace: Trace): string {
 	const elements = Object.entries(trace.elements).map(([key, changes]) => {
-		const entries = Object.entries(changes).map(([frame, state]) => `\t\t\t${JSON.stringify(frame)}: ${JSON.stringify(state)}`);
+		const entries = Object.entries(changes).map(
+			([frame, state]) => `\t\t\t${JSON.stringify(frame)}: ${JSON.stringify(state)}`
+		);
 		return `\t\t${JSON.stringify(key)}: {\n${entries.join(",\n")}\n\t\t}`;
 	});
 	return `{\n\t"frames": ${trace.frames},\n\t"times": ${JSON.stringify(trace.times)},\n\t"elements": {\n${elements.join(",\n")}\n\t}\n}\n`;
@@ -198,8 +216,7 @@ function describe(diffs: ElementDiff[], times: number[]): string {
 	const lines = diffs
 		.slice(0, 15)
 		.map(
-			(d) =>
-				`  ${d.key}: ${d.count} frame(s) differ, ${at(d.first)}..${at(d.last)}\n    first difference: ${d.detail}`
+			(d) => `  ${d.key}: ${d.count} frame(s) differ, ${at(d.first)}..${at(d.last)}\n    first difference: ${d.detail}`
 		);
 	if (diffs.length > 15) lines.push(`  ...and ${diffs.length - 15} more element(s)`);
 	return `${diffs.length} element(s) moved differently from the baseline:\n${lines.join("\n")}`;

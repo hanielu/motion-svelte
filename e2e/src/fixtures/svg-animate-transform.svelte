@@ -48,7 +48,13 @@
 			background: "linear-gradient(180deg, #7700ff 0%, rgb(68, 0, 255) 100%)",
 		}}
 	>
-		<motion.div class="icon-container" style={{ ...box }} drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.5}>
+		<motion.div
+			class="icon-container"
+			style={{ ...box }}
+			drag="x"
+			dragConstraints={{ left: 0, right: 0 }}
+			dragElastic={0.5}
+		>
 			<svg class="progress-icon" viewBox="0 0 50 50">
 				<motion.path
 					bind:ref={pathRef}

@@ -563,7 +563,9 @@ test.describe("Shared layout: Works with queueMicrotasks", () => {
 		await wait(page, 150);
 		await trigger(page.locator("#open"), "click");
 		await wait(page, 150);
-		await should(async () => expect(await page.locator("#error").evaluate((el) => (el as HTMLElement).innerText)).toBe(""));
+		await should(async () =>
+			expect(await page.locator("#error").evaluate((el) => (el as HTMLElement).innerText)).toBe("")
+		);
 	});
 });
 

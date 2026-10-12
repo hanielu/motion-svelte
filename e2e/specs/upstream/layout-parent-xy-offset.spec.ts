@@ -2,7 +2,9 @@ import { expect, test } from "@playwright/test";
 import { visit, wait } from "../../harness/upstream.js";
 
 test.describe("Layout: nested in motion.div with x/y (#3244)", () => {
-	test("layoutId element inside motion.div with x/y should not get a projection transform on mount", async ({ page }) => {
+	test("layoutId element inside motion.div with x/y should not get a projection transform on mount", async ({
+		page,
+	}) => {
 		// onBeforeLoad
 		await page.addInitScript(() => {
 			// Set up MutationObserver before React renders so we catch
