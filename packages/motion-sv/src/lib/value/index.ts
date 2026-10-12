@@ -1,4 +1,3 @@
-export * from "./use-computed.svelte.js";
 export * from "./use-combine-values.svelte.js";
 export * from "./use-transform.svelte.js";
 export * from "./use-time.js";

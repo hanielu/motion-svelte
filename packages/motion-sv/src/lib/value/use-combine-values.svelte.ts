@@ -1,40 +1,55 @@
-import { type MotionValue, cancelFrame, frame, motionValue } from "motion-dom";
+import { type MotionValue, cancelFrame, collectMotionValues, frame, motionValue } from "motion-dom";
+import { untrack } from "svelte";
 
-export function useCombineMotionValues<T>(combineValues: () => T) {
-	/**
-	 * Initialise the returned motion value. This remains the same between renders.
-	 */
-	const value = motionValue(combineValues());
-
-	/**
-	 * Create a function that will update the template motion value with the latest values.
-	 * This is pre-bound so whenever a motion value updates it can schedule its
-	 * execution in Framesync. If it's already been scheduled it won't be fired twice
-	 * in a single frame.
-	 */
-	const updateValue = () => value.set(combineValues());
-
-	/**
-	 * Subscribe to all motion values found within the template. Whenever any of them change,
-	 * schedule an update.
-	 */
-	const scheduleUpdate = () => frame.preRender(updateValue, false, true);
-	let subscriptions: VoidFunction[] = [];
-
-	const subscribe = (values: MotionValue[]) => {
-		subscriptions = values.map((v) => v.on("change", scheduleUpdate));
-	};
-	const unsubscribe = () => {
+/** Run `update` once per frame whenever one of `values` changes. Returns the unsubscribe function. */
+function followValues(values: MotionValue[], update: VoidFunction) {
+	const scheduleUpdate = () => frame.preRender(update, false, true);
+	const subscriptions = values.map((value) => value.on("change", scheduleUpdate));
+	return () => {
 		subscriptions.forEach((unsubscribe) => unsubscribe());
-		cancelFrame(updateValue);
+		cancelFrame(update);
 	};
+}
 
-	$effect(() => unsubscribe);
+/**
+ * A motion value computed by `combine` from `values`, once per frame whenever one of them changes. Svelte state
+ * that `combine` reads recomputes it too, as a React re-render would.
+ */
+export function useCombineMotionValues<T>(values: MotionValue[], combine: () => T) {
+	const value = motionValue(combine());
+	const update = () => value.set(combine());
 
-	return {
-		subscribe,
-		unsubscribe,
-		value,
-		updateValue,
-	};
+	$effect(() => {
+		const latest = combine();
+		// Untracked: listeners of the combined value must not make this effect resubscribe
+		untrack(() => value.set(latest));
+		return followValues(values, update);
+	});
+
+	return value;
+}
+
+/**
+ * A motion value computed by `compute` from the motion values it reads, once per frame whenever one of them
+ * changes. Svelte state it reads recomputes it, and collects its motion values again.
+ */
+export function useComputed<T>(compute: () => T) {
+	const value = motionValue(compute());
+	const update = () => value.set(compute());
+
+	$effect(() => {
+		collectMotionValues.current = [];
+		let latest: T;
+		let values: MotionValue[];
+		try {
+			latest = compute();
+		} finally {
+			values = collectMotionValues.current;
+			collectMotionValues.current = undefined;
+		}
+		untrack(() => value.set(latest));
+		return followValues(values, update);
+	});
+
+	return value;
 }

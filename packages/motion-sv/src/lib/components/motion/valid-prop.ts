@@ -12,8 +12,6 @@ const validMotionProps = new Set<keyof MotionProps>([
 	"variants",
 	"initial",
 	"style",
-	// "values",
-	"variants",
 	"transition",
 	"transformTemplate",
 	"custom",
@@ -28,22 +26,16 @@ const validMotionProps = new Set<keyof MotionProps>([
 	"onMeasureDragConstraints",
 	"onDirectionLock",
 	"onDragTransitionEnd",
-	// "_dragX",
-	// "_dragY",
 	"onHoverStart",
 	"onHoverEnd",
 	"onViewportEnter",
 	"onViewportLeave",
-	// "globalTapTarget",
+	"inViewOptions",
+	"onPress",
+	"onPressStart",
+	"onPressCancel",
+	"globalPressTarget",
 	"ignoreStrict",
-	// "viewport",
-
-	// just doing what the vue version does
-	"forwardMotionProps",
-	"as",
-	"ref",
-
-	// atp idk,
 ]);
 
 /**

@@ -1,16 +1,6 @@
 import { Feature } from "#lib/features/feature.js";
-import type { Options } from "#lib/types/index.js";
+import { extractEventInfo } from "#lib/events/index.js";
 import { frame, press } from "motion-dom";
-import type { EventInfo } from "motion-dom";
-
-function extractEventInfo(event: PointerEvent): EventInfo {
-	return {
-		point: {
-			x: event.pageX,
-			y: event.pageY,
-		},
-	};
-}
 
 export class PressGesture extends Feature {
 	static key = "press" as const;
@@ -19,34 +9,29 @@ export class PressGesture extends Feature {
 	private removePress: VoidFunction | undefined;
 
 	private isActive() {
-		const { whilePress, onPress, onPressCancel, onPressStart } = this.state.options as any;
+		const { whilePress, onPress, onPressCancel, onPressStart } = this.state.options;
 		return Boolean(whilePress || onPress || onPressCancel || onPressStart);
 	}
 
 	private register() {
-		const element = this.state.element as HTMLElement;
+		const element = this.state.element;
 		if (!element || !this.isActive()) return;
 
-		this.removePress?.();
 		this.removePress = press(
 			element,
 			(_el, startEvent) => {
-				const props = this.state.options as Options;
 				this.state.setActive("whilePress", true);
-				if (props.onPressStart) {
-					frame.postRender(() => props.onPressStart(startEvent, extractEventInfo(startEvent)));
-				}
+				const { onPressStart } = this.state.options;
+				if (onPressStart) frame.postRender(() => onPressStart(startEvent, extractEventInfo(startEvent)));
 
 				return (endEvent, { success }) => {
 					this.state.setActive("whilePress", false);
-					const callbackName = success ? "onPress" : "onPressCancel";
-					const callback = (this.state.options as any)[callbackName];
-					if (callback) {
-						frame.postRender(() => callback(endEvent, extractEventInfo(endEvent)));
-					}
+					const { onPress, onPressCancel } = this.state.options;
+					const callback = success ? onPress : onPressCancel;
+					if (callback) frame.postRender(() => callback(endEvent, extractEventInfo(endEvent)));
 				};
 			},
-			{ useGlobalTarget: (this.state.options as any).globalPressTarget }
+			{ useGlobalTarget: this.state.options.globalPressTarget }
 		);
 	}
 
@@ -55,13 +40,7 @@ export class PressGesture extends Feature {
 	}
 
 	update() {
-		const prev = this.state.visualElement.prevProps as any;
-		const wasActive = Boolean(
-			prev?.whilePress || prev?.whileTap || prev?.onPress || prev?.onPressCancel || prev?.onPressStart
-		);
-		if (!wasActive && this.isActive()) {
-			this.register();
-		}
+		if (!this.removePress) this.register();
 	}
 
 	unmount() {

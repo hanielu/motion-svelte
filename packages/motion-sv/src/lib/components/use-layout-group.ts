@@ -1,5 +1,4 @@
-import type { LayoutGroupState } from "./context.js";
-import { LayoutGroupContext } from "./context.js";
+import { getLayoutGroup, setLayoutGroup, type LayoutGroupState } from "./context.js";
 import { useForceUpdate } from "./use-force-update.svelte.js";
 import { nodeGroup } from "motion-dom";
 
@@ -19,35 +18,31 @@ export interface LayoutGroupProps {
 }
 
 /**
- * Hook to create and manage a layout group
- * Handles group inheritance, force updates, and context management
+ * Create a layout group and provide it to its children. Like React's LayoutGroup, it's created once, from the initial
+ * props.
  */
-export function useLayoutGroupProvider(props: LayoutGroupProps): LayoutGroupState {
-	// Get parent group context if it exists
-	const parentGroup = LayoutGroupContext.getOr(null);
+export function useLayoutGroupProvider(props: LayoutGroupProps) {
+	const parentGroup = getLayoutGroup();
 	const [forceRender, key] = useForceUpdate();
 
-	const context: LayoutGroupState = {
+	const context = {
 		id: getGroupId(props, parentGroup),
 		group: getGroup(props, parentGroup),
 		forceRender,
 		key,
 	};
-
-	// Make group context available to children
-	LayoutGroupContext.set(context);
+	setLayoutGroup(context);
 	return context;
 }
 
 export function useLayoutGroup() {
-	const { forceRender } = LayoutGroupContext.getOr({ forceRender: () => {} });
-	return { forceRender };
+	return { forceRender: getLayoutGroup()?.forceRender ?? (() => {}) };
 }
 
 /**
  * Determines the group ID based on inheritance rules
  */
-function getGroupId(props: LayoutGroupProps, parentGroup: LayoutGroupState | null) {
+function getGroupId(props: LayoutGroupProps, parentGroup: LayoutGroupState | undefined) {
 	const shouldInherit = props.inherit === true || props.inherit === "id";
 	const parentId = parentGroup?.id;
 
@@ -60,7 +55,7 @@ function getGroupId(props: LayoutGroupProps, parentGroup: LayoutGroupState | nul
 /**
  * Creates or inherits a node group based on inheritance rules
  */
-function getGroup(props: LayoutGroupProps, parentGroup: LayoutGroupState | null) {
+function getGroup(props: LayoutGroupProps, parentGroup: LayoutGroupState | undefined) {
 	const shouldInherit = props.inherit === true || props.inherit === "group";
 	return shouldInherit ? parentGroup?.group || nodeGroup() : nodeGroup();
 }

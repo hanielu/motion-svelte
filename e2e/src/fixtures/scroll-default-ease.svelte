@@ -27,8 +27,7 @@
 	const [scopeAnimateMainThreadEaseOut, animateMainThreadEaseOut] = useAnimate();
 	const [scopeAnimateMainThreadSpring, animateMainThreadSpring] = useAnimate();
 
-	// useEffect(..., []) has no dependencies, hence untrack. It matters here: motion-sv's useAnimate keeps
-	// scope.animations in $state, so calling its animate() in a tracked $effect loops (effect_update_depth_exceeded).
+	// useEffect(..., []) has no dependencies, hence untrack: the animations shouldn't restart when state they read changes.
 	$effect(() =>
 		untrack(
 			() =>

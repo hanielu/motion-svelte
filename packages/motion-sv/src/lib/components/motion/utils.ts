@@ -77,7 +77,7 @@ export function createMotionComponentWithFeatures(featureBundle?: FeatureBundle)
 	return new Proxy({} as unknown as MotionNameSpace, {
 		get(_target, key) {
 			if (key === "create") {
-				return (component: any, options?: MotionCreateOptions) =>
+				return (component: string | Component, options?: MotionCreateOptions) =>
 					createMotionComponent(component, options, featureBundle);
 			}
 

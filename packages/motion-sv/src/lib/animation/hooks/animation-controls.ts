@@ -32,7 +32,7 @@ export function animationControls(): LegacyAnimationControls {
 				"controls.start() should only be called after a component has mounted. Consider calling within a useEffect hook."
 			);
 
-			const animations: Array<Promise<any>> = [];
+			const animations: Array<Promise<unknown>> = [];
 			subscribers.forEach((visualElement) => {
 				animations.push(
 					animateVisualElement(visualElement, definition, {
@@ -80,7 +80,7 @@ export function setValues(visualElement: VisualElement, definition: AnimationDef
 	} else if (typeof definition === "string") {
 		return setVariants(visualElement, [definition]);
 	} else {
-		setTarget(visualElement, definition as any);
+		setTarget(visualElement, definition);
 	}
 }
 

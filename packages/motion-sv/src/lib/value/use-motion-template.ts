@@ -6,7 +6,7 @@ import { useCombineMotionValues } from "./use-combine-values.svelte.js";
  * Combine multiple motion values into a new one using a string template literal.
  *
  * ```svelte
- * <script setup>
+ * <script>
  * import { useSpring, motionValue, useMotionTemplate } from 'motion-sv'
  *
  * const shadowX = useSpring(0)
@@ -38,9 +38,5 @@ export function useMotionTemplate(fragments: TemplateStringsArray, ...values: Ar
 
 		return output;
 	}
-	const { value, subscribe } = useCombineMotionValues(buildValue);
-
-	subscribe(values.filter(isMotionValue));
-
-	return value;
+	return useCombineMotionValues(values.filter(isMotionValue), buildValue);
 }

@@ -1,41 +1,43 @@
 import { Feature } from "#lib/features/feature.js";
+import type { InViewOptions } from "./types.js";
 import { frame } from "motion-dom";
 import { inView } from "framer-motion/dom";
+
+const OBSERVER_OPTIONS = ["amount", "margin", "root"] as const;
 
 export class InViewGesture extends Feature {
 	static key = "inView" as const;
 	static enabledBy = ["whileInView", "onViewportEnter", "onViewportLeave"] as const;
 
 	private removeObserver: VoidFunction | undefined;
+	/** The options the observer was created with, to restart it when they change. */
+	private observedOptions: InViewOptions | undefined;
 
 	private isActive() {
-		const { whileInView, onViewportEnter, onViewportLeave } = this.state.options as any;
+		const { whileInView, onViewportEnter, onViewportLeave } = this.state.options;
 		return Boolean(whileInView || onViewportEnter || onViewportLeave);
 	}
 
 	private startObserver() {
-		const element = this.state.element as Element;
+		const element = this.state.element;
 		if (!element || !this.isActive()) return;
 
 		this.removeObserver?.();
-		const { once, ...viewOptions } = (this.state.options as any).inViewOptions || {};
+		const { once, ...viewOptions } = this.state.options.inViewOptions ?? {};
+		this.observedOptions = viewOptions;
 		this.removeObserver = inView(
 			element,
 			(_, entry) => {
-				const props = this.state.options as any;
 				this.state.setActive("whileInView", true);
-				if (props.onViewportEnter) {
-					frame.postRender(() => props.onViewportEnter(entry));
-				}
-				if (!once) {
-					return () => {
-						this.state.setActive("whileInView", false);
-						const leaveCallback = (this.state.options as any).onViewportLeave;
-						if (leaveCallback) {
-							frame.postRender(() => leaveCallback(entry));
-						}
-					};
-				}
+				const { onViewportEnter } = this.state.options;
+				if (onViewportEnter) frame.postRender(() => onViewportEnter(entry));
+				if (once) return;
+
+				return () => {
+					this.state.setActive("whileInView", false);
+					const { onViewportLeave } = this.state.options;
+					if (onViewportLeave) frame.postRender(() => onViewportLeave(entry));
+				};
 			},
 			viewOptions
 		);
@@ -46,15 +48,8 @@ export class InViewGesture extends Feature {
 	}
 
 	update() {
-		const { props, prevProps } = this.state.visualElement;
-		const hasOptionsChanged = ["amount", "margin", "root"].some((name) => {
-			const current = (props as any).inViewOptions?.[name];
-			const prev = (prevProps as any)?.inViewOptions?.[name];
-			return current !== prev;
-		});
-		if (hasOptionsChanged) {
-			this.startObserver();
-		}
+		const options = this.state.options.inViewOptions;
+		if (OBSERVER_OPTIONS.some((name) => options?.[name] !== this.observedOptions?.[name])) this.startObserver();
 	}
 
 	unmount() {

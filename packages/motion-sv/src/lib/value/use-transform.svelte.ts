@@ -1,7 +1,5 @@
-import { type AnyResolvedKeyframe, type MotionValue, type TransformOptions, motionValue, transform } from "motion-dom";
-import { watch } from "#lib/vendor/runed/index.js";
-import { useCombineMotionValues } from "./use-combine-values.svelte.js";
-import { useComputed } from "./use-computed.svelte.js";
+import { type AnyResolvedKeyframe, type MotionValue, type TransformOptions, transform } from "motion-dom";
+import { useCombineMotionValues, useComputed } from "./use-combine-values.svelte.js";
 
 export type InputRange = number[];
 
@@ -144,113 +142,62 @@ export function useTransform<I, O>(
 	outputRange?: O[] | { [K in keyof O]: O[K][] },
 	options?: TransformOptions<O>
 ): MotionValue<O> | { [K in keyof O]: MotionValue<O[K]> } {
-	if (typeof input === "function") {
-		return useComputed(input);
-	}
+	if (typeof input === "function") return useComputed(input);
 
-	// Check if outputRange is an object (multi-output mode)
-	if (outputRange && !Array.isArray(outputRange) && typeof outputRange === "object") {
+	// One output per key of the output range
+	if (outputRange && !Array.isArray(outputRange) && !Array.isArray(input)) {
 		const result = {} as { [K in keyof O]: MotionValue<O[K]> };
-
-		for (const key in outputRange) {
-			if (Object.prototype.hasOwnProperty.call(outputRange, key)) {
-				const keyOutputRange = outputRange[key];
-				result[key] = useTransform(
-					input as MotionValue<number>,
-					inputRangeOrTransformer as InputRange | ReactiveInputRange,
-					keyOutputRange as any,
-					options as any
-				) as MotionValue<O[typeof key]>;
-			}
+		for (const key of Object.keys(outputRange) as Array<keyof O>) {
+			result[key] = useTransform(
+				input as MotionValue<unknown> as MotionValue<number>,
+				inputRangeOrTransformer as InputRange | ReactiveInputRange,
+				outputRange[key],
+				options as TransformOptions<O[keyof O]>
+			);
 		}
-
 		return result;
 	}
 
-	// Handle reactive inputRange by creating a bridge MotionValue
-	let inputValues: MotionValue<any>[];
-	let transformer: Transformer<I, O>;
+	const inputs: MotionValue[] = Array.isArray(input) ? input : [input];
+	const rangeOrTransformer = inputRangeOrTransformer!;
+	const outputs = outputRange as O[];
+	// A reactive input range rebuilds the transformer, which recomputes the output
+	const transformer = $derived(
+		(typeof rangeOrTransformer === "function"
+			? rangeOrTransformer
+			: transform(
+					isReactiveInputRange(rangeOrTransformer) ? rangeOrTransformer.read() : rangeOrTransformer,
+					outputs,
+					options
+				)) as (latest: unknown) => O
+	);
 
-	if (typeof inputRangeOrTransformer === "function") {
-		// Direct transformer function
-		transformer = inputRangeOrTransformer;
-		inputValues = Array.isArray(input) ? input : [input];
-	} else if (isReactiveInputRange(inputRangeOrTransformer)) {
-		// Reactive inputRange - create a bridge MotionValue to trigger updates
-		const bridgeMV = motionValue(0);
-		let currentTransformer = transform(inputRangeOrTransformer.read(), outputRange as any[], options);
-
-		watch(
-			() => inputRangeOrTransformer.read(),
-			(newRange) => {
-				currentTransformer = transform(newRange, outputRange as any[], options);
-				// Trigger update by changing bridge value
-				bridgeMV.set(bridgeMV.get() + 1);
-			}
-		);
-
-		transformer = (values: any) => {
-			return Array.isArray(values) ? currentTransformer(values[0]) : currentTransformer(values);
-		};
-
-		inputValues = Array.isArray(input) ? [...input, bridgeMV] : [input, bridgeMV];
-	} else {
-		// Static inputRange
-		transformer = transform(inputRangeOrTransformer, outputRange as any[], options) as any;
-		inputValues = Array.isArray(input) ? input : [input];
-	}
-
-	const result = Array.isArray(input)
-		? useListTransform(inputValues, transformer as MultiTransformer<string | number, O>)
-		: useListTransform(inputValues, (values) => {
-				// Extract only the input value (ignore bridge if present)
-				return (transformer as SingleTransformer<I, O>)(values[0] as I);
-			});
+	const latest: unknown[] = [];
+	const result = useCombineMotionValues(inputs, () => {
+		for (let i = 0; i < inputs.length; i++) latest[i] = inputs[i].get();
+		return transformer(Array.isArray(input) ? latest : latest[0]);
+	});
 
 	// Propagate accelerate config for native scroll timeline support.
 	// When the input is a scroll progress MotionValue with an accelerate config
 	// (set by useScroll), we forward it to the output with updated times/keyframes
 	// so the motion component can use a native scroll timeline for this transform.
-	if (!Array.isArray(input)) {
-		const inputAccelerate = (input as MotionValue<any>).accelerate;
-		if (
-			inputAccelerate &&
-			!inputAccelerate.isTransformed &&
-			typeof inputRangeOrTransformer !== "function" &&
-			Array.isArray(outputRange) &&
-			options?.clamp !== false
-		) {
-			const resolvedInputRange = isReactiveInputRange(inputRangeOrTransformer)
-				? inputRangeOrTransformer.read()
-				: (inputRangeOrTransformer as InputRange);
-			result.accelerate = {
-				...inputAccelerate,
-				times: resolvedInputRange,
-				keyframes: outputRange,
-				isTransformed: true,
-				...(options?.ease ? { ease: options.ease } : {}),
-			};
-		}
+	const inputAccelerate = Array.isArray(input) ? undefined : input.accelerate;
+	if (
+		inputAccelerate &&
+		!inputAccelerate.isTransformed &&
+		typeof rangeOrTransformer !== "function" &&
+		outputs &&
+		options?.clamp !== false
+	) {
+		result.accelerate = {
+			...inputAccelerate,
+			times: isReactiveInputRange(rangeOrTransformer) ? rangeOrTransformer.read() : rangeOrTransformer,
+			keyframes: outputs,
+			isTransformed: true,
+			...(options?.ease ? { ease: options.ease } : {}),
+		};
 	}
 
 	return result;
-}
-
-function useListTransform<I, O>(values: MotionValue<I>[], transformer: MultiTransformer<I, O>): MotionValue<O> {
-	const latest: I[] = [];
-
-	const combineValues = () => {
-		latest.length = 0;
-		const numValues = values.length;
-		for (let i = 0; i < numValues; i++) {
-			latest[i] = values[i].get();
-		}
-		return transformer(latest);
-	};
-
-	const { value, subscribe } = useCombineMotionValues(combineValues);
-
-	subscribe(values);
-
-	return value;
 }

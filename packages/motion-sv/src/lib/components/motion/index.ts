@@ -3,6 +3,5 @@ export { createLayoutMotion, STOP_UPDATE, type LayoutMotionNamespace } from "./l
 import { motion } from "./instance.js";
 export { motion };
 
-// tbh this only exists because of the tests, but it's not exported from the package
-// reason being that if it were exported, it would get into the bundle, even if it's not used
+// For the unit tests. Not exported from the package, as it would end up in every bundle.
 export const Motion = motion.create("div");

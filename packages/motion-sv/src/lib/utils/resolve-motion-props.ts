@@ -5,7 +5,7 @@ import type { Options } from "#lib/types/index.js";
 
 export interface MotionContext {
 	layoutGroup: LayoutGroupState;
-	presenceContext: PresenceContext;
+	presenceContext: PresenceContext | undefined;
 	config: MotionConfigState;
 }
 
@@ -15,7 +15,7 @@ export interface MotionContext {
 export function resolveMotionProps(
 	props: Options,
 	context: MotionContext
-): Options & { presenceContext: PresenceContext } {
+): Options & { presenceContext: PresenceContext | undefined } {
 	const { layoutGroup, presenceContext, config } = context;
 
 	const layoutId =
@@ -29,7 +29,6 @@ export function resolveMotionProps(
 		motionConfig: config,
 		inViewOptions: props.inViewOptions ?? config.inViewOptions,
 		presenceContext,
-		initial:
-			presenceContext.initial === false ? presenceContext.initial : props.initial === true ? undefined : props.initial,
+		initial: presenceContext?.initial === false ? false : props.initial === true ? undefined : props.initial,
 	};
 }

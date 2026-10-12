@@ -9,6 +9,7 @@ import {
 	eachAxis,
 	frame,
 	isElementTextInput,
+	isHTMLElement,
 	measurePageBox,
 	mixNumber,
 	percent,
@@ -24,7 +25,7 @@ import type { Axis, BoundingBox, Point } from "motion-utils";
 import { addPointerEvent } from "#lib/events/index.js";
 import type { MotionState } from "#lib/state/motion-state.js";
 import type { Options } from "#lib/types/index.js";
-import { getContextWindow } from "#lib/utils/index.js";
+import { getContextWindow } from "#lib/utils/get-context-window.js";
 import { PanSession } from "#lib/features/gestures/pan/PanSession.js";
 import {
 	applyConstraints,
@@ -35,7 +36,6 @@ import {
 	rebaseAxisConstraints,
 	resolveDragElastic,
 } from "#lib/features/gestures/drag/utils/constraints.js";
-import { isHTMLElement } from "#lib/features/gestures/drag/utils/is.js";
 
 export const elementDragControls = new WeakMap<VisualElement, VisualElementDragControls>();
 
@@ -648,22 +648,22 @@ export class VisualElementDragControls {
 		 * If the element's layout changes, calculate the delta and apply that to
 		 * the drag gesture's origin point.
 		 */
-		const stopLayoutUpdateListener = projection!.addEventListener("didUpdate", (({
-			delta,
-			hasLayoutChanged,
-		}: LayoutUpdateData) => {
-			if (this.isDragging && hasLayoutChanged) {
-				eachAxis((axis) => {
-					const motionValue = this.getAxisMotionValue(axis);
-					if (!motionValue) return;
+		const stopLayoutUpdateListener = projection!.addEventListener(
+			"didUpdate",
+			({ delta, hasLayoutChanged }: LayoutUpdateData) => {
+				if (this.isDragging && hasLayoutChanged) {
+					eachAxis((axis) => {
+						const motionValue = this.getAxisMotionValue(axis);
+						if (!motionValue) return;
 
-					this.originPoint[axis] += delta[axis].translate;
-					motionValue.set(motionValue.get() + delta[axis].translate);
-				});
+						this.originPoint[axis] += delta[axis].translate;
+						motionValue.set(motionValue.get() + delta[axis].translate);
+					});
 
-				this.visualElement.render();
+					this.visualElement.render();
+				}
 			}
-		}) as any);
+		);
 
 		return () => {
 			stopResizeListener();

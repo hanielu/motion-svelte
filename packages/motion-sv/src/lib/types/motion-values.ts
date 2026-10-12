@@ -4,7 +4,7 @@ import type { AriaAttributes, DOMAttributes, SvelteHTMLElements, SVGAttributes }
 import type { ElementType } from "#lib/types/common.js";
 
 type EventHandlers<E> = {
-	[K in keyof E]?: E[K] extends (...args: any) => any ? E[K] : (payload: E[K]) => void;
+	[K in keyof E]?: E[K] extends (...args: never[]) => unknown ? E[K] : (payload: E[K]) => void;
 };
 type EventKeys = keyof EventHandlers<DOMAttributes<HTMLElement>>;
 interface SVGAttributesWithoutMotionProps extends Pick<
@@ -16,7 +16,7 @@ interface SVGAttributesWithoutMotionProps extends Pick<
  * @public
  */
 export interface CustomValueType {
-	mix: (from: any, to: any) => (p: number) => number | string;
+	mix: (from: unknown, to: unknown) => (p: number) => number | string;
 	toValue: () => number | string;
 }
 export type MakeCustomValueType<T> = { [K in keyof T]: T[K] | CustomValueType };

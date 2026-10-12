@@ -1,9 +1,8 @@
 import { frame, type PanInfo } from "motion-dom";
-import { noop } from "motion-utils";
 import { PanSession } from "./PanSession.js";
 import { addPointerEvent } from "#lib/events/index.js";
 import { Feature } from "#lib/features/feature.js";
-import { getContextWindow } from "#lib/utils/index.js";
+import { getContextWindow } from "#lib/utils/get-context-window.js";
 
 type PanEventHandler = (event: PointerEvent, info: PanInfo) => void;
 const asyncHandler = (handler?: PanEventHandler) => (event: PointerEvent, info: PanInfo) => {
@@ -18,7 +17,7 @@ export class PanGesture extends Feature {
 
 	private session?: PanSession;
 
-	private removePointerDownListener: Function = noop;
+	private removePointerDownListener?: VoidFunction;
 
 	onPointerDown(pointerDownEvent: PointerEvent) {
 		this.session = new PanSession(pointerDownEvent, this.createPanHandlers(), {
@@ -54,7 +53,7 @@ export class PanGesture extends Feature {
 	}
 
 	unmount() {
-		this.removePointerDownListener();
+		this.removePointerDownListener?.();
 		this.session && this.session.end();
 	}
 }

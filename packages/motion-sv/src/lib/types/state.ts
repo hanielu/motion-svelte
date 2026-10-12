@@ -50,7 +50,7 @@ export type MotionStyleProps = Partial<{
 		string | number | undefined | MotionValue;
 }>;
 
-export interface Options<T = any>
+export interface Options<T = unknown>
 	extends LayoutOptions, PressProps, HoverProps, InViewProps, DragProps, PanProps, FocusProps {
 	custom?: T;
 	as?: AsTag;
@@ -75,18 +75,13 @@ export interface Options<T = any>
 	class?: ClassValue;
 	ref?: HTMLElement | SVGElement | null;
 
-	// is this even svelte specific? idk I just know that it stops errors with Reorder.Item and Reorder.Group
 	id?: string;
-	// key?: string | number;
 }
 
+/** The variant labels a motion component's children inherit. */
 export interface MotionStateContext {
 	initial?: VariantLabels | boolean;
 	animate?: VariantLabels;
-	inView?: VariantLabels;
-	hover?: VariantLabels;
-	press?: VariantLabels;
-	exit?: VariantLabels;
 }
 
 export type AnimationFactory = () => AnimationPlaybackControls | undefined;

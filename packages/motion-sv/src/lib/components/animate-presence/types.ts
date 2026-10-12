@@ -3,8 +3,7 @@ export interface AnimatePresenceProps {
 	mode?: "wait" | "popLayout" | "sync";
 	// Whether to show the initial animation
 	initial?: boolean;
-	as?: string;
-	custom?: any;
+	custom?: unknown;
 	onExitComplete?: VoidFunction;
 	anchorX?: "left" | "right";
 }

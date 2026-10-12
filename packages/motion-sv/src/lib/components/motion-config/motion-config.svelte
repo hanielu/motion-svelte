@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from "svelte";
 	import type { MotionConfigProps } from "./types.js";
-	import { MotionConfigContext, useMotionConfig } from "./context.js";
+	import { setMotionConfig, useMotionConfig } from "./context.js";
 
 	let {
 		children,
@@ -22,7 +22,7 @@
 		inViewOptions: inViewOptions ?? parentConfig().inViewOptions,
 	});
 
-	MotionConfigContext.set(() => config);
+	setMotionConfig(() => config);
 </script>
 
 {@render children()}

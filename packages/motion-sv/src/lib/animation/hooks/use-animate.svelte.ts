@@ -1,47 +1,32 @@
 import { createScopedAnimate, type AnimationPlaybackControls } from "framer-motion/dom";
-import type { AnimationScope } from "motion-dom";
+import { prefersReducedMotion } from "svelte/motion";
 import { useMotionConfig } from "#lib/components/motion-config/index.js";
 
-type Scope = { current: Element; animations: AnimationPlaybackControls[] };
+type ScopedAnimate = ReturnType<typeof createScopedAnimate>;
 
-export function useAnimate<T extends Element = any>(): [Scope, ReturnType<typeof createScopedAnimate>] {
-	let domNode = $state<{ current: T | null }>({ current: null });
+/** The element `animate` resolves selectors within (bind it with `bind:this={scope.current}`) and its animations. */
+class AnimationScope<T extends Element> {
+	current = $state<T>(null!);
+	animations: AnimationPlaybackControls[] = [];
+}
 
-	const domProxy = new Proxy(domNode, {
-		get(target, key) {
-			if (typeof key === "string" || typeof key === "symbol") {
-				if (key === "current") return Reflect.get(target, "current");
-				return Reflect.get(target, key);
-			}
-			return undefined;
-		},
-		set(target, key, value) {
-			if (key === "current") return Reflect.set(target, key, value);
-			if (key === "animations") return Reflect.set(target, key, value);
-			return true;
-		},
-	}) as unknown as Scope;
-
-	domProxy.animations = [];
-
+export function useAnimate<T extends Element = Element>() {
+	const scope = new AnimationScope<T>();
 	const config = useMotionConfig();
 
-	// Recreate the scoped animate whenever `skipAnimations` changes so imperative
-	// animations respect `<MotionConfig skipAnimations>`, mirroring React's useAnimate.
-	const scopedAnimate = $derived(
-		createScopedAnimate({
-			scope: domProxy as unknown as AnimationScope<T>,
-			skipAnimations: config().skipAnimations,
-		})
-	);
+	// Created per call, so imperative animations follow the current MotionConfig, as React's re-created animate does.
+	const animate = ((...args: Parameters<ScopedAnimate>) => {
+		const { reducedMotion, skipAnimations } = config();
+		const reduceMotion =
+			reducedMotion === "always" ? true : reducedMotion === "never" ? false : prefersReducedMotion.current;
+		return createScopedAnimate({ scope, reduceMotion, skipAnimations })(...args);
+	}) as ScopedAnimate;
 
-	// Stable wrapper so callers keep a single reference while always delegating to
-	// the latest config-aware scoped animate.
-	const animate = ((...args: Parameters<ReturnType<typeof createScopedAnimate>>) =>
-		scopedAnimate(...args)) as ReturnType<typeof createScopedAnimate>;
+	// Stop the scope's animations on unmount
+	$effect(() => () => {
+		scope.animations.forEach((animation) => animation.stop());
+		scope.animations.length = 0;
+	});
 
-	// stop any running animations on unmount
-	$effect(() => () => domProxy.animations.forEach((animation) => animation.stop()));
-
-	return [domProxy, animate] as const;
+	return [scope, animate] as const;
 }

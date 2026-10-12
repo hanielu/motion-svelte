@@ -27,5 +27,5 @@ export interface LayoutOptions extends LayoutLifecycles {
 	/**
 	 * @public
 	 */
-	layoutDependency?: any;
+	layoutDependency?: unknown;
 }

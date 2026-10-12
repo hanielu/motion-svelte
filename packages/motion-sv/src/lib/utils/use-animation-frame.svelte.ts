@@ -12,7 +12,7 @@ export function useAnimationFrame(callback: FrameCallback) {
 		callback(timestamp - initialTimestamp, delta);
 	};
 
-	$effect.pre(() => {
+	$effect(() => {
 		frame.update(provideTimeSinceStart, true);
 		return () => cancelFrame(provideTimeSinceStart);
 	});

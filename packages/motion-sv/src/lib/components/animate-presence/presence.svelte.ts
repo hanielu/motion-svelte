@@ -1,22 +1,28 @@
 import type { AnimatePresenceProps } from "./types.js";
-import { Context } from "#lib/vendor/runed/index.js";
+import { createOptionalContext } from "#lib/utils/optional-context.js";
 
 export interface PresenceContext {
-	initial?: boolean;
-	custom?: any;
+	readonly initial?: boolean;
+	readonly custom?: unknown;
 	/**
 	 * Svelte-specific: true while the AnimatePresence itself is being destroyed (e.g. its route or parent block went
 	 * away). Children then leave without their exit animations, as when an AnimatePresence unmounts in React.
 	 */
-	isUnmounting?: boolean;
+	isUnmounting: boolean;
 }
 
-export const AnimatePresenceContext = new Context<PresenceContext>("AnimatePresenceContext");
+export const [getPresenceContext, setPresenceContext] = createOptionalContext<PresenceContext>();
 
-export function useAnimatePresence(props: AnimatePresenceProps) {
+/** Provide the presence context; `props` are getters, so children always read the current values. */
+export function useAnimatePresence(props: Pick<AnimatePresenceProps, "initial" | "custom">) {
+	// `initial={false}` only applies to the children rendered with AnimatePresence itself, which have all mounted by
+	// the time its effects run.
 	let hasMounted = false;
-	// `initial` and `custom` are getters, so children always read the current values.
-	const presenceContext: PresenceContext = {
+	$effect(() => {
+		hasMounted = true;
+	});
+
+	return setPresenceContext({
 		get initial() {
 			return hasMounted ? undefined : props.initial;
 		},
@@ -24,13 +30,5 @@ export function useAnimatePresence(props: AnimatePresenceProps) {
 			return props.custom;
 		},
 		isUnmounting: false,
-	};
-
-	AnimatePresenceContext.set(presenceContext);
-
-	$effect(() => {
-		hasMounted = true;
 	});
-
-	return presenceContext;
 }

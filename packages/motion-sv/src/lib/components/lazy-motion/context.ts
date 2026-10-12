@@ -1,10 +1,10 @@
-import { Context } from "#lib/vendor/runed/index.js";
 import type { FeatureBundle } from "#lib/features/dom-animation.js";
-import type { FnGetter } from "#lib/types/common.js";
+import { createOptionalContext } from "#lib/utils/optional-context.js";
 
-export type LazyMotionContext = {
-	features: FnGetter<Partial<FeatureBundle>>;
-	strict: boolean;
-};
+export interface LazyMotionState {
+	/** The loaded bundle; empty until a lazy bundle resolves. */
+	readonly features: Partial<FeatureBundle>;
+	readonly strict: boolean;
+}
 
-export const LazyMotionContext = new Context<LazyMotionContext>("LazyMotionContext");
+export const [getLazyMotion, setLazyMotion] = createOptionalContext<LazyMotionState>();

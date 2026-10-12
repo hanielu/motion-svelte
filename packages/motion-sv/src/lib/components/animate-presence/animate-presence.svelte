@@ -1,23 +1,30 @@
 <script lang="ts">
-	import { useAnimatePresence } from "./presence.svelte.js";
-	import type { AnimatePresenceProps } from "./types.js";
-	import { usePopLayout } from "./use-pop-layout.js";
+	import type { IProjectionNode } from "motion-dom";
 	import type { Snippet } from "svelte";
-	import { PresenceManagerContext } from "./index.js";
-	import { mountedStates } from "#lib/state/motion-state.js";
-	import type { MotionState } from "#lib/state/motion-state.js";
+	import type { AnimatePresenceProps } from "./types.js";
+	import { mountedStates, type MotionState } from "#lib/state/motion-state.js";
+	import { setPresenceManager } from "./context.js";
+	import { useAnimatePresence } from "./presence.svelte.js";
+	import { usePopLayout } from "./use-pop-layout.js";
 
 	let {
 		mode = "sync",
 		initial = true,
 		anchorX = "left",
-		as,
 		custom,
 		onExitComplete,
 		children,
 	}: AnimatePresenceProps & { children: Snippet } = $props();
 
-	const { addPopStyle, removePopStyle, trackPosition, untrackPosition, styles } = usePopLayout({
+	const presenceContext = useAnimatePresence({
+		get initial() {
+			return initial;
+		},
+		get custom() {
+			return custom;
+		},
+	});
+	const { addPopStyle, removePopStyle, trackPosition, untrackPosition } = usePopLayout({
 		get mode() {
 			return mode;
 		},
@@ -33,27 +40,23 @@
 		isComplete: boolean;
 	}
 
-	/** Elements that are exiting. Guards against double handling; re-entry deletes the session. */
+	/** Elements that are exiting. Guards against double handling; re-entry ends the session. */
 	const exitDom = new Map<Element, ExitSession>();
 
 	/**
-	 * Track elements that are actively exiting AND blocking (have actual exit animations).
-	 *
-	 * This is crucial for `mode="wait"`. When this count is > 0, `isWaitBlocked` becomes true.
-	 * Child `motion` components subscribe to this state via `PresenceManagerContext`.
-	 *
-	 * In `motion.svelte`, if `isWaitBlocked` is true:
-	 * 1. The entering component is hidden (`display: none`) and its animation is paused.
-	 * 2. When the count drops to 0, the component unhides and starts its "animate" state.
+	 * Exits that have an exit animation. In "wait" mode, motion children hide new entrants until they finish (see
+	 * `isWaitBlocked` in motion.svelte).
 	 */
 	let blockingExitCount = $state(0);
 
-	$effect.pre(() => () => {
-		exitDom.clear();
-		blockingExitCount = 0;
-	});
-
 	const isWaitBlocked = () => mode === "wait" && blockingExitCount > 0;
+
+	function endSession(el: Element) {
+		const session = exitDom.get(el);
+		if (!session) return;
+		exitDom.delete(el);
+		if (session.blocksExit) blockingExitCount--;
+	}
 
 	/**
 	 * Snapshot every layout-enabled projection node in the tree before the exiting element pops out of flow
@@ -62,23 +65,12 @@
 	 * that haven't been measured yet just mounted, and like in React they don't animate their first layout.
 	 */
 	function snapshotLayoutTree(state: MotionState) {
-		const root = state.visualElement?.projection?.root;
-		if (!root) return;
-		(root as any).nodes?.forEach((node: any) => {
-			if (node.layout && (node.options.layout || node.options.layoutId)) {
-				node.willUpdate(false);
-			}
+		const root: IProjectionNode | undefined = state.visualElement?.projection?.root;
+		root?.nodes?.forEach((child) => {
+			const node = child as IProjectionNode;
+			if (node.layout && (node.options.layout || node.options.layoutId)) node.willUpdate(false);
 		});
 	}
-
-	const presenceContext = useAnimatePresence({
-		get initial() {
-			return initial;
-		},
-		get custom() {
-			return custom;
-		},
-	});
 
 	/**
 	 * Svelte keeps an exiting element until its outro's duration has passed. Finish that outro as soon as the exit is
@@ -101,19 +93,9 @@
 		const state = mountedStates.get(el);
 		if (!state) return;
 
-		// Clean up exit state if this element was exiting
-		const entry = exitDom.get(el);
-		if (entry) {
-			exitDom.delete(el);
-			if (entry.blocksExit && blockingExitCount > 0) {
-				blockingExitCount--;
-			}
-		}
-
+		endSession(el);
 		removePopStyle(state);
-		// Re-track position for popLayout mode since element is re-entering
 		trackPosition(state);
-
 		state.reenter();
 	}
 
@@ -123,7 +105,7 @@
 	 * Called when Svelte starts the outro, in the microtask right after the flush that removed the element. Returns
 	 * whether the element must be held until its exit completes.
 	 */
-	function handleOutroStart(el: Element): boolean {
+	function handleOutroStart(el: Element) {
 		const state = mountedStates.get(el);
 		if (!state) return false;
 		if (exitDom.has(el)) return true;
@@ -163,28 +145,15 @@
 		const state = mountedStates.get(el);
 		if (!state) return;
 
-		const entry = exitDom.get(el);
-		if (entry) {
-			exitDom.delete(el);
-			// Only decrement if this element was blocking
-			if (entry.blocksExit && blockingExitCount > 0) {
-				blockingExitCount--;
-			}
-		}
-
+		endSession(el);
 		if (exitDom.size === 0) onExitComplete?.();
-		if (!styles?.has(state)) {
-			// Sync mode: the element leaves the DOM right after outroend, shifting
-			// siblings. Snapshot the tree now (element still in flow) and run the
-			// layout pass after Svelte has removed the node.
-			snapshotLayoutTree(state);
-			state.getSnapshot(state.options, false);
-			queueMicrotask(() => {
-				state.didUpdate();
-			});
-		} else {
-			removePopStyle(state);
-		}
+		if (removePopStyle(state)) return;
+
+		// Sync mode: the element leaves the DOM right after outroend, shifting siblings. Snapshot the tree now (element
+		// still in flow) and run the layout pass after Svelte has removed the node.
+		snapshotLayoutTree(state);
+		state.getSnapshot(state.options, false);
+		queueMicrotask(() => state.didUpdate());
 	}
 
 	function presenceIntro(_node: Element) {
@@ -197,8 +166,7 @@
 		return {};
 	}
 
-	// Provide PopLayout + exit registry + wait gate to Motion children
-	PresenceManagerContext.set({
+	setPresenceManager({
 		trackPosition,
 		untrackPosition,
 		isWaitBlocked,

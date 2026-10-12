@@ -1,6 +1,13 @@
 import type { MotionStateContext, Options } from "#lib/types/index.js";
 import { invariant } from "hey-listen";
-import type { AnimationType, DOMKeyframesDefinition, VisualElement, VisualElementOptions } from "motion-dom";
+import type {
+	AnimationType,
+	DOMKeyframesDefinition,
+	MotionNodeOptions,
+	PresenceContextProps,
+	ResolvedValues,
+	VisualElement,
+} from "motion-dom";
 import { frame, isVariantLabel } from "motion-dom";
 import { isSVGElement, resolveInitialValues } from "#lib/state/utils.js";
 import type { Feature, FeatureKey } from "#lib/features/feature.js";
@@ -13,6 +20,14 @@ export const mountedStates = new WeakMap<Element, MotionState>();
 
 // motion-dom's animation state keys use 'whileTap'; our public prop is 'whilePress'
 const toAnimationType = (name: StateType) => (name === "whilePress" ? "whileTap" : name) as AnimationType;
+
+/** motion-dom reads the same props, except `whilePress`, which it knows as `whileTap`. */
+const toVisualElementProps = (options: Options) =>
+	({ ...options, whileTap: options.whilePress }) as unknown as MotionNodeOptions;
+
+/** motion-dom only reads the presence context's `initial` and `custom`, which ours has too. */
+const toPresenceContextProps = ({ presenceContext }: MotionState["options"]) =>
+	(presenceContext ?? null) as unknown as PresenceContextProps | null;
 
 /**
  * Core class that manages animation state and orchestrates animations.
@@ -33,16 +48,10 @@ export class MotionState {
 	private exitGeneration = 0;
 	private settlePendingExit?: VoidFunction;
 	/**
-	 * Svelte-specific: set by the Motion component when inside an AnimatePresence
-	 * wait-mode gate. While it returns true, the entering element holds its
-	 * initial values instead of running its mount animation.
+	 * Svelte-specific: set by the Motion component inside an AnimatePresence in "wait" mode. While it returns true,
+	 * the entering element holds its initial values instead of running its mount animation.
 	 */
 	public isEnterBlocked?: () => boolean;
-	/**
-	 * Svelte-specific: marked when this element was hidden by the wait-mode gate,
-	 * so the enter animation is replayed once the gate opens.
-	 */
-	public enterWasGated = false;
 	public options: Options & {
 		presenceContext?: PresenceContext;
 		features?: Array<typeof Feature>;
@@ -59,8 +68,8 @@ export class MotionState {
 	// The features this component can use: its own bundle's, or for `m` components the nearest LazyMotion's
 	private featureCtors: ReadonlyArray<typeof Feature> = [];
 
-	// Visual element instance from Framer Motion
-	public visualElement: VisualElement<Element>;
+	// The visual element, created by setBundle() before any feature exists
+	public visualElement!: VisualElement<Element>;
 
 	constructor(options: Options, parent?: MotionState) {
 		this.options = options;
@@ -69,27 +78,16 @@ export class MotionState {
 		parent?.children?.add(this);
 
 		this.latestValues = resolveInitialValues(options, this.context);
-		this.type = isSVGElement(this.options.as as any) ? "svg" : "html";
+		this.type = isSVGElement(this.options.as ?? "div") ? "svg" : "html";
 	}
 
-	private _context: MotionStateContext | null = null;
-
-	// Get animation context, falling back to parent context for inheritance
-	get context() {
-		if (!this._context) {
-			const handler = {
-				get: (target: MotionStateContext, prop: keyof MotionStateContext) => {
-					const value = this.options[prop];
-					if (isVariantLabel(value) || (prop === "initial" && value === false)) {
-						return value;
-					}
-					return this.parent?.context[prop];
-				},
-			};
-
-			this._context = new Proxy({} as MotionStateContext, handler);
-		}
-		return this._context;
+	/** The variant labels this component's children inherit: its own, or its parent's. */
+	get context(): MotionStateContext {
+		const { initial, animate } = this.options;
+		return {
+			initial: isVariantLabel(initial) || initial === false ? initial : this.parent?.context.initial,
+			animate: isVariantLabel(animate) ? animate : this.parent?.context.animate,
+		};
 	}
 
 	/**
@@ -108,12 +106,13 @@ export class MotionState {
 	updateFeatures() {
 		if (!this.visualElement) return;
 		for (const FeatureCtor of this.featureCtors) {
-			if (!this.features.has(FeatureCtor.key)) {
+			let feature = this.features.get(FeatureCtor.key);
+			if (!feature) {
 				const { enabledBy } = FeatureCtor;
 				if (enabledBy && !enabledBy.some((prop) => this.options[prop])) continue;
-				this.features.set(FeatureCtor.key, new FeatureCtor(this));
+				feature = new FeatureCtor(this);
+				this.features.set(FeatureCtor.key, feature);
 			}
-			const feature = this.features.get(FeatureCtor.key);
 			if (this.isMounted()) {
 				if (!feature.isMount) {
 					feature.mount();
@@ -126,16 +125,9 @@ export class MotionState {
 	}
 
 	// Update visual element with new options
-	updateOptions(options: Options) {
+	updateOptions(options: MotionState["options"]) {
 		this.options = options;
-		this.visualElement?.update(
-			{
-				...(this.options as any),
-				whileTap: this.options.whilePress,
-			},
-			// presenceContext shape differs from motion-dom's PresenceContextProps
-			(this.options.presenceContext ?? null) as any
-		);
+		this.visualElement?.update(toVisualElementProps(options), toPresenceContextProps(options));
 	}
 
 	// Mount motion state to DOM element, handles parent-child relationships
@@ -166,7 +158,7 @@ export class MotionState {
 	unmount() {
 		this.settleExit();
 		this.parent?.children?.delete(this);
-		mountedStates.delete(this.element);
+		if (this.element) mountedStates.delete(this.element);
 		this.features.forEach((feature) => {
 			feature.unmount();
 			// A later mount() re-mounts it, restoring its listeners
@@ -276,8 +268,7 @@ export class MotionState {
 		const ve = this.visualElement;
 		if (!ve) return;
 		ve.values.forEach((value) => value.stop());
-		for (const key in this.latestValues) {
-			const initial = (this.latestValues as any)[key];
+		for (const [key, initial] of Object.entries(this.latestValues as ResolvedValues)) {
 			if (initial === undefined) continue;
 			ve.getValue(key)?.jump(initial);
 			ve.latestValues[key] = initial;
@@ -301,15 +292,12 @@ export class MotionState {
 	/**
 	 * Create and attach a visual element using the given renderer.
 	 */
-	private initVisualElement(
-		renderer: (tag: string, options: VisualElementOptions<any, any>) => VisualElement<Element>
-	) {
+	private initVisualElement(renderer: FeatureBundle["renderer"]) {
 		if (this.visualElement) return;
 		this.visualElement = renderer(this.options.as as string, {
-			// @ts-expect-error - presenceContext shape differs from motion-dom's
-			presenceContext: this.options.presenceContext ?? null,
+			presenceContext: toPresenceContextProps(this.options),
 			parent: this.parent?.visualElement,
-			props: { ...this.options, whileTap: this.options.whilePress } as any,
+			props: toVisualElementProps(this.options),
 			visualState: {
 				renderState: {
 					transform: {},
@@ -318,13 +306,13 @@ export class MotionState {
 					vars: {},
 					attrs: {},
 				},
-				latestValues: { ...this.latestValues } as any,
+				latestValues: { ...this.latestValues } as ResolvedValues,
 			},
 			reducedMotionConfig: this.options.motionConfig?.reducedMotion,
 		});
 		// No parent.addChild() here: visualElement.mount() registers with the parent once `current` is set, so
 		// enteringChildren never holds unmounted children (stagger sorting crashes on them in Firefox).
-		if (this.isMounted()) {
+		if (this.element) {
 			// Features loaded after mount (async LazyMotion): animate from initial so changes made meanwhile still run.
 			this.visualElement.manuallyAnimateOnMount = true;
 			this.visualElement.mount(this.element);

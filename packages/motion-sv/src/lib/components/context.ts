@@ -1,16 +1,16 @@
 import type { MotionState } from "#lib/state/index.js";
 import type { NodeGroup } from "motion-dom";
-import { Context } from "#lib/vendor/runed/index.js";
-import type { FnGetter } from "#lib/types/common.js";
-
-export const MotionStateContext = new Context<MotionState>("MotionState");
+import { createOptionalContext } from "#lib/utils/optional-context.js";
 
 export type { NodeGroup };
 export interface LayoutGroupState {
 	id?: string;
 	group?: NodeGroup;
 	forceRender?: VoidFunction;
-	key?: FnGetter<number>;
+	key?: () => number;
 }
 
-export const LayoutGroupContext = new Context<LayoutGroupState>("LayoutGroup");
+/** The closest motion component, whose variants its motion descendants inherit. */
+export const [getParentMotionState, setParentMotionState] = createOptionalContext<MotionState>();
+
+export const [getLayoutGroup, setLayoutGroup] = createOptionalContext<LayoutGroupState>();

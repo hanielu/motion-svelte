@@ -1,4 +1,3 @@
-// Reexport your entry components here
 export * from "framer-motion/dom";
 export { delay as delayInMs } from "motion-dom";
 export { motionValue as useMotionValue } from "motion-dom";
@@ -6,7 +5,7 @@ export * from "./components/index.js";
 export { default as LayoutGroup } from "./components/layout-group.svelte";
 export { useLayoutGroup } from "./components/use-layout-group.js";
 export type { LayoutGroupProps } from "./components/use-layout-group.js";
-export { MotionStateContext, LayoutGroupContext, type LayoutGroupState, type NodeGroup } from "./components/context.js";
+export type { LayoutGroupState, NodeGroup } from "./components/context.js";
 export * from "./value/index.js";
 export type * from "./types/index.js";
 export type { MotionStyleProps } from "./types/state.js";

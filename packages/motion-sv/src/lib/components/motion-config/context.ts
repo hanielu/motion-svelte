@@ -1,6 +1,5 @@
-import { Context } from "#lib/vendor/runed/index.js";
 import type { MotionConfigState } from "./types.js";
-import type { FnGetter } from "#lib/types/common.js";
+import { createOptionalContext } from "#lib/utils/optional-context.js";
 
 /**
  * Default motion configuration
@@ -11,11 +10,9 @@ export const defaultConfig: MotionConfigState = {
 	nonce: undefined,
 };
 
-/**
- * Context for sharing motion configuration with child components
- */
-export const MotionConfigContext = new Context<FnGetter<MotionConfigState>>("MotionConfig");
+export const [getMotionConfig, setMotionConfig] = createOptionalContext<() => MotionConfigState>();
 
+/** A getter for the closest MotionConfig's configuration, or the default one. */
 export function useMotionConfig() {
-	return MotionConfigContext.getOr(() => defaultConfig);
+	return getMotionConfig() ?? (() => defaultConfig);
 }

@@ -1,6 +1,3 @@
-export * from "./use-in-view.svelte";
-export * from "./use-animation-frame.svelte";
-export * from "./get-context-window.js";
-export * from "./resolve-motion-props.js";
-// export * from './use-dom-ref';
-export * from "./use-page-in-view.svelte";
+export * from "./use-in-view.svelte.js";
+export * from "./use-animation-frame.svelte.js";
+export * from "./use-page-in-view.svelte.js";

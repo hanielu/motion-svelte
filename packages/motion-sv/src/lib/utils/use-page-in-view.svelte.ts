@@ -1,22 +1,23 @@
-class UsePageInView {
-	isInView = $state(true);
+import { on } from "svelte/events";
+
+class PageInView {
+	#isInView = $state(true);
 
 	constructor() {
 		$effect(() => {
-			if (document.hidden) {
-				this.handleVisibilityChange();
-			}
-
-			document.addEventListener("visibilitychange", this.handleVisibilityChange);
-
-			return () => {
-				document.removeEventListener("visibilitychange", this.handleVisibilityChange);
-			};
+			this.#update();
+			return on(document, "visibilitychange", this.#update);
 		});
 	}
-	handleVisibilityChange() {
-		this.isInView = !document.hidden;
+
+	/** Whether the page is visible: its tab is active and its window isn't minimised. */
+	get current() {
+		return this.#isInView;
 	}
+
+	#update = () => {
+		this.#isInView = !document.hidden;
+	};
 }
 
-export const usePageInView = () => new UsePageInView();
+export const usePageInView = () => new PageInView();

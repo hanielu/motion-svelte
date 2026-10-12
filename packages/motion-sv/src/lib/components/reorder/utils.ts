@@ -1,9 +1,9 @@
-import { isMotionValue, mixNumber, motionValue } from "motion-dom";
+import { isMotionValue, mixNumber, motionValue, type MotionValue } from "motion-dom";
 import { moveItem, type Axis, type Box, type Point } from "motion-utils";
 import type { ItemData, ReorderAxis } from "./types.js";
 
-export function useDefaultMotionValue(value: any, defaultValue: number = 0) {
-	return isMotionValue(value) ? value : motionValue(defaultValue);
+export function useDefaultMotionValue(value: unknown, defaultValue = 0) {
+	return isMotionValue(value) ? (value as MotionValue<number>) : motionValue(defaultValue);
 }
 
 const isSeparated = (a: Axis, b: Axis) => a.max <= b.min || b.max <= a.min;

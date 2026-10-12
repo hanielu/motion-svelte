@@ -1,6 +1,6 @@
 import { Feature } from "#lib/features/feature.js";
 import { VisualElementDragControls } from "#lib/features/gestures/drag/VisualElementDragControls.js";
-import { noop } from "motion-utils";
+import type { MotionState } from "#lib/state/motion-state.js";
 
 export class DragGesture extends Feature {
 	static key = "drag" as const;
@@ -8,10 +8,10 @@ export class DragGesture extends Feature {
 
 	controls: VisualElementDragControls;
 
-	removeGroupControls: Function = noop;
-	removeListeners: Function = noop;
+	removeGroupControls?: VoidFunction;
+	removeListeners?: VoidFunction;
 
-	constructor(state) {
+	constructor(state: MotionState) {
 		super(state);
 		this.controls = new VisualElementDragControls(state);
 	}
@@ -24,7 +24,7 @@ export class DragGesture extends Feature {
 		if (dragControls) {
 			this.removeGroupControls = dragControls.subscribe(this.controls);
 		}
-		this.removeListeners = this.controls.addListeners() || noop;
+		this.removeListeners = this.controls.addListeners();
 	}
 
 	update() {
@@ -32,7 +32,7 @@ export class DragGesture extends Feature {
 		const { dragControls: prevDragControls } = this.state.visualElement.prevProps || {};
 
 		if (dragControls !== prevDragControls) {
-			this.removeGroupControls();
+			this.removeGroupControls?.();
 			if (dragControls) {
 				this.removeGroupControls = dragControls.subscribe(this.controls);
 			}
@@ -40,8 +40,8 @@ export class DragGesture extends Feature {
 	}
 
 	unmount() {
-		this.removeGroupControls();
-		this.removeListeners();
+		this.removeGroupControls?.();
+		this.removeListeners?.();
 		/**
 		 * A keyed list reorder can unmount and remount an item mid-drag. Keep the
 		 * pan session alive then; its window listeners end it on pointerup.

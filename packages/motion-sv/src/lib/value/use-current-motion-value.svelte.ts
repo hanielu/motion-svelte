@@ -1,7 +1,19 @@
 import type { MotionValue } from "framer-motion/dom";
+import { createSubscriber } from "svelte/reactivity";
 
-export interface CurrentMotionValue<T> {
-	readonly current: T;
+class CurrentMotionValue<T> {
+	#value: MotionValue<T>;
+	#subscribe: () => void;
+
+	constructor(value: MotionValue<T>) {
+		this.#value = value;
+		this.#subscribe = createSubscriber((update) => value.on("change", update));
+	}
+
+	get current() {
+		this.#subscribe();
+		return this.#value.get();
+	}
 }
 
 /**
@@ -14,7 +26,7 @@ export interface CurrentMotionValue<T> {
  * @example
  * ```svelte
  * <script>
- *   import { useMotionValue, useCurrentMotionValue } from 'motion-svelte';
+ *   import { useMotionValue, useCurrentMotionValue } from 'motion-sv';
  *
  *   const x = useMotionValue(0);
  *   const reactiveX = useCurrentMotionValue(x);
@@ -26,14 +38,6 @@ export interface CurrentMotionValue<T> {
  * @param value - The MotionValue to make reactive
  * @returns An object with a reactive `current` getter
  */
-export function useCurrentMotionValue<T>(value: MotionValue<T>): CurrentMotionValue<T> {
-	let current = $state(value.get());
-
-	$effect(() => value.on("change", (latest) => (current = latest)));
-
-	return {
-		get current() {
-			return current;
-		},
-	};
+export function useCurrentMotionValue<T>(value: MotionValue<T>) {
+	return new CurrentMotionValue(value);
 }

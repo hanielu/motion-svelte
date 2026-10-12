@@ -9,27 +9,23 @@ export class HoverGesture extends Feature {
 	private removeHover: VoidFunction | undefined;
 
 	private isActive() {
-		const { whileHover, onHoverStart, onHoverEnd } = this.state.options as any;
+		const { whileHover, onHoverStart, onHoverEnd } = this.state.options;
 		return Boolean(whileHover || onHoverStart || onHoverEnd);
 	}
 
 	private register() {
-		const element = this.state.element as HTMLElement;
+		const element = this.state.element;
 		if (!element || !this.isActive()) return;
 
-		this.removeHover?.();
 		this.removeHover = hover(element, (_el, startEvent) => {
-			const props = this.state.options as any;
 			this.state.setActive("whileHover", true);
-			if (props.onHoverStart) {
-				frame.postRender(() => props.onHoverStart(startEvent, extractEventInfo(startEvent)));
-			}
+			const { onHoverStart } = this.state.options;
+			if (onHoverStart) frame.postRender(() => onHoverStart(startEvent, extractEventInfo(startEvent)));
+
 			return (endEvent) => {
 				this.state.setActive("whileHover", false);
-				const callback = (this.state.options as any).onHoverEnd;
-				if (callback) {
-					frame.postRender(() => callback(endEvent, extractEventInfo(endEvent)));
-				}
+				const { onHoverEnd } = this.state.options;
+				if (onHoverEnd) frame.postRender(() => onHoverEnd(endEvent, extractEventInfo(endEvent)));
 			};
 		});
 	}
@@ -39,11 +35,7 @@ export class HoverGesture extends Feature {
 	}
 
 	update() {
-		const prev = this.state.visualElement.prevProps as any;
-		const wasActive = Boolean(prev?.whileHover || prev?.onHoverStart || prev?.onHoverEnd);
-		if (!wasActive && this.isActive()) {
-			this.register();
-		}
+		if (!this.removeHover) this.register();
 	}
 
 	unmount() {

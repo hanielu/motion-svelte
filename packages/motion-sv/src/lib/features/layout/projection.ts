@@ -1,16 +1,16 @@
 import { Feature } from "#lib/features/feature.js";
 import type { IProjectionNode } from "motion-dom";
-import { HTMLProjectionNode, addScaleCorrector } from "motion-dom";
+import { HTMLProjectionNode, addScaleCorrector, isHTMLElement } from "motion-dom";
 import { getClosestProjectingNode } from "#lib/features/layout/utils.js";
 import { defaultScaleCorrector } from "#lib/features/layout/config.js";
-import { isHTMLElement } from "#lib/features/gestures/drag/utils/is.js";
 import { isSSR } from "#lib/utils/is.js";
+import type { MotionState } from "#lib/state/motion-state.js";
 
 export class ProjectionFeature extends Feature {
 	static key = "projection" as const;
 	private projection: IProjectionNode | undefined;
 
-	constructor(state) {
+	constructor(state: MotionState) {
 		super(state);
 		addScaleCorrector(defaultScaleCorrector);
 		if (!isSSR) {
@@ -24,8 +24,9 @@ export class ProjectionFeature extends Feature {
 			this.state.visualElement.latestValues,
 			options["data-framer-portal-id"] ? undefined : getClosestProjectingNode(this.state.visualElement.parent)
 		);
-		this.projection = this.state.visualElement.projection;
-		this.projection.isPresent = true;
+		const projection: IProjectionNode = this.state.visualElement.projection;
+		projection.isPresent = true;
+		this.projection = projection;
 		this.setOptions();
 	}
 

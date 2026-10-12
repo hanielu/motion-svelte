@@ -1,17 +1,8 @@
-export * from "./box.svelte.js";
 export * from "./watch.svelte.js";
-export * from "./is.js";
-export * from "./context.js";
 export * from "./types.js";
 export * from "./extract.js";
-export * from "./attach-ref.js";
-export * from "./unbox.js";
-export * from "./previous.svelte.js";
-export * from "./is-mounted.svelte.js";
-export * from "./vue-reactivity/index.js";
-export * from "./rala-log.js";
 
-export const isDef = <T = any>(val?: T): val is T => typeof val !== "undefined";
+export const isDef = <T>(val?: T): val is T => typeof val !== "undefined";
 
 /**
  * Converts a style object into a CSS string.
@@ -59,29 +50,5 @@ export function withProp<T extends object, K extends PropertyKey, V>(props: T, k
 	return Object.defineProperties({}, {
 		...Object.getOwnPropertyDescriptors(props),
 		[key]: { value, writable: true, enumerable: true, configurable: true },
-	} as PropertyDescriptorMap) as any;
-}
-
-/**
- * Returns a new object that copies all properties from the given object `props`
- * and adds (or overwrites) properties from the `extras` object.
- *
- * @template T - Type of the original object.
- * @template E - Type of the extra properties to add.
- *
- * @param {T} props - The source object whose properties should be copied.
- * @param {E} extras - An object containing additional properties to merge into the result.
- * @returns {T & E} A new object with all original properties from `props`
- * and all properties from `extras`.
- */
-export function withProps<T extends object, E extends object>(props: T, extras: E): T & E {
-	return Object.defineProperties(
-		{},
-		{
-			...Object.getOwnPropertyDescriptors(props),
-			...Object.fromEntries(
-				Object.entries(extras).map(([k, v]) => [k, { value: v, writable: true, enumerable: true, configurable: true }])
-			),
-		}
-	) as T & E;
+	} as PropertyDescriptorMap) as T & Record<K, V>;
 }

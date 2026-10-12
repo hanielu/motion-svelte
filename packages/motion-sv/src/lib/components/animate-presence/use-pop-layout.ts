@@ -1,6 +1,6 @@
 import type { AnimatePresenceProps } from "./types.js";
 import type { MotionState } from "#lib/state/motion-state.js";
-import { frame } from "motion-dom";
+import { cancelFrame, frame } from "motion-dom";
 import { useMotionConfig } from "../motion-config/index.js";
 
 let popId = 0;
@@ -31,87 +31,59 @@ function measure(element: HTMLElement): PopSize {
 	};
 }
 
-export function usePopLayout(props: AnimatePresenceProps) {
+export function usePopLayout(props: Pick<AnimatePresenceProps, "mode" | "anchorX">) {
 	const styles = new WeakMap<MotionState, HTMLStyleElement>();
-	// Cache of positions captured continuously via rAF - always has the "stable" position
-	const cachedPositions = new WeakMap<MotionState, PopSize>();
-	// Track states that are being monitored
-	const trackedStates = new Set<MotionState>();
-	let rafId: number | null = null;
 	const config = useMotionConfig();
 
 	/**
-	 * Continuously capture positions of tracked elements.
-	 * Runs every frame to ensure we always have the latest stable position.
+	 * React measures an exiting element right before the update that removes it. Svelte only reports the exit after
+	 * that update, when new siblings may already have shifted it, so tracked elements are measured every frame (in
+	 * motion's read phase) and the exit uses the last measurement.
 	 */
-	function updatePositions() {
-		for (const state of trackedStates) capturePositionSync(state);
+	const trackedStates = new Set<MotionState>();
+	const cachedPositions = new WeakMap<MotionState, PopSize>();
 
-		if (trackedStates.size > 0) {
-			rafId = requestAnimationFrame(updatePositions);
-		} else {
-			rafId = null;
-		}
+	function measureTracked() {
+		for (const state of trackedStates) measureState(state);
 	}
 
-	/**
-	 * Capture position for a single element synchronously.
-	 */
-	function capturePositionSync(state: MotionState) {
-		const element = state.element as HTMLElement;
-		if (!element || !element.isConnected) return;
-		cachedPositions.set(state, measure(element));
+	function measureState(state: MotionState) {
+		const element = state.element as HTMLElement | null;
+		if (element?.isConnected) cachedPositions.set(state, measure(element));
 	}
 
-	/**
-	 * Start tracking a state's position continuously.
-	 */
 	function trackPosition(state: MotionState) {
 		if (props.mode !== "popLayout") return;
+		if (trackedStates.size === 0) frame.read(measureTracked, true);
 		trackedStates.add(state);
-
-		// Capture position immediately so we have it even if element exits before rAF
-		capturePositionSync(state);
-
-		if (rafId === null) {
-			rafId = requestAnimationFrame(updatePositions);
-		}
+		// Measure now too, in case the element exits before the next frame
+		measureState(state);
 	}
 
-	/**
-	 * Stop tracking a state's position.
-	 */
 	function untrackPosition(state: MotionState) {
 		trackedStates.delete(state);
 		cachedPositions.delete(state);
+		if (trackedStates.size === 0) cancelFrame(measureTracked);
 	}
 
 	function addPopStyle(state: MotionState) {
 		if (props.mode !== "popLayout") return;
 		const element = state.element as HTMLElement;
-
-		// Stop tracking this element since it's exiting
-		trackedStates.delete(state);
-
-		// Use the cached position if available, otherwise measure now (may be off if the DOM has shifted)
 		const size = cachedPositions.get(state) ?? measure(element);
-		cachedPositions.delete(state);
+		untrackPosition(state);
 
 		// Anchor to the start edge, which is the right one in RTL.
 		const anchorLeft = (props.anchorX === "left") === (size.direction !== "rtl");
 		const x = anchorLeft ? `left: ${size.left}px` : `right: ${size.right}px`;
 
-		// Use unique pop id for CSS selector
 		const elementPopId = `pop-${popId++}`;
-		(state.element as HTMLElement).dataset.motionPopId = elementPopId;
+		element.dataset.motionPopId = elementPopId;
 		const style = document.createElement("style");
-		if (config().nonce) {
-			style.nonce = config().nonce;
-		}
+		const { nonce } = config();
+		if (nonce) style.nonce = nonce;
 		styles.set(state, style);
 		element.ownerDocument.head.appendChild(style);
-		if (style.sheet) {
-			style.sheet.insertRule(`
+		style.sheet?.insertRule(`
     [data-motion-pop-id="${elementPopId}"] {
       position: absolute !important;
       width: ${size.width}px !important;
@@ -120,22 +92,17 @@ export function usePopLayout(props: AnimatePresenceProps) {
       ${x} !important;
       }
       `);
-		}
 	}
 
+	/** Returns whether the element was popped. */
 	function removePopStyle(state: MotionState) {
 		const style = styles.get(state);
-		if (!style) return;
+		if (!style) return false;
 		styles.delete(state);
 		delete (state.element as HTMLElement).dataset.motionPopId;
 		frame.render(() => style.remove());
+		return true;
 	}
 
-	return {
-		addPopStyle,
-		removePopStyle,
-		trackPosition,
-		untrackPosition,
-		styles,
-	};
+	return { addPopStyle, removePopStyle, trackPosition, untrackPosition };
 }

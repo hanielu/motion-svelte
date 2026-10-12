@@ -1,13 +1,11 @@
 <script lang="ts" module>
 	import type { ElementType } from "#lib/types/index.js";
 	import type { Snippet } from "svelte";
-	import { ReorderContext } from "./context.js";
+	import { getReorderContext } from "./context.js";
 	import type { MotionProps } from "../motion/index.js";
-	import { invariant } from "hey-listen";
 	import { useDefaultMotionValue } from "./utils.js";
 	import { autoScrollIfNeeded, resetAutoScrollState } from "./auto-scroll.js";
 	import { useTransform } from "#lib/value/index.js";
-	import { watch } from "#lib/vendor/runed/index.js";
 	import type { PanInfo } from "motion-dom";
 
 	export interface GroupItemProps<T extends ElementType = "li", K = unknown, V = unknown> extends MotionProps<T, K> {
@@ -43,9 +41,8 @@
 		children: Snippet<[isDragging: boolean]>;
 	} = $props();
 
-	const context = ReorderContext.getOr(null);
-	invariant(Boolean(context), "Reorder.Item must be a child of Reorder.Group");
-	const { registerItem, updateOrder, groupRef, layoutMotion } = context!;
+	const context = getReorderContext();
+	const { registerItem, updateOrder, groupRef, layoutMotion } = context;
 
 	// svelte-ignore state_referenced_locally - the drag motion values are created once, like React's hooks
 	const point = {
@@ -58,15 +55,10 @@
 
 	// svelte-ignore state_referenced_locally - the element type is fixed per item, as in React
 	const Item = layoutMotion[as as "li"];
-	watch.pre(
-		() => [rest.custom],
-		() => layoutMotion.update(),
-		{ lazy: true }
-	);
 
 	function handleDrag(event: PointerEvent, gesturePoint: PanInfo) {
 		const { velocity, point: pointerPoint } = gesturePoint;
-		const { axis } = context!;
+		const { axis } = context;
 
 		updateOrder(value, { x: point.x.get(), y: point.y.get() }, velocity);
 
@@ -85,7 +77,7 @@
 </script>
 
 <Item
-	drag={drag ?? (context!.axis === "xy" ? true : context!.axis)}
+	drag={drag ?? (context.axis === "xy" ? true : context.axis)}
 	{...rest}
 	dragSnapToOrigin
 	style={{ ...style, x: point.x, y: point.y, zIndex }}

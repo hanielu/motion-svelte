@@ -1,9 +1,10 @@
 <script module lang="ts">
 	import type { AsTag } from "#lib/types/index.js";
-	import type { Box } from "motion-utils";
+	import type { Box, Point } from "motion-utils";
 	import type { ReorderAxis } from "./types.js";
-	import { Motion, createLayoutMotion, type MotionProps } from "../motion/index.js";
-	import { ReorderContext } from "./context.js";
+	import { createLayoutMotion, motion, type MotionProps } from "../motion/index.js";
+	import { setReorderContext } from "./context.js";
+	import { watch } from "#lib/vendor/runed/index.js";
 	import { invariant } from "hey-listen";
 	import { checkReorder, detectAxis } from "./utils.js";
 
@@ -53,30 +54,26 @@
 		...rest
 	}: GroupProps<AsTag, K, V> = $props();
 
+	// svelte-ignore state_referenced_locally - a programming error, checked once
+	invariant(Boolean(values), "Reorder.Group must be provided a values prop");
+
+	// svelte-ignore state_referenced_locally - the element type is fixed per group, as in React
+	const Group = motion[as as "ul"];
+
 	const itemLayouts = new Map<V, Box>();
 	let detectedAxis = $state<ReorderAxis>("y");
 	const axis = $derived(axisOverride ?? detectedAxis);
+	/** Set while a new order is waiting to render, so a drag reorders once per render. */
 	let isReordering = false;
 	const layoutMotion = createLayoutMotion();
 
-	$effect(() => {
-		invariant(Boolean(values), "Reorder.Group must be provided a values prop");
-	});
-
-	$effect.pre(() => {
-		const valuesSet = new Set(values);
-		itemLayouts.forEach((_, value) => {
-			if (!valuesSet.has(value)) itemLayouts.delete(value);
-		});
-	});
-
-	ReorderContext.set({
+	setReorderContext({
 		get axis() {
 			return axis;
 		},
 		groupRef: () => ref,
 		layoutMotion,
-		registerItem: (value, layout) => {
+		registerItem(value: V, layout: Box) {
 			itemLayouts.set(value, layout);
 
 			if (!axisOverride) {
@@ -88,7 +85,7 @@
 				);
 			}
 		},
-		updateOrder: (item, offset, velocity) => {
+		updateOrder(item: V, offset: Point, velocity: Point) {
 			if (isReordering) return;
 
 			const order = values.flatMap((value) => {
@@ -97,31 +94,37 @@
 			});
 			const direction = ref && getComputedStyle(ref).direction === "rtl" ? "rtl" : "ltr";
 			const newOrder = checkReorder(order, item, offset, velocity, axis, direction);
+			if (order === newOrder) return;
 
-			if (order !== newOrder) {
-				isReordering = true;
-				// Snapshot the items before the new order renders, as a React re-render does.
-				layoutMotion.update();
+			isReordering = true;
+			// Snapshot the items before the new order renders, as a React re-render does.
+			layoutMotion.update();
 
-				// Unmeasured items (e.g. exiting with AnimatePresence) keep their positions.
-				const newValues = [...values];
-				const measuredIndexes = order.map(({ value }) => values.indexOf(value));
-				newOrder.forEach(({ value }, index) => {
-					newValues[measuredIndexes[index]] = value;
-				});
-				values = newValues;
-				onReorder?.(newValues);
-			}
+			// Unmeasured items (e.g. exiting with AnimatePresence) keep their positions.
+			const newValues = [...values];
+			const measuredIndexes = order.map(({ value }) => values.indexOf(value));
+			newOrder.forEach(({ value }, index) => {
+				newValues[measuredIndexes[index]] = value;
+			});
+			values = newValues;
+			onReorder?.(newValues);
 		},
 	});
 
-	// Only clear the guard once the new order has been rendered.
-	$effect(() => {
-		void values;
-		isReordering = false;
-	});
+	// Once new values have rendered: allow the next reorder, and forget the layouts of removed items.
+	watch(
+		() => values,
+		(current) => {
+			isReordering = false;
+			const valuesSet = new Set(current);
+			for (const value of itemLayouts.keys()) {
+				if (!valuesSet.has(value)) itemLayouts.delete(value);
+			}
+		}
+	);
 
-	const groupStyle = $derived({ overflowAnchor: "none", ...(rest.style as Record<string, any>) });
+	// Scroll anchoring would move the page as items reorder, throwing off the drag.
+	const groupStyle = $derived({ overflowAnchor: "none", ...rest.style });
 </script>
 
-<Motion as={as as any} {...rest} style={groupStyle} bind:ref />
+<Group {...rest} style={groupStyle} bind:ref />

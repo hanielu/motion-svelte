@@ -1,12 +1,10 @@
 import type { AsTag, MotionStateContext, Options, VariantType } from "#lib/types/index.js";
+import type { PresenceContext } from "#lib/components/animate-presence/presence.svelte.js";
+import type { ResolvedValues } from "motion-dom";
 
-/**
- * Resolve a variant definition to its full target, including `transition`.
- * Used by the Svelte exit-transition duration estimator, which needs the
- * variant's own transition to size the outro window.
- */
-export function resolveVariantValue(
-	definition?: Options["animate"],
+/** Resolve a variant definition to its full target, including `transition`. */
+function resolveVariantValue(
+	definition?: Options["initial"] | Options["animate"],
 	variants?: Options["variants"],
 	custom?: Options["custom"]
 ): VariantType | undefined {
@@ -19,18 +17,18 @@ export function resolveVariantValue(
 		return definition as VariantType;
 	} else if (definition && variants) {
 		const variant = variants[definition as string];
-		return (typeof variant === "function" ? (variant as any)(custom) : variant) as VariantType;
+		return (typeof variant === "function" ? variant(custom, {}, {}) : variant) as VariantType;
 	}
 }
 
 export function resolveVariant(
-	definition?: Options["animate"],
+	definition?: Options["initial"] | Options["animate"],
 	variants?: Options["variants"],
 	custom?: Options["custom"]
 ): VariantType | undefined {
 	const resolved = resolveVariantValue(definition, variants, custom);
 	if (!resolved) return undefined;
-	const { transition, transitionEnd, ...target } = resolved as any;
+	const { transition, transitionEnd, ...target } = resolved as VariantType & { transitionEnd?: ResolvedValues };
 	return { ...target, ...transitionEnd };
 }
 
@@ -41,11 +39,14 @@ export function resolveVariant(
  * @param options - Motion options
  * @param context - Optional parent context for variant inheritance (MotionState passes this)
  */
-export function resolveInitialValues(options: Options, context?: MotionStateContext): Record<string, any> {
+export function resolveInitialValues(
+	options: Options & { presenceContext?: PresenceContext },
+	context?: MotionStateContext
+): VariantType {
 	const initial = options.initial === undefined && options.variants ? context?.initial : options.initial;
-	const sources = initial === false ? ["initial", "animate"] : ["initial"];
-	const custom = options.custom ?? (options as any).presenceContext?.custom;
-	return sources.reduce<Record<string, any>>((acc, variant) => {
+	const sources = initial === false ? (["initial", "animate"] as const) : (["initial"] as const);
+	const custom = options.custom ?? options.presenceContext?.custom;
+	return sources.reduce<VariantType>((acc, variant) => {
 		return {
 			...acc,
 			...resolveVariant(options[variant] || context?.[variant], options.variants, custom),
@@ -55,12 +56,6 @@ export function resolveInitialValues(options: Options, context?: MotionStateCont
 
 export function isCssVar(name: string) {
 	return name?.startsWith("--");
-}
-
-export const noopReturn = <V>(v: V) => v;
-
-export function isNumber(value: any): boolean {
-	return typeof value === "number";
 }
 
 export const svgElements = [

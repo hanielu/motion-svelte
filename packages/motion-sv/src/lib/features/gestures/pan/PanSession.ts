@@ -1,8 +1,10 @@
-import type { EventInfo, PanHandler } from "motion-dom";
+import type { EventInfo, PanInfo } from "motion-dom";
 import { cancelFrame, frame, frameData, isPrimaryPointer, time } from "motion-dom";
 import { millisecondsToSeconds, pipe, secondsToMilliseconds, type Point, type TransformPoint } from "motion-utils";
 import { distance2D } from "framer-motion/dom";
 import { addPointerEvent, extractEventInfo } from "#lib/events/index.js";
+
+type PanHandler = (event: PointerEvent, info: PanInfo) => void;
 
 interface PanSessionHandlers {
 	onSessionStart: PanHandler;
@@ -39,7 +41,7 @@ export class PanSession {
 	/**
 	 * @internal
 	 */
-	private history: TimestampedPoint[];
+	private history: TimestampedPoint[] = [];
 
 	/**
 	 * @internal
@@ -82,21 +84,21 @@ export class PanSession {
 	/**
 	 * @internal
 	 */
-	private removeListeners: Function;
+	private removeListeners?: VoidFunction;
 
 	/**
 	 * For determining if an animation should resume after it is interrupted
 	 *
 	 * @internal
 	 */
-	private dragSnapToOrigin: boolean | "x" | "y";
+	private dragSnapToOrigin: boolean | "x" | "y" = false;
 
 	/**
 	 * The distance after which panning should start.
 	 *
 	 * @internal
 	 */
-	private distanceThreshold: number;
+	private distanceThreshold = 3;
 
 	/**
 	 * @internal
@@ -154,7 +156,7 @@ export class PanSession {
 			addPointerEvent(this.contextWindow, "pointermove", this.handlePointerMove, eventOptions),
 			addPointerEvent(this.contextWindow, "pointerup", this.handlePointerUp, eventOptions),
 			addPointerEvent(this.contextWindow, "pointercancel", this.handlePointerUp, eventOptions)
-		);
+		) as VoidFunction;
 
 		// Start scroll tracking if element provided
 		if (element) {
@@ -323,8 +325,8 @@ export class PanSession {
 	}
 
 	end() {
-		this.removeListeners && this.removeListeners();
-		this.removeScrollListeners && this.removeScrollListeners();
+		this.removeListeners?.();
+		this.removeScrollListeners?.();
 		this.scrollPositions.clear();
 		cancelFrame(this.updatePoint);
 	}

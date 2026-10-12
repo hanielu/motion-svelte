@@ -35,10 +35,6 @@ type ViewportEventHandler = (entry: IntersectionObserverEntry | null) => void;
 
 export interface InViewProps {
 	inViewOptions?: InViewOptions & { once?: boolean };
-	// /**
-	//  * @deprecated Use `whileInView` instead.
-	//  */
-	// inView?: VariantLabels | TargetAndTransition;
 	/**
 	 * Variant to apply when the element is in view.
 	 */

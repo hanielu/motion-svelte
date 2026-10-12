@@ -1,39 +1,45 @@
 <script lang="ts">
 	import type { FeatureBundle } from "#lib/features/dom-animation.js";
 	import type { Snippet } from "svelte";
-	import { LazyMotionContext } from "./context.js";
+	import { untrack } from "svelte";
+	import { setLazyMotion } from "./context.js";
 
-	type FeaturesProp = FeatureBundle | Promise<FeatureBundle> | (() => Promise<FeatureBundle>);
+	type LazyFeatureBundle = Promise<FeatureBundle> | (() => Promise<FeatureBundle>);
 
 	interface LazyMotionProps {
 		children: Snippet;
-		features: FeaturesProp;
+		features: FeatureBundle | LazyFeatureBundle;
 		strict?: boolean;
 	}
 
-	let { children, features: featuresProp, strict = false }: LazyMotionProps = $props();
+	let { children, features, strict = false }: LazyMotionProps = $props();
 
-	let features = $state.raw<Partial<FeatureBundle>>({});
+	const isLazy = (bundle: LazyMotionProps["features"]): bundle is LazyFeatureBundle =>
+		typeof bundle === "function" || bundle instanceof Promise;
 
-	// Check if it's a FeatureBundle object (has renderer property)
-	if (typeof featuresProp === "object" && "renderer" in featuresProp) {
-		// Sync load
-		features = featuresProp;
-	} else if (typeof featuresProp === "function") {
-		// Async load - function that returns promise
-		featuresProp().then((mod) => {
-			features = mod;
+	let loaded = $state.raw<FeatureBundle>();
+
+	// A lazy bundle loads once, when LazyMotion mounts, as in React; a later `features` prop doesn't reload it.
+	$effect(() => {
+		const bundle = untrack(() => features);
+		if (!isLazy(bundle)) return;
+
+		let isMounted = true;
+		(typeof bundle === "function" ? bundle() : bundle).then((resolved) => {
+			if (isMounted) loaded = resolved;
 		});
-	} else if (featuresProp instanceof Promise) {
-		// Async load - direct promise
-		featuresProp.then((mod) => {
-			features = mod;
-		});
-	}
+		return () => {
+			isMounted = false;
+		};
+	});
 
-	LazyMotionContext.set({
-		features: () => features,
-		strict,
+	setLazyMotion({
+		get features() {
+			return isLazy(features) ? (loaded ?? {}) : features;
+		},
+		get strict() {
+			return strict;
+		},
 	});
 </script>
 

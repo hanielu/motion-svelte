@@ -19,12 +19,6 @@ export interface UseScrollOptions extends Omit<ScrollInfoOptions, "container" | 
 	target?: HTMLElement | null;
 }
 
-/** Plain object or getter — mirrors Vue’s `MaybeRefOrGetter<UseScrollOptions>`. */
-export type UseScrollOptionsInput = UseScrollOptions | (() => UseScrollOptions);
-function resolveScrollOptions(input: UseScrollOptionsInput): UseScrollOptions {
-	return typeof input === "function" ? input() : input;
-}
-
 function createScrollMotionValues() {
 	return {
 		scrollX: motionValue(0),
@@ -59,7 +53,7 @@ function makeAccelerateConfig(axis: "x" | "y", getOptions: () => UseScrollOption
 					return;
 				}
 				const { container, target, ...rest } = options;
-				cleanup = scroll(animation, { ...rest, axis, container, target });
+				cleanup = scroll(animation, { ...rest, axis, container: container ?? undefined, target: target ?? undefined });
 			};
 			microtask.read(start);
 			return () => {
@@ -75,9 +69,10 @@ function makeAccelerateConfig(axis: "x" | "y", getOptions: () => UseScrollOption
 	};
 }
 
+/** `container` and `target` can be getters (`get target() { return element }`), so they're read when bound. */
 export function useScroll(scrollOptions: UseScrollOptions = {}) {
 	const values = createScrollMotionValues();
-	const getOptions = () => resolveScrollOptions(scrollOptions);
+	const getOptions = () => scrollOptions;
 
 	// Set the acceleration config once, at setup. Elements are resolved when the VisualElement invokes the factory.
 	if (canAccelerateScroll(getOptions())) {
@@ -94,11 +89,7 @@ export function useScroll(scrollOptions: UseScrollOptions = {}) {
 				values.scrollY.set(y.current);
 				values.scrollYProgress.set(y.progress);
 			},
-			{
-				...rest,
-				container,
-				target,
-			}
+			{ ...rest, container: container ?? undefined, target: target ?? undefined }
 		);
 	});
 
