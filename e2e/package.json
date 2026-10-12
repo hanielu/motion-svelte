@@ -4,11 +4,11 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"dev": "vite",
-		"build:motion": "pnpm -F motion-sv package",
-		"test": "pnpm build:motion && playwright test",
-		"test:playground": "pnpm build:motion && playwright test --project=playground",
-		"test:upstream": "pnpm build:motion && playwright test --project=upstream",
+		"fixtures": "vite",
+		"build:motion": "bun run --filter motion-sv package",
+		"test": "bun run build:motion && playwright test",
+		"test:playground": "bun run build:motion && playwright test --project=playground",
+		"test:upstream": "bun run build:motion && playwright test --project=upstream",
 		"report": "playwright show-report"
 	},
 	"devDependencies": {

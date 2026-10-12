@@ -5,14 +5,14 @@
 	"license": "MIT",
 	"author": "Haniel Ubogu <https://github.com/HanielU>",
 	"scripts": {
-		"build": "pnpm -r build",
-		"build:packages": "pnpm -F \"./packages/**\" --parallel build",
-		"check": "pnpm build:packages && pnpm -r check",
-		"dev": "pnpm -F \"./packages/**\" svelte-kit sync && pnpm -r --parallel --reporter append-only --color dev",
+		"build": "bun run --workspaces --if-present build",
+		"build:packages": "bun run --filter motion-sv --filter motion-rsv --filter runed build",
+		"check": "bun run build:packages && bun run --workspaces --if-present check",
+		"dev": "bun run --workspaces --parallel --if-present dev",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
-		"test:e2e": "pnpm -F e2e test",
-		"release": "pnpm build:packages && changeset publish"
+		"test:e2e": "bun run --filter e2e test",
+		"release": "bun run build:packages && changeset publish"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.3",
@@ -25,9 +25,10 @@
 		"typescript": "^5.0.0",
 		"typescript-eslint": "^8.0.0"
 	},
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"esbuild"
-		]
-	}
+	"workspaces": [
+		"packages/*",
+		"playground/*",
+		"e2e",
+		"docs"
+	]
 }

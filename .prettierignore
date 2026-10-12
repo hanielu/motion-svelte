@@ -13,7 +13,7 @@ misc
 public
 $houdini
 
-# Ignore files for PNPM, NPM and YARN
+# Ignore lockfiles
+bun.lock
 package-lock.json
-pnpm-lock.yaml
 yarn.lock

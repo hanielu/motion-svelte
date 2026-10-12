@@ -1,8 +1,0 @@
-packages:
-  - "packages/*"
-  - "playground/*"
-  - "e2e"
-  - "docs"
-  - "new-docs"
-onlyBuiltDependencies:
-  - esbuild

@@ -9,16 +9,16 @@
 		"url": "git+https://github.com/HanielU/motion-svelte.git"
 	},
 	"scripts": {
-		"build": "pnpm package",
-		"dev": "pnpm watch",
+		"build": "bun run package",
+		"dev": "svelte-kit sync && bun run watch",
 		"dev:svelte": "vite dev",
 		"watch": "svelte-package --watch",
 		"package": "svelte-kit sync && svelte-package && publint",
-		"prepublishOnly": "npm run package",
+		"prepublishOnly": "bun run package",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test:unit": "vitest",
-		"test": "npm run test:unit -- --run"
+		"test": "bun run test:unit --run"
 	},
 	"files": [
 		"dist",

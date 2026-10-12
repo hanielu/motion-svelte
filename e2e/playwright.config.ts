@@ -38,13 +38,13 @@ export default defineConfig({
 	],
 	webServer: [
 		{
-			command: `npx vite --port ${PLAYGROUND_PORT} --strictPort`,
+			command: `bunx vite --port ${PLAYGROUND_PORT} --strictPort`,
 			cwd: "../playground/vite",
 			url: `http://localhost:${PLAYGROUND_PORT}`,
 			reuseExistingServer: true,
 		},
 		{
-			command: `npx vite --port ${FIXTURES_PORT} --strictPort`,
+			command: `bunx vite --port ${FIXTURES_PORT} --strictPort`,
 			url: `http://localhost:${FIXTURES_PORT}`,
 			reuseExistingServer: true,
 		},
