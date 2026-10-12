@@ -6,7 +6,7 @@
 	"description": "Motion for Svelte",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/HanielU/motion-svlte.git"
+		"url": "git+https://github.com/HanielU/motion-svelte.git"
 	},
 	"scripts": {
 		"build": "pnpm package",

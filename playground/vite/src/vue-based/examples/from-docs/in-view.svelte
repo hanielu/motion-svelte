@@ -3,7 +3,7 @@
 	 * ==============   Animation   ================
 	 */
 
-	const cardVariants = {
+	const cardVariants: Variants = {
 		offscreen: {
 			y: 300,
 		},
@@ -81,7 +81,7 @@
 </script>
 
 <script lang="ts">
-	import { motion } from "motion-sv";
+	import { motion, type Variants } from "motion-sv";
 	import { css } from "runed";
 </script>
 

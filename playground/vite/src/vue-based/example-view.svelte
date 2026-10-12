@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { useParams } from "@hvniel/svelte-router";
 	import { examplesById } from "./example-registry";
-	
-	const params = useParams();
-	
+
+	const params = $derived(useParams());
+
 	let example = $derived(params.id ? examplesById[params.id] : undefined);
 	let ExampleComponent = $derived(example?.component);
 </script>
@@ -34,7 +34,7 @@
 				<div class="rounded-xl border border-neutral-800 bg-neutral-900/50 p-8">
 					<ExampleComponent />
 				</div>
-				
+
 				<!-- Add some bottom padding for better scrolling experience -->
 				<div class="h-32"></div>
 			</div>

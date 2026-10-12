@@ -1,0 +1,101 @@
+<script lang="ts">
+	import { motion, useAnimate, stagger, type AnimationOptions } from "motion-sv";
+	import { cn } from "$lib/utils";
+	import type { HTMLAttributes } from "svelte/elements";
+
+	interface LetterSwapProps extends HTMLAttributes<HTMLSpanElement> {
+		label: string;
+		reverse?: boolean;
+		transition?: AnimationOptions;
+		staggerDuration?: number;
+		staggerFrom?: "first" | "last" | "center" | number;
+		class?: string;
+	}
+
+	let {
+		label,
+		reverse = true,
+		transition = {
+			type: "spring",
+			duration: 0.7,
+		},
+		staggerDuration = 0.03,
+		staggerFrom = "first",
+		class: className,
+		onclick,
+		...props
+	}: LetterSwapProps = $props();
+
+	let [scope, animate] = useAnimate();
+	let blocked = $state(false);
+	let letters = $derived(label.split(""));
+
+	let hoverStart = () => {
+		if (blocked) return;
+
+		console.log("Hover start - scope.current:", scope.current.textContent);
+
+		blocked = true;
+
+		// Function to merge user transition with stagger and delay
+		let mergeTransition = (baseTransition: AnimationOptions) => ({
+			...baseTransition,
+			delay: stagger(staggerDuration, {
+				from: staggerFrom,
+			}),
+		});
+
+		animate(".letter", { y: reverse ? "100%" : "-100%" }, mergeTransition(transition) as any).then(() => {
+			animate(
+				".letter",
+				{
+					y: 0,
+				},
+				{
+					duration: 0,
+				}
+			).then(() => {
+				blocked = false;
+			});
+		});
+
+		animate(
+			".letter-secondary",
+			{
+				top: "0%",
+			},
+			mergeTransition(transition) as any
+		).then(() => {
+			animate(
+				".letter-secondary",
+				{
+					top: reverse ? "-100%" : "100%",
+				},
+				{
+					duration: 0,
+				}
+			);
+		});
+	};
+</script>
+
+<span
+	bind:this={scope.current}
+	class={cn("flex justify-center items-center relative overflow-hidden", className)}
+	onmouseenter={hoverStart}
+	{onclick}
+	{...props}
+>
+	<span class="sr-only">{label}</span>
+
+	{#each letters as letter}
+		<span class="whitespace-pre relative flex" aria-hidden="true">
+			<motion.span class="relative letter" style={{ top: 0 }}>
+				{letter}
+			</motion.span>
+			<motion.span class="absolute letter-secondary" style={{ top: reverse ? "-100%" : "100%" }}>
+				{letter}
+			</motion.span>
+		</span>
+	{/each}
+</span>

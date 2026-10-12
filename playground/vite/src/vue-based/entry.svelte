@@ -3,7 +3,8 @@
 	import Navigation from "./navigation.svelte";
 	import type { Snippet } from "svelte";
 	import { BrowserRouter, Routes, Route, Outlet } from "@hvniel/svelte-router";
-	// import QuillowCard from "./examples/layout-focused/quillow-card.svelte";
+	import QuillowCard from "./examples/layout-focused/quillow-card.svelte";
+	import FrequencySelector from "./examples/layout-focused/frequency-selector.svelte";
 </script>
 
 <BrowserRouter>
@@ -12,7 +13,8 @@
 			<Route path="/" element={home as Snippet} />
 			<Route path="/example/:id" Component={ExampleView} />
 		</Route>
-		<!-- <Route path="/quillow-card" Component={QuillowCard} /> -->
+		<Route path="/quillow-card" Component={QuillowCard} />
+		<Route path="/frequency-selector" Component={FrequencySelector} />
 	</Routes>
 </BrowserRouter>
 

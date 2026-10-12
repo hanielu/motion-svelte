@@ -2,7 +2,7 @@
 	import { useLocation, Link } from "@hvniel/svelte-router";
 	import { examplesByCategory } from "./example-registry";
 
-	const location = useLocation();
+	const location = $derived(useLocation());
 	const categories = Object.keys(examplesByCategory);
 	const currentPath = $derived(location.pathname);
 

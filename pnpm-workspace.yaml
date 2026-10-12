@@ -3,3 +3,5 @@ packages:
   - "playground/*"
   - "docs"
   - "new-docs"
+onlyBuiltDependencies:
+  - esbuild

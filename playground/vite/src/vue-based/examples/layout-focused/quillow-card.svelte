@@ -216,7 +216,7 @@
 							animate={{ scale: 1, opacity: 1 }}
 							exit={{ scale: 0.5, opacity: 0 }}
 							transition={spring}
-							class="bg-white px-5 py-4 will-change-transform relative shadow-lg rd-full flex-s-center gap-6"
+							class="bg-white px-5 py-4 will-change-transform relative shadow-lg rd-full flex-s-center gap-2"
 						>
 							<motion.button
 								class="s-30px b-2 b-neutral-6 rd-4px"

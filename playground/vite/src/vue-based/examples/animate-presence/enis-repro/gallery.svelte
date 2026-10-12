@@ -8,7 +8,7 @@
 	];
 
 	let selectedIndex = $state<number | null>(null);
-	const layout = createLayoutMotion(motion);
+	const layout = createLayoutMotion();
 </script>
 
 <div class="columns-2 gap-2 p-4">
