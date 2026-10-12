@@ -1,0 +1,27 @@
+{
+	"name": "root",
+	"version": "0.0.0",
+	"private": true,
+	"license": "MIT",
+	"author": "Haniel Ubogu <https://github.com/HanielU>",
+	"type": "module",
+	"workspaces": [
+		"packages/*",
+		"playground/*",
+		"e2e"
+	],
+	"scripts": {
+		"build": "bun run --filter motion-sv build",
+		"check": "bun run build && bun run --workspaces --if-present check",
+		"dev": "bun run --workspaces --parallel --if-present dev",
+		"format": "prettier --write .",
+		"lint": "prettier --check .",
+		"test": "bun run --filter motion-sv test",
+		"test:e2e": "bun run --filter e2e test",
+		"release": "bun run build && changeset publish"
+	},
+	"devDependencies": {
+		"prettier": "^3.9.10",
+		"prettier-plugin-svelte": "^4.1.1"
+	}
+}

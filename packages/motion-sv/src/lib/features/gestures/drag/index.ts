@@ -1,0 +1,33 @@
+import { Feature } from "#lib/features/feature.js";
+import { VisualElementDragControls } from "#lib/features/gestures/drag/VisualElementDragControls.js";
+import { noop } from "motion-utils";
+
+export class DragGesture extends Feature {
+	static key = "drag" as const;
+
+	controls: VisualElementDragControls;
+
+	removeGroupControls: Function = noop;
+	removeListeners: Function = noop;
+
+	constructor(state) {
+		super(state);
+		this.controls = new VisualElementDragControls(state);
+	}
+
+	mount() {
+		// If we've been provided a DragControls for manual control over the drag gesture,
+		// subscribe this component to it on mount.
+		const { dragControls } = this.state.options;
+
+		if (dragControls) {
+			this.removeGroupControls = dragControls.subscribe(this.controls);
+		}
+		this.removeListeners = this.controls.addListeners() || noop;
+	}
+
+	unmount() {
+		this.removeGroupControls();
+		this.removeListeners();
+	}
+}

@@ -1,0 +1,41 @@
+/* :root {
+  --background: oklch(99% 0 0deg);
+  --foreground: oklch(18% 0 0deg);
+
+  --card: oklch(98% 0 0deg);
+  --card-foreground: oklch(18% 0 0deg);
+
+  --popover: oklch(98% 0 0deg);
+  --popover-foreground: oklch(18% 0 0deg);
+
+  --primary: oklch(51.1% 0.2456 277.68deg);
+  --primary-foreground: oklch(100% 0 0deg);
+
+  --secondary: oklch(95.5% 0 0deg);
+  --secondary-foreground: oklch(24% 0 0deg);
+
+  --muted: oklch(96.5% 0 0deg);
+  --muted-foreground: oklch(50% 0 0deg);
+
+  --accent: oklch(96% 0.02 277.68deg);
+  --accent-foreground: oklch(22% 0.02 277.68deg);
+
+  --destructive: oklch(60% 0.19 25.38deg);
+  --destructive-foreground: oklch(100% 0 0deg);
+
+  --border: oklch(90.5% 0 0deg);
+  --input: oklch(97% 0 0deg);
+  --ring: oklch(51.1% 0.2456 277.68deg);
+
+  --radius: 1rem;
+}
+
+html,
+body {
+  --at-apply: bg-background h-full text-foreground overflow-hidden;
+}
+
+button {
+  cursor: pointer;
+  --at-apply: transition-150 ease-[ease-out] active-scale-95;
+} */

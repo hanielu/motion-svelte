@@ -1,0 +1,18 @@
+// Reexport your entry components here
+export * from "framer-motion/dom";
+export { delay as delayInMs } from "motion-dom";
+export { motionValue as useMotionValue } from "motion-dom";
+export * from "./components/index.js";
+export { default as LayoutGroup } from "./components/layout-group.svelte";
+export { useLayoutGroup } from "./components/use-layout-group.js";
+export type { LayoutGroupProps } from "./components/use-layout-group.js";
+export { MotionStateContext, LayoutGroupContext, type LayoutGroupState, type NodeGroup } from "./components/context.js";
+export * from "./value/index.js";
+export type * from "./types/index.js";
+export type { MotionStyleProps } from "./types/state.js";
+export * from "./animation/index.js";
+export * from "./utils/index.js";
+export { useDragControls } from "./features/gestures/drag/use-drag-controls.js";
+export type { PanInfo } from "./features/gestures/pan/PanSession.js";
+export { domAnimation, domMax } from "#lib/features/index.js";
+export { motionGlobalConfig } from "./config.js";
