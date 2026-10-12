@@ -4,6 +4,10 @@ import { scroll } from "framer-motion/dom";
 import {
 	type AccelerateConfig,
 	type AnimationPlaybackControlsWithThen,
+	cancelFrame,
+	cancelMicrotask,
+	frame,
+	microtask,
 	motionValue,
 	supportsScrollTimeline,
 	supportsViewTimeline,
@@ -30,21 +34,39 @@ function createScrollMotionValues() {
 	};
 }
 
-function canAccelerateScroll(target: () => HTMLElement | undefined, offset: ScrollInfoOptions["offset"]): boolean {
+/**
+ * Whether a container or target element is provided but not bound yet. A getter (`get target() { return el }`)
+ * counts as provided from the start, like a React ref whose `current` is still null.
+ */
+const isPending = (options: UseScrollOptions, key: "container" | "target") => key in options && !options[key];
+
+function canAccelerateScroll(options: UseScrollOptions): boolean {
 	if (isSSR) return false;
-	return target() ? supportsViewTimeline() && !!offsetToViewTimelineRange(offset) : supportsScrollTimeline();
+	return "target" in options
+		? supportsViewTimeline() && !!offsetToViewTimelineRange(options.offset)
+		: supportsScrollTimeline() && !options.offset;
 }
 
-function makeAccelerateConfig(axis: "x" | "y", options: () => UseScrollOptions): AccelerateConfig {
+function makeAccelerateConfig(axis: "x" | "y", getOptions: () => UseScrollOptions): AccelerateConfig {
 	return {
 		factory: (animation: AnimationPlaybackControlsWithThen) => {
-			const { container, target, ...rest } = options();
-			return scroll(animation, {
-				...rest,
-				axis,
-				container: container,
-				target: target,
-			});
+			let cleanup: VoidFunction | undefined;
+			const start = () => {
+				const options = getOptions();
+				// Attaching to the window scroll while an element is still unbound would be cached and mistrack.
+				if (isPending(options, "container") || isPending(options, "target")) {
+					frame.read(start);
+					return;
+				}
+				const { container, target, ...rest } = options;
+				cleanup = scroll(animation, { ...rest, axis, container, target });
+			};
+			microtask.read(start);
+			return () => {
+				cancelMicrotask(start);
+				cancelFrame(start);
+				cleanup?.();
+			};
 		},
 		times: [0, 1],
 		keyframes: [0, 1],
@@ -57,15 +79,8 @@ export function useScroll(scrollOptions: UseScrollOptions = {}) {
 	const values = createScrollMotionValues();
 	const getOptions = () => resolveScrollOptions(scrollOptions);
 
-	// Set acceleration config once at setup time if browser supports it.
-	// The factory lazily resolves options at invocation time,
-	// so it always gets current values when the VisualElement invokes it.
-	// Note: when options is a getter, target/offset are resolved here at
-	// construction time (before onMounted), so target will be undefined.
-	// This means getter-wrapped targets always use the ScrollTimeline path
-	// rather than ViewTimeline — the same behaviour as React's useScroll.
-	const { target, offset } = getOptions();
-	if (canAccelerateScroll(() => target, offset)) {
+	// Set the acceleration config once, at setup. Elements are resolved when the VisualElement invokes the factory.
+	if (canAccelerateScroll(getOptions())) {
 		values.scrollXProgress.accelerate = makeAccelerateConfig("x", getOptions);
 		values.scrollYProgress.accelerate = makeAccelerateConfig("y", getOptions);
 	}

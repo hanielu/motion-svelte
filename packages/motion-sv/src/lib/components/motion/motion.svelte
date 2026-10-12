@@ -253,7 +253,9 @@
 	function nodeRef(node: HTMLElement | SVGElement) {
 		externalRef = node;
 
-		motionState.mount(node);
+		// Mounting can run user callbacks synchronously (e.g. onLayoutMeasure). Untracked, so the attachment only
+		// re-runs for a new element, not whenever state those callbacks read changes.
+		untrack(() => motionState.mount(node));
 
 		// onUnmounted
 		return () => {

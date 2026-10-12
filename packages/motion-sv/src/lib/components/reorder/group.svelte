@@ -2,7 +2,7 @@
 	import type { AsTag } from "#lib/types/index.js";
 	import type { Box } from "motion-utils";
 	import type { ReorderAxis } from "./types.js";
-	import { Motion, type MotionProps } from "../motion/index.js";
+	import { Motion, createLayoutMotion, type MotionProps } from "../motion/index.js";
 	import { ReorderContext } from "./context.js";
 	import { invariant } from "hey-listen";
 	import { checkReorder, detectAxis } from "./utils.js";
@@ -57,6 +57,7 @@
 	let detectedAxis = $state<ReorderAxis>("y");
 	const axis = $derived(axisOverride ?? detectedAxis);
 	let isReordering = false;
+	const layoutMotion = createLayoutMotion();
 
 	$effect(() => {
 		invariant(Boolean(values), "Reorder.Group must be provided a values prop");
@@ -74,6 +75,7 @@
 			return axis;
 		},
 		groupRef: () => ref,
+		layoutMotion,
 		registerItem: (value, layout) => {
 			itemLayouts.set(value, layout);
 
@@ -98,6 +100,8 @@
 
 			if (order !== newOrder) {
 				isReordering = true;
+				// Snapshot the items before the new order renders, as a React re-render does.
+				layoutMotion.update();
 
 				// Unmeasured items (e.g. exiting with AnimatePresence) keep their positions.
 				const newValues = [...values];

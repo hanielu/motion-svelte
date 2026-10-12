@@ -36,7 +36,7 @@ export class ProjectionFeature extends Feature {
 		this.projection?.setOptions({
 			layout,
 			layoutId,
-			alwaysMeasureLayout: Boolean(layoutId) || Boolean(drag) || (dragConstraints && isHTMLElement(dragConstraints)),
+			alwaysMeasureLayout: Boolean(drag) || (dragConstraints && isHTMLElement(dragConstraints)),
 			visualElement: this.state.visualElement,
 			animationType: typeof options.layout === "string" ? options.layout : "both",
 			// initialPromotionConfig

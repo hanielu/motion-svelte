@@ -5,6 +5,7 @@
 	import type { Snippet } from "svelte";
 	import { Context, withProp } from "#lib/vendor/runed/index.js";
 	import { motion } from "./instance.js";
+	import { frame } from "motion-dom";
 
 	export interface LayoutMotionScope {
 		states: Set<MotionState>;
@@ -82,6 +83,11 @@
 			scope.states.forEach((state) => {
 				state.beforeUpdate();
 			});
+			// Usually a motion component whose props change with the update finishes the layout pass. When only plain
+			// markup changes, nothing does, so finish it once the change is in the DOM (a no-op if it already ran).
+			const [state] = scope.states;
+			const root = state?.visualElement?.projection?.root;
+			if (root) frame.read(() => root.didUpdate());
 		}
 
 		function updateWith<A extends unknown[], R>(fn: (...args: A) => R): (...args: A) => R {

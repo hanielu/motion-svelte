@@ -167,7 +167,11 @@ export class MotionState {
 		this.settleExit();
 		this.parent?.children?.delete(this);
 		mountedStates.delete(this.element);
-		this.features.forEach((f) => f.unmount?.());
+		this.features.forEach((feature) => {
+			feature.unmount();
+			// A later mount() re-mounts it, restoring its listeners
+			feature.isMount = false;
+		});
 
 		const projection = this.visualElement?.projection;
 		const shouldDeferProjectionUnmount = Boolean(this.options.layoutId && projection);

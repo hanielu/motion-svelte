@@ -1,6 +1,12 @@
-import type { Edge, Intersection, ProgressIntersection } from "#lib/types/index.js";
+import type {
+	Edge,
+	Intersection,
+	NamedEdges,
+	ProgressIntersection,
+	ScrollOffset as ScrollOffsetDefinition,
+} from "#lib/types/framer-motion.js";
 
-type ScrollOffsetType = Array<Edge | Intersection | ProgressIntersection>;
+export type ScrollOffset = ScrollOffsetDefinition;
 
 /**
  * Preset scroll offsets matching framer-motion's ScrollOffset presets.
@@ -14,95 +20,123 @@ export const ScrollOffset = {
 	Enter: [
 		[0, 1],
 		[1, 1],
-	] as const,
+	],
 	/** Progress 0→1 as target exits the container */
 	Exit: [
 		[0, 0],
 		[1, 0],
-	] as const,
+	],
 	/** Progress 0→1 across any overlap between target and container */
 	Any: [
 		[1, 0],
 		[0, 1],
-	] as const,
+	],
 	/** Progress 0→1 while target is fully contained within the container */
 	All: [
 		[0, 0],
 		[1, 1],
-	] as const,
-};
+	],
+} satisfies Record<string, ProgressIntersection[]>;
 
-export type ScrollOffset = ScrollOffsetType;
-
-type NormalisedOffset = [[number, number], [number, number]];
-
-const presets: [readonly (readonly [number, number])[], string][] = [
-	[ScrollOffset.Enter, "entry"],
-	[ScrollOffset.Exit, "exit"],
-	[ScrollOffset.Any, "cover"],
-	[ScrollOffset.All, "contain"],
-];
-
-const stringToProgress: Record<string, number> = {
+const namedEdges: Record<NamedEdges, number> = {
 	start: 0,
+	center: 0.5,
 	end: 1,
 };
 
-function parseStringOffset(s: string): [number, number] | undefined {
-	const parts = s.trim().split(/\s+/);
-	if (parts.length !== 2) return undefined;
-	const a = stringToProgress[parts[0]];
-	const b = stringToProgress[parts[1]];
-	if (a === undefined || b === undefined) return undefined;
-	return [a, b];
-}
+function resolveEdge(edge: Edge, length: number, inset = 0) {
+	let delta = 0;
 
-function normaliseOffset(offset: ScrollOffsetType): NormalisedOffset | undefined {
-	if (offset.length !== 2) return undefined;
-	const result: [number, number][] = [];
-	for (const item of offset) {
-		if (Array.isArray(item)) {
-			result.push(item as [number, number]);
-		} else if (typeof item === "string") {
-			const parsed = parseStringOffset(item);
-			if (!parsed) return undefined;
-			result.push(parsed);
+	if (edge in namedEdges) {
+		edge = namedEdges[edge as NamedEdges];
+	}
+
+	if (typeof edge === "string") {
+		const asNumber = parseFloat(edge);
+
+		if (edge.endsWith("px")) {
+			delta = asNumber;
+		} else if (edge.endsWith("%")) {
+			edge = asNumber / 100;
+		} else if (edge.endsWith("vw")) {
+			delta = (asNumber / 100) * document.documentElement.clientWidth;
+		} else if (edge.endsWith("vh")) {
+			delta = (asNumber / 100) * document.documentElement.clientHeight;
 		} else {
-			// bare number Edge values are not mapped to [target, container] coordinates
-			// fall through to undefined → signals JS-based scroll tracking fallback
-			return undefined;
+			edge = asNumber;
 		}
 	}
-	return result as NormalisedOffset;
+
+	if (typeof edge === "number") {
+		delta = length * edge;
+	}
+
+	return inset + delta;
 }
 
-function matchesPreset(offset: ScrollOffsetType, preset: readonly (readonly [number, number])[]): boolean {
-	const normalised = normaliseOffset(offset);
-	if (!normalised) return false;
-	for (let i = 0; i < 2; i++) {
-		const o = normalised[i];
-		const p = preset[i];
-		if (o[0] !== p[0] || o[1] !== p[1]) return false;
+function resolveOffset(
+	offset: Edge | Intersection | ProgressIntersection,
+	containerLength: number,
+	targetLength: number,
+	targetInset: number
+) {
+	let offsetDefinition: ProgressIntersection | [Edge, Edge] = Array.isArray(offset) ? offset : [0, 0];
+
+	if (typeof offset === "number") {
+		offsetDefinition = [offset, offset];
+	} else if (typeof offset === "string") {
+		const edges = offset.trim();
+		offsetDefinition = edges.includes(" ")
+			? (edges.split(" ") as [Edge, Edge])
+			: [edges as Edge, namedEdges[edges as NamedEdges] ? (edges as Edge) : `0`];
 	}
-	return true;
+
+	const targetPoint = resolveEdge(offsetDefinition[0], targetLength, targetInset);
+	const containerPoint = resolveEdge(offsetDefinition[1], containerLength);
+
+	return targetPoint - containerPoint;
 }
 
 /**
- * Maps a ScrollOffset array to a ViewTimeline named range.
- * Returns undefined for unrecognised patterns — signals fallback to JS scroll tracking.
- *
- * Ported from framer-motion's internal render/dom/scroll/utils/offset-to-range.mjs
+ * A ViewTimeline range for a scroll offset. `points` are the range's start and end; `a` and `b` are how the progress
+ * moves with the target and container lengths, so the direction can flip when the target is longer than the
+ * container. `cover` marks the ViewTimeline's default range.
  */
-export function offsetToViewTimelineRange(
-	offset: ScrollOffsetType | undefined
-): { rangeStart: string; rangeEnd: string } | undefined {
-	if (!offset) {
-		return { rangeStart: "contain 0%", rangeEnd: "contain 100%" };
+export interface ViewTimelineRange {
+	points: string[];
+	a: number;
+	b: number;
+	cover: boolean;
+}
+
+const toIntersection = (o: ScrollOffset[number]) => {
+	if (/v/u.test(o as string)) return [];
+	const px = resolveOffset(o, 0, 0, 0);
+	return [resolveOffset(o, 0, 1, 0) - px, px - resolveOffset(o, 1, 0, 0), px];
+};
+
+const toRange = ([t, c, px]: number[]) => !px && (c === 0 || c === 1) && `${c ? "entry" : "exit"}-crossing ${t * 100}%`;
+
+/**
+ * Maps a scroll offset to a ViewTimeline range. Returns undefined when the offset can't be expressed as one, which
+ * means falling back to JS scroll tracking.
+ *
+ * Ported from framer-motion's internal render/dom/scroll/utils/offset-to-range.
+ */
+export function offsetToViewTimelineRange(offset: ScrollOffset = ScrollOffset.All): ViewTimelineRange | undefined {
+	if (offset.length !== 2) return;
+
+	const [start, end] = offset.map(toIntersection);
+	const points = [toRange(start), toRange(end)];
+	const a = end[0] - start[0];
+	const b = start[1] - end[1];
+
+	if (points[0] && points[1] && (a || b)) {
+		return {
+			points: points as string[],
+			a,
+			b,
+			cover: !start[0] && a === 1 && b === 1,
+		};
 	}
-	for (const [preset, name] of presets) {
-		if (matchesPreset(offset, preset)) {
-			return { rangeStart: `${name} 0%`, rangeEnd: `${name} 100%` };
-		}
-	}
-	return undefined;
 }

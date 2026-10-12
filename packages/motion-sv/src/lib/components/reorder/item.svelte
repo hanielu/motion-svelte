@@ -2,7 +2,7 @@
 	import type { ElementType } from "#lib/types/index.js";
 	import type { Snippet } from "svelte";
 	import { ReorderContext } from "./context.js";
-	import { createLayoutMotion, motion, type MotionProps } from "../motion/index.js";
+	import type { MotionProps } from "../motion/index.js";
 	import { invariant } from "hey-listen";
 	import { useDefaultMotionValue } from "./utils.js";
 	import { autoScrollIfNeeded, resetAutoScrollState } from "./auto-scroll.js";
@@ -45,7 +45,7 @@
 
 	const context = ReorderContext.getOr(null);
 	invariant(Boolean(context), "Reorder.Item must be a child of Reorder.Group");
-	const { registerItem, updateOrder, groupRef } = context!;
+	const { registerItem, updateOrder, groupRef, layoutMotion } = context!;
 
 	// svelte-ignore state_referenced_locally - the drag motion values are created once, like React's hooks
 	const point = {
@@ -56,7 +56,6 @@
 
 	let isDragging = $state(false);
 
-	const layoutMotion = createLayoutMotion(motion);
 	// svelte-ignore state_referenced_locally - the element type is fixed per item, as in React
 	const Item = layoutMotion[as as "li"];
 	watch.pre(
