@@ -7,7 +7,6 @@ export interface MotionProps<T extends AsTag = "div", K = unknown> extends Omit<
 	"motionConfig" | "layoutGroup"
 > {
 	as?: T;
-	asChild?: boolean;
 	ref?: HTMLElement | SVGElement | null;
 	whileDrag?: Options["whileDrag"];
 	whileHover?: Options["whileHover"];

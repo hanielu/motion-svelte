@@ -43,7 +43,9 @@ export function createMotionComponent(
 				return props.ref!;
 			},
 			set ref(value) {
-				props.ref = value;
+				// Only a bound `ref` accepts the element. Reflect.set skips an unbound one (e.g. spread props) instead
+				// of throwing.
+				Reflect.set(props, "ref", value);
 			},
 		});
 	};
@@ -55,22 +57,27 @@ export function createMotionComponent(
 	return motionComponent;
 }
 
+/** Renders another element than the component's own, e.g. when the tag is chosen at runtime. */
+export interface AsProp {
+	as?: ElementType;
+}
+
 export type MotionNameSpace = {
 	[K in keyof SvelteHTMLElements]: Component<
-		Omit<MotionProps<K, unknown>, "as" | "asChild" | "motionConfig" | "layoutGroup"> & MotionHTMLAttributes<K>
+		Omit<MotionProps<K, unknown>, "as" | "motionConfig" | "layoutGroup"> & MotionHTMLAttributes<K> & AsProp
 	>;
 } & {
 	// Component overload
 	create<T extends Component>(
 		component: T,
 		options?: MotionCreateOptions
-	): Component<Omit<MotionProps<T, unknown>, "as" | "asChild"> & ComponentProps<T>>;
+	): Component<Omit<MotionProps<T, unknown>, "as"> & ComponentProps<T>>;
 
 	// ElementType overload
 	create<T extends ElementType>(
 		component: T,
 		options?: MotionCreateOptions
-	): Component<Omit<MotionProps<T, unknown>, "asChild"> & MotionHTMLAttributes<T>>;
+	): Component<Omit<MotionProps<T, unknown>, "as"> & MotionHTMLAttributes<T> & AsProp>;
 };
 
 export function createMotionComponentWithFeatures(featureBundle?: FeatureBundle) {

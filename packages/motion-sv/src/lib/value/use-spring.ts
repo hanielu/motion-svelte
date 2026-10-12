@@ -6,10 +6,13 @@ import { watch, extract, type MaybeGetter } from "#lib/vendor/runed/index.js";
 
 type AnyResolvedKeyframe = string | number;
 
+/** A literal source widens to its type, so `useSpring(0)` can be set to any number. */
+type Widen<T extends AnyResolvedKeyframe> = T extends number ? number : string;
+
 export function useFollowValue<T extends AnyResolvedKeyframe>(
 	source: T | MotionValue<T>,
 	options: MaybeGetter<FollowValueOptions> = {}
-) {
+): MotionValue<Widen<T>> {
 	const value = motionValue(isMotionValue(source) ? source.get() : source);
 
 	watch(
@@ -17,19 +20,12 @@ export function useFollowValue<T extends AnyResolvedKeyframe>(
 		(currentOptions) => attachFollow(value, source, currentOptions)
 	);
 
-	return value;
+	return value as MotionValue<Widen<T>>;
 }
 
-export function useSpring(
-	source: MotionValue<string> | MotionValue<number> | number,
-	config: MaybeGetter<SpringOptions> = {}
-) {
-	const value = motionValue(isMotionValue(source) ? source.get() : source);
-
-	watch(
-		() => extract(config),
-		(currentConfig) => attachFollow(value, source, { type: "spring", ...currentConfig })
-	);
-
-	return value;
+export function useSpring<T extends AnyResolvedKeyframe>(
+	source: T | MotionValue<T>,
+	config: MaybeGetter<SpringOptions & Pick<FollowValueOptions, "skipInitialAnimation">> = {}
+): MotionValue<Widen<T>> {
+	return useFollowValue(source, () => ({ type: "spring", ...extract(config) }));
 }

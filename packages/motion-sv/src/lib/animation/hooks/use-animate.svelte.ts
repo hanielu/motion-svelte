@@ -10,7 +10,7 @@ class AnimationScope<T extends Element> {
 	animations: AnimationPlaybackControls[] = [];
 }
 
-export function useAnimate<T extends Element = Element>() {
+export function useAnimate<T extends Element = HTMLElement | SVGElement>() {
 	const scope = new AnimationScope<T>();
 	const config = useMotionConfig();
 

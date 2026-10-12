@@ -8,7 +8,10 @@
 	import { useTransform } from "#lib/value/index.js";
 	import type { PanInfo } from "motion-dom";
 
-	export interface GroupItemProps<T extends ElementType = "li", K = unknown, V = unknown> extends MotionProps<T, K> {
+	export interface GroupItemProps<T extends ElementType = "li", K = unknown, V = unknown> extends Omit<
+		MotionProps<T, K>,
+		"children"
+	> {
 		/**
 		 * The value in the list that this component represents.
 		 *

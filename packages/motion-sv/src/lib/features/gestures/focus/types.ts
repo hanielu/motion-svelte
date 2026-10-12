@@ -5,6 +5,4 @@ export type FocusProps = {
 	 * Variant to apply when the element is focused.
 	 */
 	whileFocus?: VariantLabels | TargetAndTransition;
-	onFocus?: (e: FocusEvent) => void;
-	onBlur?: (e: FocusEvent) => void;
 };
