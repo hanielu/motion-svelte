@@ -5,7 +5,7 @@
 		"0:div.wrapper": {
 			"0": {"box":[33,33,20,20],"opacity":1,"transform":"none","backgroundColor":"rgba(0, 0, 0, 0)","color":"oklab(0.97 0 0)","borderRadius":"0px","clipPath":"none","filter":"none","boxShadow":"none","visibility":"visible"}
 		},
-		"1:button.svelte-5kurwf": {
+		"1:button": {
 			"0": {"box":[33,33,19.19,19.19],"opacity":1,"transform":"none","backgroundColor":"rgba(0, 0, 0, 0)","color":"oklab(0.97 0 0)","borderRadius":"0px","clipPath":"none","filter":"none","boxShadow":"none","visibility":"visible"}
 		},
 		"2:div": {

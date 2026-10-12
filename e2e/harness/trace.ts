@@ -50,7 +50,12 @@ export function sampleFrame(rootSelector: string): Frame {
 	const label = (el: Element) => {
 		const tag = el.tagName.toLowerCase();
 		if (el.id) return `${tag}#${el.id}`;
-		const className = el.getAttribute("class")?.trim().split(/\s+/)[0];
+		// Svelte's scoped-style class (svelte-<hash>) changes whenever a component's file or styles change.
+		const className = el
+			.getAttribute("class")
+			?.trim()
+			.split(/\s+/)
+			.find((name) => !/^svelte-[a-z0-9]+$/.test(name));
 		return className ? `${tag}.${className.slice(0, 24)}` : tag;
 	};
 	const round = (n: number) => Math.round(n * 100) / 100;
