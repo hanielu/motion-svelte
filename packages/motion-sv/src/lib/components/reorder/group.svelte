@@ -1,5 +1,5 @@
 <script module lang="ts">
-	import type { AsTag } from "#lib/types/index.js";
+	import type { AsTag, MotionHTMLAttributes } from "#lib/types/index.js";
 	import type { Box, Point } from "motion-utils";
 	import type { ReorderAxis } from "./types.js";
 	import { createLayoutMotion, motion, type MotionProps } from "../motion/index.js";
@@ -52,7 +52,7 @@
 		onReorder,
 		ref = $bindable(),
 		...rest
-	}: GroupProps<AsTag, K, V> = $props();
+	}: GroupProps<AsTag, K, V> & MotionHTMLAttributes<"ul"> = $props();
 
 	// svelte-ignore state_referenced_locally - a programming error, checked once
 	invariant(Boolean(values), "Reorder.Group must be provided a values prop");

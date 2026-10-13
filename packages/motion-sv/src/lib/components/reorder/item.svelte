@@ -1,5 +1,5 @@
 <script lang="ts" module>
-	import type { ElementType } from "#lib/types/index.js";
+	import type { ElementType, MotionHTMLAttributes } from "#lib/types/index.js";
 	import type { Snippet } from "svelte";
 	import { getReorderContext } from "./context.js";
 	import type { MotionProps } from "../motion/index.js";
@@ -40,9 +40,11 @@
 		children,
 		ref = $bindable(),
 		...rest
-	}: GroupItemProps<ElementType> & {
-		children: Snippet<[isDragging: boolean]>;
-	} = $props();
+	}: GroupItemProps<ElementType, K, V> &
+		// The li's own `value` attribute is replaced by the item's value
+		Omit<MotionHTMLAttributes<"li">, "value" | "children"> & {
+			children: Snippet<[isDragging: boolean]>;
+		} = $props();
 
 	const context = getReorderContext();
 	const { registerItem, updateOrder, groupRef, layoutMotion } = context;
