@@ -3,10 +3,10 @@
 
 	let { title, content }: { title: string; content: string } = $props();
 
-	const layout = createLayoutMotion();
-
 	let isOpen = $state(false);
-	const toggle = layout.update.with(() => (isOpen = !isOpen));
+	const layout = createLayoutMotion(() => isOpen);
+
+	const toggle = () => (isOpen = !isOpen);
 </script>
 
 <layout.div class="item" style={{ borderRadius: 12 }} onclick={toggle}>

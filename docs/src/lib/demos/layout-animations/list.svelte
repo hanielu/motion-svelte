@@ -1,13 +1,12 @@
 <script lang="ts">
 	import { AnimatePresence, createLayoutMotion } from "motion-sv";
 
-	const layout = createLayoutMotion();
-
 	let nextId = 4;
 	let items = $state([1, 2, 3]);
+	const layout = createLayoutMotion(() => items);
 
-	const add = layout.update.with(() => (items = [nextId++, ...items]));
-	const remove = layout.update.with((id: number) => (items = items.filter((item) => item !== id)));
+	const add = () => (items = [nextId++, ...items]);
+	const remove = (id: number) => (items = items.filter((item) => item !== id));
 </script>
 
 <div class="list-demo">

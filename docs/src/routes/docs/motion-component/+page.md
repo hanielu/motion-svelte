@@ -718,7 +718,7 @@ Callback that fires when the element leaves the viewport. It receives the [`Inte
 
 ### Layout
 
-In motion-sv, elements animate their layout when they're rendered through a layout namespace from `createLayoutMotion()`, and its `update()` is called with the state change. Read [layout animations](/docs/layout-animations) first. These props configure them.
+In motion-sv, elements animate their layout when they're rendered through a layout namespace from `createLayoutMotion()`, which measures them when the state it depends on changes. Read [layout animations](/docs/layout-animations) first. These props configure them.
 
 #### layout
 
@@ -751,7 +751,7 @@ If the old element stays on the page, the two crossfade. See [shared layout anim
 
 #### layoutDependency
 
-In motion-sv, `update()` decides when layout is measured, so `layoutDependency` doesn't. It only affects `layoutId` handoffs: an element that takes over a `layoutId` from one with the same `layoutDependency` doesn't animate from it.
+In motion-sv, the layout namespace decides when layout is measured, so `layoutDependency` doesn't. It only affects `layoutId` handoffs: an element that takes over a `layoutId` from one with the same `layoutDependency` doesn't animate from it.
 
 #### layoutScroll
 

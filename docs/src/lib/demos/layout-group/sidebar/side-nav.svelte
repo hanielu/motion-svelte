@@ -3,10 +3,10 @@
 
 	const links = ["Home", "Search", "Library"];
 
-	const layout = createLayoutMotion();
-
 	let isOpen = $state(false);
-	const toggle = layout.update.with(() => (isOpen = !isOpen));
+	const layout = createLayoutMotion(() => isOpen);
+
+	const toggle = () => (isOpen = !isOpen);
 </script>
 
 <layout.nav class={["side-nav", { open: isOpen }]} style={{ borderRadius: 16 }}>

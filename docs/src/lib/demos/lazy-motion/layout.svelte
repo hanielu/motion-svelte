@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { LazyMotion, createLayoutMotion, domMax, m } from "motion-sv";
 
-	const layout = createLayoutMotion(m);
-
 	let isOn = $state(false);
-	const toggle = layout.update.with(() => (isOn = !isOn));
+	const layout = createLayoutMotion(m, () => isOn);
+
+	const toggle = () => (isOn = !isOn);
 </script>
 
 <LazyMotion features={domMax}>

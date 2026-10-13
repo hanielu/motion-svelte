@@ -93,23 +93,23 @@ Children are passed as normal Svelte content. Render a `motion` component as ano
 
 ## Layout animations
 
-This is the biggest difference. React and Vue measure every element right before each re-render, so adding the `layout` prop is enough. Svelte has no hook that runs before the DOM updates, so motion-sv needs to be told when a layout change is coming:
+This is the biggest difference. React and Vue measure every element right before each re-render, so adding the `layout` prop is enough. Svelte has no hook that runs before the DOM updates, so motion-sv needs to know which state the layout depends on:
 
 ```svelte
 <script lang="ts">
 	import { createLayoutMotion } from "motion-sv";
 
-	const layout = createLayoutMotion();
-	const toggle = layout.update.with(() => (isOn = !isOn));
+	let isOn = $state(false);
+	const layout = createLayoutMotion(() => isOn);
 </script>
 
-<layout.div class={{ on: isOn }} onclick={toggle} />
+<layout.div class={{ on: isOn }} onclick={() => (isOn = !isOn)} />
 ```
 
 - Render elements through a namespace from `createLayoutMotion()` instead of adding `layout` to `motion` components.
-- Call `layout.update()` (or wrap the handler with `layout.update.with()`) with the state change that moves them.
-- Shared layout animations with `layoutId` work as in React, without `update()`.
-- `layoutDependency` isn't used to decide when to measure. `update()` is the signal.
+- Pass it a getter for the state that moves them, like React's `layoutDependency` but for the whole namespace. Or call `layout.update()` with the state change.
+- Shared layout animations with `layoutId` work as in React, without a namespace.
+- The `layoutDependency` prop isn't used to decide when to measure. The namespace's dependency is.
 
 [The layout animations guide](/docs/layout-animations) covers all of this in detail.
 

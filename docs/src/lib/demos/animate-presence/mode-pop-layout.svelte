@@ -1,15 +1,13 @@
 <script lang="ts">
 	import { AnimatePresence, createLayoutMotion } from "motion-sv";
 
-	const layout = createLayoutMotion();
-
 	const colors = ["#ff3e00", "#9911ff", "#0cdcf7", "#8df0cc", "#ff0088"];
 
 	let nextId = 5;
 	let items = $state([0, 1, 2, 3, 4]);
+	const layout = createLayoutMotion(() => items);
 
-	const add = layout.update.with(() => (items = [...items, nextId++]));
-	// AnimatePresence measures the squares before one exits, so only adding one needs update().
+	const add = () => (items = [...items, nextId++]);
 	const remove = (id: number) => (items = items.filter((item) => item !== id));
 </script>
 

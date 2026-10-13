@@ -35,11 +35,45 @@ Layout animations are the one part of motion-sv that works differently from Moti
 
 To animate a layout change, Motion needs to measure each element twice: once **before** the change, and once after. It then animates the element from the old box to the new one with `transform`.
 
-React and Vue take the "before" measurement for you, in a hook that runs right before every re-render. Svelte updates the DOM directly and has no such hook, so motion-sv can't know a layout change is coming. Instead, you tell it:
+React and Vue take the "before" measurement for you, in a hook that runs right before every re-render. Svelte updates the DOM directly and has no such hook, so motion-sv needs to know which state the layout depends on:
 
-1. **Create a layout namespace** with `createLayoutMotion()`. It works like `motion`: `layout.div`, `layout.li`, `layout.button` and so on.
+1. **Create a layout namespace** with `createLayoutMotion()`, and pass it a getter for the state the layout depends on. The namespace works like `motion`: `layout.div`, `layout.li`, `layout.button` and so on.
 2. **Render the elements that should animate through it.** Its components animate their layout by default, as if they had the `layout` prop.
-3. **Call `layout.update()` with the state change.** It measures the namespace's elements before Svelte updates the DOM. Once the DOM has updated, they animate to their new layout, before the browser paints.
+3. **Change the state.** Whenever the state the getter reads changes, the namespace measures its elements before Svelte updates the DOM. Once the DOM has updated, they animate to their new layout, before the browser paints.
+
+```svelte
+<script lang="ts">
+	import { createLayoutMotion } from "motion-sv";
+
+	let isOn = $state(false);
+	const layout = createLayoutMotion(() => isOn);
+</script>
+
+<button class={["toggle-container", isOn ? "start" : "end"]} onclick={() => (isOn = !isOn)}>
+	<layout.div class="toggle-handle" />
+</button>
+```
+
+The getter works like `$derived`: the state it reads is tracked, and the change can come from anywhere, like an event handler, a timer, code after an `await`, or a prop. Read all the state that moves the elements, for instance `() => [mode, items.length]`. For a list that changes in place, like with `items.reverse()`, read every item: `() => [...items]`.
+
+<Callout type="warning">
+
+The namespace measures before the DOM updates of the component that creates it, and of the components that component renders. So create it at the top of the `<script>` of the component whose markup changes the layout, usually where the state lives. If a parent's markup moves the elements, for instance an `{#if}` block in the parent that inserts content above them, create the namespace in the parent and [pass it down](#sharing-a-namespace).
+
+</Callout>
+
+<Callout type="tip">
+
+There are two cases where the namespace doesn't need to know about the change:
+
+- **Shared layout animations.** When an element with a `layoutId` replaces another, it animates from it automatically. See [shared layout animations](#shared-layout-animations).
+- **Exits and reorders.** Before an element exits, [`AnimatePresence`](/docs/animate-presence) measures the layout elements inside it, and the rest of their [`LayoutGroup`](/docs/layout-group). A [`ReorderGroup`](/docs/reorder) measures its items whenever its `values` change.
+
+</Callout>
+
+### Updating manually
+
+Without a dependency, tell the namespace about a change yourself, by calling `layout.update()` with the state change:
 
 ```svelte
 <script lang="ts">
@@ -54,10 +88,6 @@ React and Vue take the "before" measurement for you, in a hook that runs right b
 		layout.update();
 	}
 </script>
-
-<button class={["toggle-container", isOn ? "start" : "end"]} onclick={toggleSwitch}>
-	<layout.div class="toggle-handle" />
-</button>
 ```
 
 `update.with()` wraps a function so that it calls `update()` for you, which is handy for event handlers:
@@ -70,57 +100,9 @@ React and Vue take the "before" measurement for you, in a hook that runs right b
 
 Call `update()` in the same synchronous code as the state change. Svelte applies changes to the DOM after your code finishes, so it doesn't matter whether `update()` comes before or after the assignment. It must not come after an `await` or a `flushSync()`, because by then the DOM has already changed.
 
-<Callout type="tip">
+A namespace with a dependency has `update()` too, for changes its dependency doesn't cover.
 
-There are two exceptions where you don't need `update()`:
-
-- **Shared layout animations.** When an element with a `layoutId` replaces another, it animates from it automatically. See [shared layout animations](#shared-layout-animations).
-- **Exits and reorders.** Before an element exits, [`AnimatePresence`](/docs/animate-presence) measures the layout elements inside it, and the rest of their [`LayoutGroup`](/docs/layout-group). A [`ReorderGroup`](/docs/reorder) measures its items whenever its `values` change.
-
-</Callout>
-
-## Usage
-
-<Demo demo={notificationsList} height={564} />
-
-Any layout change you announce with `update()` can be animated: `width` and `height`, grid columns, flex direction, reordering a list, or adding and removing items.
-
-```svelte
-<layout.div style={{ width: isOpen ? "80vw" : 0 }} />
-```
-
-<Demo demo={resize} />
-
-Change CSS immediately, through `style` or a class, rather than through `animate`. The layout animation animates it for you.
-
-Reordering a list is a layout change too. Here, each item's CSS `order` changes every second, and `update()` runs with each change:
-
-<Demo demo={reorderItems} height={300} />
-
-Adding and removing items works the same way. Here, each item is rendered through the namespace, and `update()` runs with every change to the list. [`AnimatePresence`](/docs/animate-presence) keeps removed items around for their `exit` animation, while the others move into place.
-
-```svelte
-<script lang="ts">
-	import { AnimatePresence, createLayoutMotion } from "motion-sv";
-
-	const layout = createLayoutMotion();
-
-	let items = $state([1, 2, 3]);
-	const remove = layout.update.with((id: number) => (items = items.filter((item) => item !== id)));
-</script>
-
-<ul>
-	<AnimatePresence>
-		{#each items as id (id)}
-			<layout.li exit={{ opacity: 0 }} onclick={() => remove(id)}>Item {id}</layout.li>
-		{/each}
-	</AnimatePresence>
-</ul>
-```
-
-<Demo demo={list} height={360} />
-
-### Skipping an update
+#### Skipping an update
 
 Return `STOP_UPDATE` from a function wrapped with `update.with()` to skip the layout update, for instance when nothing changed:
 
@@ -137,9 +119,50 @@ Return `STOP_UPDATE` from a function wrapped with `update.with()` to skip the la
 </script>
 ```
 
+## Usage
+
+<Demo demo={notificationsList} height={564} />
+
+Any layout change the namespace measures can be animated: `width` and `height`, grid columns, flex direction, reordering a list, or adding and removing items.
+
+```svelte
+<layout.div style={{ width: isOpen ? "80vw" : 0 }} />
+```
+
+<Demo demo={resize} />
+
+Change CSS immediately, through `style` or a class, rather than through `animate`. The layout animation animates it for you.
+
+Reordering a list is a layout change too. Here, the list is shuffled every second, and the namespace depends on its order:
+
+<Demo demo={reorderItems} height={300} />
+
+Adding and removing items works the same way. Here, each item is rendered through the namespace, which depends on the list. [`AnimatePresence`](/docs/animate-presence) keeps removed items around for their `exit` animation, while the others move into place.
+
+```svelte
+<script lang="ts">
+	import { AnimatePresence, createLayoutMotion } from "motion-sv";
+
+	let items = $state([1, 2, 3]);
+	const layout = createLayoutMotion(() => items);
+
+	const remove = (id: number) => (items = items.filter((item) => item !== id));
+</script>
+
+<ul>
+	<AnimatePresence>
+		{#each items as id (id)}
+			<layout.li exit={{ opacity: 0 }} onclick={() => remove(id)}>Item {id}</layout.li>
+		{/each}
+	</AnimatePresence>
+</ul>
+```
+
+<Demo demo={list} height={360} />
+
 ### Sharing a namespace
 
-Each `createLayoutMotion()` call creates its own namespace, and `update()` measures only that namespace's elements. When a change affects elements in several components, render them all through the same namespace. It's a plain object, so pass it down as a prop or through context.
+Each `createLayoutMotion()` call creates its own namespace, which measures only its own elements. When a change affects elements in several components, render them all through the same namespace. It's a plain object, so pass it down as a prop or through context.
 
 ```svelte
 <!-- list.svelte -->
@@ -147,7 +170,8 @@ Each `createLayoutMotion()` call creates its own namespace, and `update()` measu
 	import { createLayoutMotion } from "motion-sv";
 	import Row from "./row.svelte";
 
-	const layout = createLayoutMotion();
+	let { rows } = $props();
+	const layout = createLayoutMotion(() => rows);
 </script>
 
 {#each rows as row (row.id)}
@@ -170,13 +194,14 @@ When separate namespaces affect each other's layout, wrap their elements in a [`
 
 ### `m`, LazyMotion and custom components
 
-`createLayoutMotion()` builds on `motion` by default. Pass `m` to use it with [`LazyMotion`](/docs/lazy-motion):
+`createLayoutMotion()` builds on `motion` by default. Pass `m` first to use it with [`LazyMotion`](/docs/lazy-motion), and the dependency, if any, second:
 
 ```svelte
 <script lang="ts">
 	import { createLayoutMotion, m } from "motion-sv";
 
-	const layout = createLayoutMotion(m);
+	let isOn = $state(false);
+	const layout = createLayoutMotion(m, () => isOn);
 </script>
 ```
 
@@ -192,7 +217,7 @@ Like `motion.create()`, `layout.create()` turns a component into a layout-animat
 
 ## Shared layout animations
 
-When an element with a `layoutId` mounts while another element with the same `layoutId` leaves, it animates out from the old one. This works with plain `motion` components, without `update()`.
+When an element with a `layoutId` mounts while another element with the same `layoutId` leaves, it animates out from the old one. This works with plain `motion` components, without a layout namespace.
 
 ```svelte
 {#each tabs as item (item.label)}
@@ -226,7 +251,7 @@ If the old element is still on the page when the new one enters, they crossfade 
 
 <Callout type="note">
 
-The automatic handoff covers elements that are added or removed. If a `layoutId` element stays mounted and moves, or other elements move along with the handoff, render them through a layout namespace and call `update()` too.
+The automatic handoff covers elements that are added or removed. If a `layoutId` element stays mounted and moves, or other elements move along with the handoff, render them through a layout namespace too.
 
 </Callout>
 
@@ -292,7 +317,7 @@ To animate layout correctly within a `position: fixed` element, give it the `lay
 
 ## Group layout animations
 
-`update()` measures the elements of its own namespace. Elements in other components, with namespaces of their own, aren't measured, so when their layout changes as a result, they jump.
+A namespace measures only its own elements. Elements in other components, with namespaces of their own, aren't measured, so when their layout changes as a result, they jump.
 
 [`LayoutGroup`](/docs/layout-group) links them: when any element inside it is measured, all of its layout elements are. Here each accordion item is a component with its own namespace, and opening one pushes the others down:
 
@@ -315,10 +340,10 @@ To animate layout correctly within a `position: fixed` element, give it the `lay
 
 	let { title, content } = $props();
 
-	const layout = createLayoutMotion();
-
 	let isOpen = $state(false);
-	const toggle = layout.update.with(() => (isOpen = !isOpen));
+	const layout = createLayoutMotion(() => isOpen);
+
+	const toggle = () => (isOpen = !isOpen);
 </script>
 
 <layout.div onclick={toggle}>
@@ -350,7 +375,8 @@ Motion also corrects `borderRadius` and `boxShadow` distortion, as long as Motio
 ### The element isn't animating
 
 - Check the element is rendered through a layout namespace (`<layout.div>`), not `<motion.div>`.
-- Check `layout.update()` is called with the state change, in the same synchronous code (not after an `await`).
+- Check the namespace's dependency reads the state that changes the layout. If you update manually, check `layout.update()` is called with the state change, in the same synchronous code (not after an `await`).
+- Check the namespace is created in the component whose markup changes the layout, or in a parent of it, not in a child.
 - Check the element isn't `display: inline`. Browsers don't apply `transform` to inline elements.
 - If its layout changes because of another component's update, wrap both in a [`LayoutGroup`](#group-layout-animations) or [share one namespace](#sharing-a-namespace).
 

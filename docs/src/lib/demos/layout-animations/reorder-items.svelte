@@ -3,10 +3,10 @@
 
 	const initialOrder = ["#ff0088", "#dd00ee", "#9911ff", "#0d63f8"];
 
-	const layout = createLayoutMotion();
-
 	let order = $state([...initialOrder]);
-	const reorder = layout.update.with(() => (order = shuffle(order)));
+	const layout = createLayoutMotion(() => order);
+
+	const reorder = () => (order = shuffle(order));
 
 	$effect(() => {
 		const intervalId = setInterval(reorder, 1000);

@@ -147,19 +147,17 @@ Motion can animate between any two layouts using transforms, for example switchi
 
 <Demo demo={layoutAnimation} />
 
-Svelte has no hook that runs right before the DOM updates, which is where React and Vue measure the old layout. So in motion-sv you create a layout namespace with `createLayoutMotion()`, render the elements through it, and call its `update()` together with the state change:
+Svelte has no hook that runs right before the DOM updates, which is where React and Vue measure the old layout. So in motion-sv you create a layout namespace with `createLayoutMotion()`, pass it a getter for the state the layout depends on, and render the elements through it. Whenever that state changes, they animate to their new layout:
 
 ```svelte
 <script lang="ts">
 	import { createLayoutMotion } from "motion-sv";
 
-	const layout = createLayoutMotion();
-
 	let isOn = $state(false);
-	const toggle = layout.update.with(() => (isOn = !isOn));
+	const layout = createLayoutMotion(() => isOn);
 </script>
 
-<button class={["switch", { on: isOn }]} onclick={toggle}>
+<button class={["switch", { on: isOn }]} onclick={() => (isOn = !isOn)}>
 	<layout.div class="handle" />
 </button>
 ```

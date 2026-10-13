@@ -40,21 +40,20 @@ Then import the `motion` component:
 
 Most of the API is identical. The main differences:
 
-- **Layout animations** need to know when a layout change is coming, because Svelte has no hook that runs before the DOM
-  updates. Render the elements through a namespace from `createLayoutMotion()` and call its `update()` with the state
-  change. Shared layout animations with `layoutId`, exits in `AnimatePresence` and `Reorder` lists work without it.
+- **Layout animations** need to know which state the layout depends on, because Svelte has no hook that runs before the
+  DOM updates. Render the elements through a namespace from `createLayoutMotion()`, with a getter for that state, or call
+  its `update()` with the state change. Shared layout animations with `layoutId`, exits in `AnimatePresence` and
+  `Reorder` lists work without it.
 
   ```svelte
   <script lang="ts">
   	import { createLayoutMotion } from "motion-sv";
 
-  	const layout = createLayoutMotion();
-
   	let isOn = $state(false);
-  	const toggle = layout.update.with(() => (isOn = !isOn));
+  	const layout = createLayoutMotion(() => isOn);
   </script>
 
-  <button class={{ on: isOn }} onclick={toggle}>
+  <button class={{ on: isOn }} onclick={() => (isOn = !isOn)}>
   	<layout.div class="handle" />
   </button>
   ```

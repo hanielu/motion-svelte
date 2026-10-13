@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { createLayoutMotion } from "motion-sv";
 
-	const layout = createLayoutMotion();
-
 	let isOpen = $state(false);
-	const toggle = layout.update.with(() => (isOpen = !isOpen));
+	const layout = createLayoutMotion(() => isOpen);
+
+	const toggle = () => (isOpen = !isOpen);
 </script>
 
 <div class="resize">

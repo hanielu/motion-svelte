@@ -102,20 +102,18 @@ Once the features arrive, each `m` component starts animating from its initial s
 
 ## Layout animations
 
-[Layout animations](/docs/layout-animations) need a layout namespace, which `createLayoutMotion()` builds on `motion` by default. Pass it `m` to render its components as `m` components, and load `domMax`, which includes layout animations:
+[Layout animations](/docs/layout-animations) need a layout namespace, which `createLayoutMotion()` builds on `motion` by default. Pass it `m` first to render its components as `m` components, and load `domMax`, which includes layout animations:
 
 ```svelte
 <script lang="ts">
 	import { LazyMotion, createLayoutMotion, domMax, m } from "motion-sv";
 
-	const layout = createLayoutMotion(m);
-
 	let isOn = $state(false);
-	const toggle = layout.update.with(() => (isOn = !isOn));
+	const layout = createLayoutMotion(m, () => isOn);
 </script>
 
 <LazyMotion features={domMax}>
-	<button class={["switch", { on: isOn }]} onclick={toggle}>
+	<button class={["switch", { on: isOn }]} onclick={() => (isOn = !isOn)}>
 		<layout.div class="handle" />
 	</button>
 </LazyMotion>

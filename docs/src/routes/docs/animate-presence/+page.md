@@ -239,7 +239,7 @@ Svelte renders the new block straight away, so the entering `motion` elements wa
 
 With `mode="popLayout"`, an exiting element is taken out of the page layout with `position: absolute`, at the position and size it had. Pair it with [layout animations](/docs/layout-animations), and the elements around it move into its space right away, while it animates out.
 
-Render the other elements through a layout namespace. Before an element exits, `AnimatePresence` measures the layout elements inside it, so removing one doesn't need `update()`. Click a square to remove it:
+Render the other elements through a layout namespace. Before an element exits, `AnimatePresence` measures the layout elements inside it, so the namespace doesn't need a dependency for removals. Click a square to remove it:
 
 ```svelte
 <script lang="ts">
@@ -267,7 +267,7 @@ Render the other elements through a layout namespace. Before an element exits, `
 
 <Demo demo={modePopLayout} />
 
-Adding an element still moves the others without an exit, so the demo's Add button calls `update()` with its change, as with any [layout change](/docs/layout-animations).
+Adding an element moves the others without an exit, so the demo's namespace also depends on the list, as with any [layout change](/docs/layout-animations).
 
 The popped element is positioned relative to its [offset parent](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent), so give the element around it a `position` other than `static`, like the list's `position: relative` here.
 
@@ -337,16 +337,13 @@ If elements outside it move too, like a button below the list, render them throu
 
 With the default `mode="sync"`, the exiting element stays in the layout until its exit animation finishes, and the elements around it move once it's gone. Use [`mode="popLayout"`](#poplayout) to move them right away.
 
-If the same state change also adds elements or changes other layouts, wrap it with `update.with()`, as with any layout change:
+If the same state change also adds elements or changes other layouts, give the namespace a dependency on that state, as with any layout change:
 
 ```svelte
 <script lang="ts">
-	const layout = createLayoutMotion();
-
-	// Removes one item and adds another: the addition needs update().
-	const replace = layout.update.with((id: number) => {
-		items = [...items.filter((item) => item.id !== id), { id: nextId++ }];
-	});
+	let items = $state([{ id: 1 }, { id: 2 }]);
+	// AnimatePresence measures removals, the dependency covers additions
+	const layout = createLayoutMotion(() => items);
 </script>
 ```
 

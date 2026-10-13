@@ -1,18 +1,18 @@
 <script lang="ts">
 	import { AnimatePresence, createLayoutMotion } from "motion-sv";
 
-	const layout = createLayoutMotion();
-
 	let notifications = $state([0]);
 	let newIndex = 0;
+	// The list changes in place, so depend on its length
+	const layout = createLayoutMotion(() => notifications.length);
 
-	const addNotification = layout.update.with(() => {
+	function addNotification() {
 		notifications.push(++newIndex);
-	});
+	}
 
-	const removeNotification = layout.update.with((id: number) => {
+	function removeNotification(id: number) {
 		notifications.splice(notifications.indexOf(id), 1);
-	});
+	}
 </script>
 
 <div class="notifications">

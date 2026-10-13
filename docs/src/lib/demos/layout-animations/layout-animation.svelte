@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { createLayoutMotion } from "motion-sv";
 
-	const layout = createLayoutMotion();
-
 	let isOn = $state(false);
-	const toggleSwitch = layout.update.with(() => (isOn = !isOn));
+	const layout = createLayoutMotion(() => isOn);
+
+	const toggleSwitch = () => (isOn = !isOn);
 </script>
 
 <button class={["toggle-container", isOn ? "start" : "end"]} onclick={toggleSwitch}>

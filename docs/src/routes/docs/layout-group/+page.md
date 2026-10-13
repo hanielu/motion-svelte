@@ -10,7 +10,7 @@ description: Group layout animations across components, and scope shared layout 
 	import tabRows from "#lib/demos/layout-group/tab-rows.svelte?demo";
 </script>
 
-[Layout animations](/docs/layout-animations) run when you call a layout namespace's `update()`, which measures that namespace's elements before the change. Elements in other components, rendered through namespaces of their own, aren't measured. When their layout changes as a side effect, they jump.
+[Layout animations](/docs/layout-animations) run when a layout namespace measures its elements before a change. Elements in other components, rendered through namespaces of their own, aren't measured. When their layout changes as a side effect, they jump.
 
 `LayoutGroup` groups components that don't render together, but affect each other's layout. It also namespaces `layoutId`s, so a component with a shared layout animation can be rendered more than once.
 
@@ -33,10 +33,10 @@ Take this sidebar, which handles its own state. Its namespace animates it when i
 
 	const links = ["Home", "Search", "Library"];
 
-	const layout = createLayoutMotion();
-
 	let isOpen = $state(false);
-	const toggle = layout.update.with(() => (isOpen = !isOpen));
+	const layout = createLayoutMotion(() => isOpen);
+
+	const toggle = () => (isOpen = !isOpen);
 </script>
 
 <layout.nav class={["side-nav", { open: isOpen }]}>
@@ -50,7 +50,7 @@ Take this sidebar, which handles its own state. Its namespace animates it when i
 </layout.nav>
 ```
 
-Next to it, the page's content takes up the remaining width. It renders its elements through a namespace too, but it has no state of its own, and never calls `update()`:
+Next to it, the page's content takes up the remaining width. It renders its elements through a namespace too, but it has no state of its own, so nothing tells it a change is coming:
 
 ```svelte
 <!-- content.svelte -->
@@ -66,7 +66,7 @@ Next to it, the page's content takes up the remaining width. It renders its elem
 </layout.main>
 ```
 
-When the sidebar opens, the content has no way of knowing, so it jumps to its new size. Wrap both in a `LayoutGroup`, and when the sidebar's `update()` measures its elements, the content's elements are measured too:
+When the sidebar opens, the content has no way of knowing, so it jumps to its new size. Wrap both in a `LayoutGroup`, and when the sidebar's namespace measures its elements, the content's elements are measured too:
 
 ```svelte
 <script lang="ts">
