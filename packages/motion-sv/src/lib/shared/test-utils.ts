@@ -7,6 +7,7 @@ import { html, type InlineSnippet } from "@hvniel/vite-plugin-svelte-inline-comp
  * composable API that eliminates boilerplate and enables easy nested component testing.
  */
 import type { ComponentInternals, Component, Snippet, ComponentProps } from "svelte";
+import { frame } from "motion-dom";
 
 const { _element } = html`
 	<script lang="ts" module>
@@ -265,3 +266,6 @@ export function createClickGetter(locator: Locator): () => void | Promise<void> 
 export { element, html };
 
 export const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Resolves at the end of the next animation frame, once its animations have been applied. */
+export const nextFrame = () => new Promise<void>((resolve) => frame.postRender(() => resolve()));

@@ -8,7 +8,7 @@ import type {
 	ResolvedValues,
 	VisualElement,
 } from "motion-dom";
-import { frame, isVariantLabel } from "motion-dom";
+import { frame, isVariantLabel, microtask } from "motion-dom";
 import { isSVGElement, resolveInitialValues } from "#lib/state/utils.js";
 import type { Feature, FeatureKey } from "#lib/features/feature.js";
 import type { StateType } from "#lib/features/animation/animation.js";
@@ -46,6 +46,8 @@ export class MotionState {
 	 * it has no position to animate its layout from (as in React).
 	 */
 	public isNewlyMounted = false;
+	/** Set while the initial animation pass, which AnimationFeature defers by a microtask, hasn't run yet. */
+	public isInitialPassPending = false;
 	/**
 	 * Bumped by exit() and reenter(). An exit completion from an older generation is a no-op, so an
 	 * exit → reenter → exit sequence can't have the first exit's late settlement end the second one.
@@ -203,7 +205,12 @@ export class MotionState {
 	}
 
 	// Set animation state active status and propagate to children
-	setActive(name: StateType, isActive: boolean) {
+	setActive(name: StateType, isActive: boolean): Promise<unknown> | undefined {
+		// A gesture can fire before the deferred initial pass, e.g. on an element focused as it mounts. That pass skips
+		// its animations, so it would swallow this one: run it after the pass instead, as after React's mount effect.
+		if (this.isInitialPassPending) {
+			return new Promise((resolve) => microtask.render(() => resolve(this.setActive(name, isActive))));
+		}
 		return this.visualElement?.animationState?.setActive(toAnimationType(name), isActive);
 	}
 

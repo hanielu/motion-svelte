@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render } from "vitest-browser-svelte";
-import { html, delay } from "#lib/shared/test-utils.js";
+import { html, nextFrame } from "#lib/shared/test-utils.js";
 import { flushSync } from "svelte";
 
 // svelte:defs
@@ -32,7 +32,7 @@ describe("focus Gesture", () => {
 			const element = getByTestId("myAnchorElement").element() as HTMLElement;
 			vi.spyOn(element, "matches").mockReturnValue(true);
 			element.focus();
-			await delay(7);
+			await nextFrame();
 			resolve(opacity.get());
 		});
 
@@ -62,7 +62,7 @@ describe("focus Gesture", () => {
 			const element = getByTestId("myAnchorElement").element() as HTMLElement;
 			vi.spyOn(element, "matches").mockReturnValue(false);
 			element.focus();
-			await delay(7);
+			await nextFrame();
 			resolve(opacity.get());
 		});
 
@@ -98,7 +98,7 @@ describe("focus Gesture", () => {
 				throw new Error("this selector not supported");
 			});
 			element.focus();
-			await delay(7);
+			await nextFrame();
 			resolve(opacity.get());
 		});
 
@@ -135,7 +135,7 @@ describe("focus Gesture", () => {
 			const element = getByTestId("myAnchorElement").element() as HTMLElement;
 			vi.spyOn(element, "matches").mockReturnValue(true);
 			element.focus();
-			await delay(7);
+			await nextFrame();
 			resolve(opacity.get());
 		});
 

@@ -50,7 +50,9 @@ export class AnimationFeature extends Feature {
 		 * wait-mode gate hides entrants with display:none, which must NOT be
 		 * treated as exiting — so that check is intentionally omitted.
 		 */
+		this.state.isInitialPassPending = true;
 		microtask.render(() => {
+			this.state.isInitialPassPending = false;
 			if (!this.state.isMounted()) return;
 			if (this.state.isEnterBlocked?.()) {
 				// AnimatePresence wait-mode: hold initial values; the Motion component
