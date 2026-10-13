@@ -238,7 +238,9 @@
 	 * lead, and they stay until it finishes so it can crossfade from them. Nothing exits while the AnimatePresence
 	 * itself is being destroyed.
 	 */
-	const takesPartInExit = () => (!!props.exit || !!props.layoutId) && presenceContext?.isUnmounting === false;
+	const takesPartInExit = () =>
+		// The synced options, not the live props: an outroing block's props can depend on state that's gone
+		(!!motionState.options.exit || !!motionState.options.layoutId) && presenceContext?.isUnmounting === false;
 
 	/**
 	 * Svelte transitions only keep the DOM node alive while MotionState plays the exit; motion drives the actual
