@@ -1,24 +1,12 @@
 <script lang="ts">
-	import { page } from "$app/state";
+	import type { Heading } from "#lib/markdown/headings.svelte.js";
 
-	interface Heading {
-		id: string;
-		text: string;
-		level: number;
-	}
+	let { headings }: { headings: Heading[] } = $props();
 
-	let headings = $state.raw<Heading[]>([]);
 	let activeId = $state<string>();
 
-	// Collect the page's headings once it has rendered (again on each navigation), and track the one being read.
+	// Track the heading being read
 	$effect(() => {
-		void page.url.pathname;
-		const elements = [...document.querySelectorAll<HTMLElement>(".markdown :is(h2, h3)[id]")];
-		headings = elements.map((element) => ({
-			id: element.id,
-			text: element.textContent ?? "",
-			level: Number(element.tagName[1]),
-		}));
 		activeId = undefined;
 
 		const observer = new IntersectionObserver(
@@ -28,7 +16,7 @@
 			},
 			{ rootMargin: "0px 0px -70% 0px" }
 		);
-		elements.forEach((element) => observer.observe(element));
+		headings.forEach(({ element }) => observer.observe(element));
 		return () => observer.disconnect();
 	});
 </script>

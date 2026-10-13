@@ -3,8 +3,11 @@
 	import Pager from "#lib/components/pager.svelte";
 	import Sidebar from "#lib/components/sidebar.svelte";
 	import Toc from "#lib/components/toc.svelte";
+	import { PageHeadings, setPageHeadings } from "#lib/markdown/headings.svelte.js";
 
 	let { children } = $props();
+
+	const headings = setPageHeadings(new PageHeadings());
 
 	let menuOpen = $state(false);
 </script>
@@ -20,7 +23,7 @@
 		<Pager />
 	</main>
 	<aside class="toc">
-		<Toc />
+		<Toc headings={headings.current} />
 	</aside>
 </div>
 

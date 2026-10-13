@@ -20,6 +20,7 @@
 
 <script lang="ts">
 	import type { Snippet } from "svelte";
+	import { getPageHeadings } from "./headings.svelte.js";
 
 	interface Props {
 		metadata: { title: string; description?: string };
@@ -27,6 +28,20 @@
 	}
 
 	let { metadata, children }: Props = $props();
+
+	const pageHeadings = getPageHeadings();
+	let article = $state<HTMLElement>();
+
+	// Publish the headings from this article only: while a navigation swaps pages, both are briefly in the DOM.
+	$effect(() => {
+		if (!article) return;
+		pageHeadings.current = [...article.querySelectorAll<HTMLElement>(":is(h2, h3)[id]")].map((element) => ({
+			id: element.id,
+			text: element.textContent ?? "",
+			level: Number(element.tagName[1]),
+			element,
+		}));
+	});
 </script>
 
 <svelte:head>
@@ -36,7 +51,7 @@
 	{/if}
 </svelte:head>
 
-<article class="markdown">
+<article bind:this={article} class="markdown">
 	<h1>{metadata.title}</h1>
 	{#if metadata.description}
 		<p class="lead">{metadata.description}</p>
