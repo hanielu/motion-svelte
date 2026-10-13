@@ -59,19 +59,31 @@
 	}
 
 	/**
-	 * Snapshot every layout-enabled projection node in the tree before the exiting element pops out of flow
-	 * (popLayout) or leaves the DOM (sync), so siblings can FLIP from their pre-shift positions. Nodes already
-	 * snapshotted by createLayoutMotion().update() keep their snapshot; nodes that don't move won't animate. Elements
-	 * that mounted in this same update don't animate their first layout, as in React.
+	 * Snapshot this AnimatePresence's layout elements before the exiting element pops out of flow (popLayout) or
+	 * leaves the DOM (sync), so its siblings can FLIP from their pre-shift positions. These are the elements React
+	 * re-renders when a child exits; snapshotting one also dirties the rest of its LayoutGroup, as React's forceRender
+	 * does. Elements elsewhere keep animating undisturbed. Nodes already snapshotted by createLayoutMotion().update()
+	 * keep their snapshot, and elements that mounted in this same update don't animate their first layout, as in React.
+	 *
+	 * Returns the layout pass to run once the exiting element is out of the layout. It runs even when the exiting
+	 * element doesn't animate its own layout, since a snapshot left behind would later animate from a stale layout.
 	 */
 	function snapshotLayoutTree(state: MotionState) {
 		const root: IProjectionNode | undefined = state.visualElement?.projection?.root;
+		let hasSnapshot = false;
 		root?.nodes?.forEach((child) => {
 			const node = child as IProjectionNode;
-			if (!(node.options.layout || node.options.layoutId)) return;
-			if (node.instance instanceof Element && mountedStates.get(node.instance)?.isNewlyMounted) return;
-			node.willUpdate(false);
+			if (!(node.options.layout || node.options.layoutId) || !(node.instance instanceof Element)) return;
+			const owner = mountedStates.get(node.instance);
+			if (owner?.options.presenceContext !== presenceContext || owner.isNewlyMounted) return;
+			node.willUpdate();
+			hasSnapshot = true;
 		});
+
+		return () => {
+			state.didUpdate();
+			if (hasSnapshot && root?.isUpdating) root.didUpdate();
+		};
 	}
 
 	/**
@@ -119,8 +131,11 @@
 			return false;
 		}
 
-		snapshotLayoutTree(state);
-		if (state.options.exit) addPopStyle(state);
+		// popLayout takes the element out of the layout now, so measure around it first. Otherwise it stays in the
+		// layout until its outro ends (see handleOutroEnd), and measuring now would only finish running animations.
+		const popsOut = mode === "popLayout" && !!state.options.exit;
+		const updateLayout = popsOut ? snapshotLayoutTree(state) : () => state.didUpdate();
+		if (popsOut) addPopStyle(state);
 
 		const session: ExitSession = { blocksExit: !!state.options.exit, isComplete: false };
 		exitDom.set(el, session);
@@ -131,7 +146,7 @@
 			session.isComplete = true;
 			finishOutro(el);
 		});
-		state.didUpdate();
+		updateLayout();
 		return true;
 	}
 
@@ -151,11 +166,11 @@
 		if (exitDom.size === 0) onExitComplete?.();
 		if (removePopStyle(state)) return;
 
-		// Sync mode: the element leaves the DOM right after outroend, shifting siblings. Snapshot the tree now (element
-		// still in flow) and run the layout pass after Svelte has removed the node.
-		snapshotLayoutTree(state);
+		// Sync mode: the element leaves the DOM right after outroend, shifting siblings. Snapshot them now (element still
+		// in flow) and run the layout pass after Svelte has removed the node.
+		const updateLayout = snapshotLayoutTree(state);
 		state.getSnapshot(state.options, false);
-		queueMicrotask(() => state.didUpdate());
+		queueMicrotask(updateLayout);
 	}
 
 	function presenceIntro(_node: Element) {
