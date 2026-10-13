@@ -59,7 +59,7 @@
     },
     "packages/motion-sv": {
       "name": "motion-sv",
-      "version": "0.1.13",
+      "version": "0.2.0",
       "dependencies": {
         "csstype": "^3.2.3",
         "framer-motion": "14.1.0",
