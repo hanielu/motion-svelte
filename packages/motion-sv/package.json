@@ -8,7 +8,7 @@
 		"type": "git",
 		"url": "git+https://github.com/hanielu/motion-svelte.git"
 	},
-	"homepage": "https://github.com/hanielu/motion-svelte#readme",
+	"homepage": "https://motion.hyprsonic.dev",
 	"bugs": "https://github.com/hanielu/motion-svelte/issues",
 	"keywords": [
 		"svelte",
