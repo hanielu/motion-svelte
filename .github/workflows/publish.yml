@@ -1,0 +1,73 @@
+name: Publish Package
+
+# Run by hand once the version pull request is merged. npm trusts this workflow through trusted publishing (OIDC), so
+# no npm token is stored and npm attaches provenance. The trusted publisher is configured on npmjs.com under
+# motion-sv → Settings, for hanielu/motion-svelte and this workflow's filename (publish.yml).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.15.0
+          registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Chromium
+        working-directory: packages/motion-sv
+        run: bunx playwright install --with-deps chromium
+
+      # Builds the package first
+      - name: Check
+        run: bun run check
+
+      - name: Test
+        run: bun run test
+
+      - name: Read package version
+        id: package
+        run: echo "version=$(jq -r .version packages/motion-sv/package.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Publish to npm
+        run: bunx changeset publish
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: motion-sv@${{ steps.package.outputs.version }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "GitHub release $TAG already exists"
+          else
+            gh release create "$TAG" \
+              --generate-notes \
+              --target "$GITHUB_SHA" \
+              --title "$TAG"
+          fi

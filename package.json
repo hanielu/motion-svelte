@@ -20,9 +20,12 @@
 		"test": "bun run --filter motion-sv test",
 		"test:e2e": "bun run --filter e2e test",
 		"release": "bun run build && changeset publish",
+		"version-packages": "changeset version && bun install",
 		"docs": "bun run --filter docs dev"
 	},
 	"devDependencies": {
+		"@changesets/changelog-github": "^0.7.0",
+		"@changesets/cli": "^2.31.1",
 		"prettier": "^3.9.10",
 		"prettier-plugin-svelte": "^4.1.1"
 	}
