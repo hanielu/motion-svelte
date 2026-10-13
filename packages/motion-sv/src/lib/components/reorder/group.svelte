@@ -65,7 +65,9 @@
 	const axis = $derived(axisOverride ?? detectedAxis);
 	/** Set while a new order is waiting to render, so a drag reorders once per render. */
 	let isReordering = false;
-	const layoutMotion = createLayoutMotion();
+	// Measures the items whenever the values change, from a drag or from outside (e.g. adding an item), before the new
+	// list renders, as a React re-render does.
+	const layoutMotion = createLayoutMotion(() => values);
 
 	setReorderContext({
 		get axis() {
@@ -108,14 +110,6 @@
 			onReorder?.(newValues);
 		},
 	});
-
-	// Snapshot the items whenever the values change, from a drag or from outside (e.g. adding an item), before the new
-	// list renders, as a React re-render does. Pre, so it runs before the items' block updates the DOM.
-	watch.pre(
-		() => values,
-		() => layoutMotion.update(),
-		{ lazy: true }
-	);
 
 	// Once new values have rendered: allow the next reorder, and forget the layouts of removed items.
 	watch(

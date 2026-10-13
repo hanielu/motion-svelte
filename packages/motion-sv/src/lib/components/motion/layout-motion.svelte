@@ -6,6 +6,7 @@
 	import { createOptionalContext } from "#lib/utils/optional-context.js";
 	import { motion } from "./instance.js";
 	import type { IProjectionNode } from "motion-dom";
+	import { watch } from "#lib/vendor/runed/index.js";
 
 	type MotionComponent = Component<Record<string, unknown>>;
 
@@ -46,14 +47,34 @@
 		};
 	};
 
+	/** A getter for the state a layout depends on. Like `$derived`, the state it reads is tracked. */
+	export type LayoutDependency = () => unknown;
+
 	/**
 	 * Create a motion namespace whose components animate their layout changes. Svelte has no hook that runs before a
 	 * component's DOM updates (https://github.com/sveltejs/svelte/issues/16648#issuecomment-3201964832), so the
-	 * layout is snapshotted explicitly, by calling `update()` right after the state change that moves the components.
+	 * namespace needs to know when a layout change is coming:
+	 *
+	 * - Pass a `dependency`, a getter for the state the layout depends on. Whenever that state changes, the namespace
+	 *   measures its components before the DOM updates, wherever the change comes from (an event, a timer, a prop).
+	 *   Create the namespace in the component whose markup changes the layout, or above it, at the top of its script.
+	 * - Or call `update()` right after the state change that moves the components.
+	 *
+	 * ```ts
+	 * let isOn = $state(false);
+	 * const layout = createLayoutMotion(() => isOn);
+	 * ```
 	 *
 	 * @param base - The motion namespace (`motion` or `m`) to render the components with
+	 * @param dependency - A getter for the state the layout depends on
 	 */
-	export function createLayoutMotion(base: MotionNameSpace = motion): LayoutMotionNamespace {
+	export function createLayoutMotion(dependency?: LayoutDependency): LayoutMotionNamespace;
+	export function createLayoutMotion(base: MotionNameSpace, dependency?: LayoutDependency): LayoutMotionNamespace;
+	export function createLayoutMotion(
+		...args: [dependency?: LayoutDependency] | [base: MotionNameSpace, dependency?: LayoutDependency]
+	): LayoutMotionNamespace {
+		// The namespaces are proxies of plain objects, so a function is always the dependency.
+		const [base = motion, dependency] = typeof args[0] === "function" ? [undefined, args[0]] : args;
 		const scope = new Set<MotionState>();
 
 		function update() {
@@ -79,6 +100,9 @@
 				if (result !== STOP_UPDATE) update();
 				return result;
 			};
+
+		// A pre effect runs before the DOM updates of the component that creates it, and of everything it renders.
+		if (dependency) watch.pre(dependency, () => update(), { lazy: true });
 
 		/** Render the component inside this namespace's scope, with `layout` on unless it's set (e.g. to "position"). */
 		const withScope =

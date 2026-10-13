@@ -1,5 +1,10 @@
 export type { MotionProps } from "./types.js";
-export { createLayoutMotion, STOP_UPDATE, type LayoutMotionNamespace } from "./layout-motion.svelte";
+export {
+	createLayoutMotion,
+	STOP_UPDATE,
+	type LayoutDependency,
+	type LayoutMotionNamespace,
+} from "./layout-motion.svelte";
 import { motion } from "./instance.js";
 export { motion };
 

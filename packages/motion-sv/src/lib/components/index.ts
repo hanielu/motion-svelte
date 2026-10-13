@@ -2,6 +2,7 @@ export {
 	motion,
 	createLayoutMotion,
 	STOP_UPDATE,
+	type LayoutDependency,
 	type LayoutMotionNamespace,
 	type MotionProps,
 } from "./motion/index.js";
