@@ -1,25 +1,24 @@
-import { createHighlighter, type Highlighter } from "shiki";
+import { language as bash } from "@twinkleplop/bash";
+import { escape_html } from "@twinkleplop/core";
+import { language as svelte } from "@twinkleplop/svelte";
+import { language as typescript } from "@twinkleplop/typescript";
 
-const LANGS = ["svelte", "typescript", "javascript", "html", "css", "json", "shellscript"] as const;
-
-let highlighter: Promise<Highlighter> | undefined;
+const languages: Record<string, (code: string) => string> = {
+	svelte: svelte(),
+	typescript: typescript(),
+	shellscript: bash(),
+};
 
 /**
- * Highlights code at build time, as a `<pre class="shiki">`, with light and dark colours as CSS variables (see
- * `.shiki` in app.css).
+ * Highlights code at build time, as a `<pre class="twinkleplop">` with a class per token. Their colours come from
+ * the theme imported in the root layout.
  */
-export async function highlight(code: string, lang = "svelte") {
-	highlighter ??= createHighlighter({ themes: ["github-light-default", "github-dark-default"], langs: [...LANGS] });
-	const shiki = await highlighter;
-	const known = (shiki.getLoadedLanguages() as string[]).includes(lang);
-	return shiki.codeToHtml(code.trimEnd(), {
-		lang: known ? lang : "text",
-		themes: { light: "github-light-default", dark: "github-dark-default" },
-		defaultColor: false,
-	});
+export function highlight(code: string, lang = "svelte") {
+	const source = code.trimEnd();
+	return languages[lang]?.(source) ?? `<pre class="twinkleplop"><code>${escape_html(source)}</code></pre>`;
 }
 
 /** Just the highlighted `<code>`, for a markdown code block, whose `<pre>` is the blueprint's own. */
-export async function highlightCode(code: string, lang = "svelte") {
-	return (await highlight(code, lang)).replace(/^<pre[^>]*>|<\/pre>$/g, "");
+export function highlightCode(code: string, lang = "svelte") {
+	return highlight(code, lang).replace(/^<pre[^>]*>|<\/pre>$/g, "");
 }

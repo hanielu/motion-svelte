@@ -8,7 +8,7 @@
 
 <style>
 	blockquote {
-		margin: 0 0 1.25rem;
+		margin: 0 0 1.5rem;
 		padding: 0.75rem 1rem;
 		border-left: 3px solid var(--accent);
 		border-radius: 0 0.5rem 0.5rem 0;

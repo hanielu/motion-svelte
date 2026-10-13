@@ -8,7 +8,8 @@
 
 <style>
 	h4 {
-		margin: 1.5rem 0 0.5rem;
+		margin: 2rem 0 0.5rem;
+		color: var(--text);
 		font-size: 1rem;
 	}
 </style>

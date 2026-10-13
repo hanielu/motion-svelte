@@ -8,7 +8,10 @@
 
 <style>
 	h3 {
-		margin: 2rem 0 0.75rem;
-		font-size: 1.125rem;
+		margin: 3rem 0 0.75rem;
+		color: var(--text);
+		font-size: 1.25rem;
+		line-height: 1.2;
+		letter-spacing: -0.02em;
 	}
 </style>

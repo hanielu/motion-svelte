@@ -1,44 +1,31 @@
 /* ==============   Theme   ================ */
 
+/* Light by default; app.html adds `.dark` for the saved theme, or the system's */
 :root {
 	--bg: #ffffff;
 	--bg-subtle: #f7f7f8;
 	--surface: #f2f2f4;
 	--border: #e4e4e8;
 	--text: #18181b;
+	--text-body: #3f3f46;
 	--text-muted: #5f5f6a;
 	--accent: #e63600;
 	--accent-soft: rgb(255 62 0 / 0.1);
 	--code-bg: #f6f6f8;
-	--font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+	--font-sans: "TASA Orbiter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 	--font-mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, monospace;
 	--header-height: 3.5rem;
 
 	color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-	:root:not([data-theme="light"]) {
-		--bg: #0c0c0e;
-		--bg-subtle: #121215;
-		--surface: #18181c;
-		--border: #27272c;
-		--text: #ededf0;
-		--text-muted: #a0a0ab;
-		--accent: #ff5a24;
-		--accent-soft: rgb(255 90 36 / 0.14);
-		--code-bg: #141417;
-
-		color-scheme: dark;
-	}
-}
-
-:root[data-theme="dark"] {
+:root.dark {
 	--bg: #0c0c0e;
 	--bg-subtle: #121215;
 	--surface: #18181c;
 	--border: #27272c;
 	--text: #ededf0;
+	--text-body: #c2c2ca;
 	--text-muted: #a0a0ab;
 	--accent: #ff5a24;
 	--accent-soft: rgb(255 90 36 / 0.14);
@@ -64,29 +51,16 @@ a {
 	color: inherit;
 }
 
-/* ==============   Code (Shiki)   ================ */
+/* ==============   Code   ================ */
 
-.shiki {
+/* Token colours come from @twinkleplop/theme-github, imported in the root layout */
+.twinkleplop {
 	margin: 0;
 	padding: 1rem 1.25rem;
 	overflow-x: auto;
-	background: var(--code-bg) !important;
+	background: var(--code-bg);
 	font-family: var(--font-mono);
 	font-size: 0.8125rem;
-	line-height: 1.7;
+	line-height: 1.65;
 	tab-size: 2;
-}
-
-.shiki span {
-	color: var(--shiki-light);
-}
-
-@media (prefers-color-scheme: dark) {
-	:root:not([data-theme="light"]) .shiki span {
-		color: var(--shiki-dark);
-	}
-}
-
-:root[data-theme="dark"] .shiki span {
-	color: var(--shiki-dark);
 }

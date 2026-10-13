@@ -8,14 +8,14 @@
 </script>
 
 <div class="code-block">
-	<pre class="shiki" bind:this={pre} {...rest}>{@render children?.()}</pre>
+	<pre class="twinkleplop" bind:this={pre} {...rest}>{@render children?.()}</pre>
 	<CopyButton text={() => pre?.textContent ?? ""} />
 </div>
 
 <style>
 	.code-block {
 		position: relative;
-		margin: 0 0 1.25rem;
+		margin: 0 0 1.5rem;
 	}
 
 	pre {

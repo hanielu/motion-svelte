@@ -2,22 +2,11 @@
 	import IconMoon from "~icons/lucide/moon";
 	import IconSun from "~icons/lucide/sun";
 
-	type Theme = "light" | "dark";
-
-	// The saved theme is applied by app.html before the first paint; this reads it back.
-	let theme = $state<Theme | undefined>();
-
-	$effect(() => {
-		theme =
-			(document.documentElement.dataset.theme as Theme | undefined) ??
-			(matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-	});
-
+	// app.html applies the theme as a `.dark` class on <html>, so the icon follows it in CSS, including system changes
 	function toggle() {
-		theme = theme === "dark" ? "light" : "dark";
-		document.documentElement.dataset.theme = theme;
+		const isDark = document.documentElement.classList.toggle("dark");
 		try {
-			localStorage.setItem("theme", theme);
+			localStorage.setItem("theme", isDark ? "dark" : "light");
 		} catch {
 			// Storage can be unavailable (private mode); the theme still applies for this visit
 		}
@@ -25,6 +14,17 @@
 </script>
 
 <button type="button" class="icon-button" onclick={toggle} aria-label="Toggle theme">
-	{const Icon = $derived(theme === "dark" ? IconSun : IconMoon)}
-	<Icon />
+	<IconMoon class="moon" />
+	<IconSun class="sun" />
 </button>
+
+<style>
+	button :global(.sun),
+	:global(.dark) button :global(.moon) {
+		display: none;
+	}
+
+	:global(.dark) button :global(.sun) {
+		display: block;
+	}
+</style>

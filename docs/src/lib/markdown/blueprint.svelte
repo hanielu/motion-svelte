@@ -62,29 +62,50 @@
 <style>
 	article {
 		min-width: 0;
-		font-size: 0.9375rem;
+		color: var(--text-body);
+		font-size: 1rem;
+		line-height: 1.72;
+		letter-spacing: -0.01em;
+	}
+
+	/* Prose reads best in a narrow column. Demos, code and tables use the full width. */
+	article > :global(:not(.demo, .code-block, .table)) {
+		max-width: 40rem;
+	}
+
+	article :global(strong) {
+		color: var(--text);
 	}
 
 	h1 {
-		margin: 0 0 0.5rem;
-		font-size: 2.25rem;
-		line-height: 1.2;
-		letter-spacing: -0.02em;
+		margin: 0 0 0.75rem;
+		color: var(--text);
+		font-size: 2.5rem;
+		line-height: 1.1;
+		letter-spacing: -0.035em;
 	}
 
 	.lead {
 		margin: 0 0 2rem;
-		color: var(--text-muted);
-		font-size: 1.125rem;
+		color: var(--text);
+		font-size: 1.375rem;
+		line-height: 1.45;
+		letter-spacing: -0.015em;
 	}
 
 	/* Inline code. mdsx renders it as escaped text rather than through an element component, so it's styled here,
 	   leaving code blocks and the demos inside the page alone. */
 	article :global(code:not(pre code, .demo *)) {
-		padding: 0.125rem 0.375rem;
-		border-radius: 0.375rem;
+		padding: 0.125rem 0.3125rem;
+		border-radius: 0.25rem;
 		background: var(--surface);
+		color: var(--text);
 		font-family: var(--font-mono);
-		font-size: 0.85em;
+		font-size: 0.86em;
+		letter-spacing: 0;
+	}
+
+	article :global(a code) {
+		color: inherit;
 	}
 </style>

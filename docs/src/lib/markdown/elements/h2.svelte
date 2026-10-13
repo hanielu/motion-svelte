@@ -8,11 +8,10 @@
 
 <style>
 	h2 {
-		margin: 3rem 0 1rem;
-		padding-top: 1.5rem;
-		border-top: 1px solid var(--border);
-		font-size: 1.5rem;
-		line-height: 1.3;
-		letter-spacing: -0.01em;
+		margin: 4.5rem 0 1rem;
+		color: var(--text);
+		font-size: 1.875rem;
+		line-height: 1.1;
+		letter-spacing: -0.03em;
 	}
 </style>

@@ -100,7 +100,7 @@
 		opacity: 1;
 	}
 
-	.code :global(.shiki) {
+	.code :global(.twinkleplop) {
 		border-radius: 0;
 	}
 </style>

@@ -8,7 +8,7 @@
 
 <style>
 	ol {
-		margin: 0 0 1rem;
-		padding-left: 1.5rem;
+		margin: 0 0 1.5rem;
+		padding-left: 1.375rem;
 	}
 </style>

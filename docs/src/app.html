@@ -4,11 +4,19 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<script>
-			// Apply the saved theme before the first paint
-			try {
-				const theme = localStorage.getItem("theme");
-				if (theme) document.documentElement.dataset.theme = theme;
-			} catch {}
+			// Apply the theme before the first paint: the saved one, or the system's, which is followed while it's used
+			{
+				const system = matchMedia("(prefers-color-scheme: dark)");
+				const apply = () => {
+					let saved = null;
+					try {
+						saved = localStorage.getItem("theme");
+					} catch {}
+					document.documentElement.classList.toggle("dark", saved ? saved === "dark" : system.matches);
+				};
+				apply();
+				system.addEventListener("change", apply);
+			}
 		</script>
 		%sveltekit.head%
 	</head>

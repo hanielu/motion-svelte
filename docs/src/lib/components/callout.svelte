@@ -18,13 +18,14 @@
 
 <style>
 	.callout {
-		margin: 0 0 1.25rem;
+		margin: 0 0 1.5rem;
 		padding: 0.875rem 1rem;
 		border: 1px solid var(--border);
 		border-left-width: 3px;
 		border-radius: 0.5rem;
 		background: var(--bg-subtle);
-		font-size: 0.875rem;
+		font-size: 0.9375rem;
+		line-height: 1.65;
 	}
 
 	.tip {

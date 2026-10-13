@@ -10,7 +10,7 @@
 
 <style>
 	.table {
-		margin: 0 0 1.25rem;
+		margin: 0 0 1.5rem;
 		overflow-x: auto;
 	}
 

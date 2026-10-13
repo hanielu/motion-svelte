@@ -7,8 +7,13 @@
 <li {...rest}>{@render children?.()}</li>
 
 <style>
+	li {
+		padding-left: 0.25rem;
+		line-height: 1.65;
+	}
+
 	li:not(:first-child) {
-		margin-top: 0.25rem;
+		margin-top: 0.5rem;
 	}
 
 	/* A list item's paragraphs (a "loose" list) and nested lists don't need their own spacing */
