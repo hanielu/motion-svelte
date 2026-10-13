@@ -3,9 +3,9 @@
 </script>
 
 <motion.div
-	style={{ width: 80, height: 80, background: "#9911ff" }}
+	style={{ width: 100, height: 100, backgroundColor: "currentColor", borderRadius: 5 }}
 	animate={{
-		scale: [1, 1.6, 1.6, 1, 1],
+		scale: [1, 2, 2, 1, 1],
 		rotate: [0, 0, 180, 180, 0],
 		borderRadius: ["0%", "0%", "50%", "50%", "0%"],
 	}}

@@ -6,7 +6,7 @@ description: Creates a motion value that animates to its latest target with a sp
 <script>
 	import Callout from "#lib/components/callout.svelte";
 	import Demo from "#lib/components/demo.svelte";
-	import followPointer from "#lib/demos/use-spring/follow-pointer.svelte?demo";
+	import followPointerWithSpring from "#lib/demos/use-spring/follow-pointer-with-spring.svelte?demo";
 	import setAndJump from "#lib/demos/use-spring/set-and-jump.svelte?demo";
 	import followValue from "#lib/demos/use-spring/follow-value.svelte?demo";
 </script>
@@ -19,16 +19,18 @@ You can set the target yourself with `set()`, or have it follow another motion v
 <script lang="ts">
 	import { motion, useMotionValue, useSpring } from "motion-sv";
 
-	const pointerX = useMotionValue(0);
-	const pointerY = useMotionValue(0);
-	const x = useSpring(pointerX, { stiffness: 50, damping: 3 });
-	const y = useSpring(pointerY, { stiffness: 50, damping: 3 });
+	const spring = { damping: 3, stiffness: 50, restDelta: 0.001 };
+
+	const xPoint = useMotionValue(0);
+	const yPoint = useMotionValue(0);
+	const x = useSpring(xPoint, spring);
+	const y = useSpring(yPoint, spring);
 </script>
 
 <motion.div style={{ x, y }} />
 ```
 
-<Demo demo={followPointer} height={300} />
+<Demo demo={followPointerWithSpring} height={400} />
 
 ## Usage
 

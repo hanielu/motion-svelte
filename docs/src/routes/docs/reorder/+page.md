@@ -6,11 +6,11 @@ description: Drag-to-reorder lists, tabs and grids.
 <script>
 	import Demo from "#lib/components/demo.svelte";
 	import basic from "#lib/demos/reorder/basic.svelte?demo";
-	import grid from "#lib/demos/reorder/grid.svelte?demo";
+	import reorderGrid from "#lib/demos/reorder/reorder-grid.svelte?demo";
 	import dragging from "#lib/demos/reorder/dragging.svelte?demo";
 	import addRemove from "#lib/demos/reorder/add-remove.svelte?demo";
 	import dragHandle from "#lib/demos/reorder/drag-handle.svelte?demo";
-	import scrollable from "#lib/demos/reorder/scrollable.svelte?demo";
+	import todoList from "#lib/demos/reorder/todo-list.svelte?demo";
 </script>
 
 The `ReorderGroup` and `ReorderItem` components create drag-to-reorder layouts, like reorderable tabs, to-do lists or grids.
@@ -83,13 +83,13 @@ Render each item with a `ReorderItem`, passing it the value it represents with `
 
 ```svelte
 <ReorderGroup axis="xy" bind:values={items} class="grid">
-	{#each items as item (item.id)}
-		<ReorderItem value={item}>{item.id}</ReorderItem>
+	{#each items as item (item)}
+		<ReorderItem value={item}>{item}</ReorderItem>
 	{/each}
 </ReorderGroup>
 ```
 
-<Demo demo={grid} height={300} />
+<Demo demo={reorderGrid} height={500} />
 
 When the axis is `"x"` or `"y"`, items only move along that axis. To let them move in both directions, while still reordering along the axis, pass `drag` to the items:
 
@@ -234,14 +234,16 @@ Give the handle `touch-action: none`, so touch devices don't scroll the page ins
 When the group is inside a scrollable element, dragging an item close to one of that element's edges scrolls it. The closer the pointer is to the edge, the faster it scrolls. When no element around the group scrolls, the page does.
 
 ```svelte
-<div style="height: 220px; overflow-y: auto">
+<div style="height: 280px; overflow: auto">
 	<ReorderGroup bind:values={items}>
 		<!-- ... -->
 	</ReorderGroup>
 </div>
 ```
 
-<Demo demo={scrollable} height={300} />
+In this to-do list, ticking a task also moves it to the end, which the group animates like any other change to `values`:
+
+<Demo demo={todoList} height={400} />
 
 ## API
 

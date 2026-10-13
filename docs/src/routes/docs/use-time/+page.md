@@ -5,7 +5,7 @@ description: Creates a motion value that updates every frame with the time since
 
 <script>
 	import Demo from "#lib/components/demo.svelte";
-	import rotate from "#lib/demos/use-time/rotate.svelte?demo";
+	import useTimeDemo from "#lib/demos/use-time/use-time.svelte?demo";
 	import wave from "#lib/demos/use-time/wave.svelte?demo";
 </script>
 
@@ -24,7 +24,9 @@ It's especially useful for perpetual animations.
 <motion.div style={{ rotate }} />
 ```
 
-<Demo demo={rotate} />
+Here, two more layers of boxes spin at 1.5 and 2 times that speed, by multiplying `rotate` in [`useTransform`](/docs/use-transform) functions:
+
+<Demo demo={useTimeDemo} height={400} />
 
 ## Usage
 

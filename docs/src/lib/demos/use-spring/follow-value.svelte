@@ -48,7 +48,7 @@
 		position: absolute;
 		top: 50%;
 		right: 16px;
-		font-family: ui-monospace, monospace;
+		font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 		font-size: 13px;
 		opacity: 0.6;
 		transform: translateY(-50%);

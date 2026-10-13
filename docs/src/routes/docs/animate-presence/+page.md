@@ -5,7 +5,7 @@ description: Animate elements out before Svelte removes them from the page.
 
 <script>
 	import Demo from "#lib/components/demo.svelte";
-	import basic from "#lib/demos/animate-presence/basic.svelte?demo";
+	import exitAnimation from "#lib/demos/introduction/exit-animation.svelte?demo";
 	import nested from "#lib/demos/animate-presence/nested.svelte?demo";
 	import slideshow from "#lib/demos/animate-presence/slideshow.svelte?demo";
 	import custom from "#lib/demos/animate-presence/custom.svelte?demo";
@@ -23,7 +23,7 @@ description: Animate elements out before Svelte removes them from the page.
 </AnimatePresence>
 ```
 
-<Demo demo={basic} />
+<Demo demo={exitAnimation} />
 
 ## Usage
 
@@ -239,7 +239,7 @@ Svelte renders the new block straight away, so the entering `motion` elements wa
 
 With `mode="popLayout"`, an exiting element is taken out of the page layout with `position: absolute`, at the position and size it had. Pair it with [layout animations](/docs/layout-animations), and the elements around it move into its space right away, while it animates out.
 
-Render the other elements through a layout namespace. Before an element exits, `AnimatePresence` measures the layout elements on the page, so removing one doesn't need `update()`. Click a square to remove it:
+Render the other elements through a layout namespace. Before an element exits, `AnimatePresence` measures the layout elements inside it, so removing one doesn't need `update()`. Click a square to remove it:
 
 ```svelte
 <script lang="ts">
@@ -331,7 +331,9 @@ Instead, put the condition inside `AnimatePresence`:
 
 ### The elements around an exiting element jump
 
-Only layout elements animate to a new layout. Render the siblings that move through a [layout namespace](/docs/layout-animations), and `AnimatePresence` measures them before the element exits, wherever they are on the page.
+Only layout elements animate to a new layout. Render the siblings that move through a [layout namespace](/docs/layout-animations): before an element exits, `AnimatePresence` measures the layout elements inside it.
+
+If elements outside it move too, like a button below the list, render them through a layout namespace as well, and wrap them and the `AnimatePresence` in a [`LayoutGroup`](/docs/layout-group), which measures the whole group together.
 
 With the default `mode="sync"`, the exiting element stays in the layout until its exit animation finishes, and the elements around it move once it's gone. Use [`mode="popLayout"`](#poplayout) to move them right away.
 

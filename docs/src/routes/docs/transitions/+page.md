@@ -11,6 +11,7 @@ description: Configure how values animate, with tweens, springs and inertia, plu
 	import inertia from "#lib/demos/transitions/inertia.svelte?demo";
 	import repeat from "#lib/demos/transitions/repeat.svelte?demo";
 	import variants from "#lib/demos/animation/variants.svelte?demo";
+	import appStore from "#lib/demos/layout-animations/app-store.svelte?demo";
 </script>
 
 A transition defines the kind of animation used when a value animates from one state to another.
@@ -151,6 +152,8 @@ Default: dynamic
 
 - Physics-based springs are set with `stiffness`, `damping` and `mass`. They incorporate the velocity of any existing gesture or animation, so they feel natural to interact with.
 - Duration-based springs are set with `visualDuration` (or `duration`) and `bounce`. They don't incorporate velocity, but they're easier to reason about.
+
+<Demo demo={appStore} height={700} />
 
 **Inertia** animations decelerate a value based on its initial velocity. They're mostly used to implement inertial scrolling, and they power the momentum at the end of a drag.
 
@@ -551,7 +554,7 @@ const transition = {
 };
 ```
 
-<Demo demo={variants} height={320} />
+<Demo demo={variants} height={400} />
 
 <Callout type="note">
 

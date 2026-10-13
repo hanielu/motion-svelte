@@ -4,31 +4,22 @@
 	let constraints = $state<HTMLElement>();
 </script>
 
-<div class="area" bind:this={constraints}>
-	<motion.div
-		class="box"
-		drag
-		dragConstraints={constraints}
-		dragElastic={0.2}
-		whileDrag={{ scale: 1.1 }}
-	/>
+<div bind:this={constraints} class="constraints">
+	<motion.div drag dragConstraints={constraints} dragElastic={0.2} class="box" />
 </div>
 
 <style>
-	.area {
-		display: grid;
-		place-items: center;
-		width: 320px;
-		height: 200px;
-		border-radius: 20px;
-		background: rgb(12 220 247 / 0.15);
+	.constraints {
+		width: 300px;
+		height: 300px;
+		border-radius: 10px;
+		background-color: #ff008844;
 	}
 
-	.area :global(.box) {
-		width: 60px;
-		height: 60px;
-		border-radius: 14px;
-		background: #0cdcf7;
-		cursor: grab;
+	.constraints :global(.box) {
+		width: 100px;
+		height: 100px;
+		border-radius: 10px;
+		background-color: #ff0088;
 	}
 </style>

@@ -7,10 +7,13 @@ description: Motion for Svelte. Production-ready animations, gestures, layout an
 	import Callout from "#lib/components/callout.svelte";
 	import Demo from "#lib/components/demo.svelte";
 	import rotate from "#lib/demos/introduction/rotate.svelte?demo";
-	import enter from "#lib/demos/introduction/enter.svelte?demo";
-	import gestures from "#lib/demos/introduction/gestures.svelte?demo";
-	import exit from "#lib/demos/introduction/exit.svelte?demo";
-	import layoutToggle from "#lib/demos/layout-animations/toggle.svelte?demo";
+	import enterAnimation from "#lib/demos/introduction/enter-animation.svelte?demo";
+	import gestures from "#lib/demos/gestures/gestures.svelte?demo";
+	import scrollTriggered from "#lib/demos/scroll-animations/scroll-triggered.svelte?demo";
+	import scrollLinked from "#lib/demos/scroll-animations/scroll-linked.svelte?demo";
+	import layoutAnimation from "#lib/demos/layout-animations/layout-animation.svelte?demo";
+	import sharedLayoutAnimation from "#lib/demos/layout-animations/shared-layout-animation.svelte?demo";
+	import exitAnimation from "#lib/demos/introduction/exit-animation.svelte?demo";
 </script>
 
 motion-sv brings [Motion](https://motion.dev) (formerly Framer Motion) to Svelte 5. It runs on the same animation engine as Motion for React and Vue, with an API shaped for Svelte: `motion` components, runes-friendly hooks and snippets.
@@ -86,7 +89,7 @@ When a component enters the page, it animates from the rendered value to the val
 <motion.button initial={{ scale: 0 }} animate={{ scale: 1 }} />
 ```
 
-<Demo demo={enter} />
+<Demo demo={enterAnimation} />
 
 Or disable the enter animation entirely by setting `initial` to `false`. The element renders straight away with the values in `animate`.
 
@@ -120,6 +123,8 @@ Scroll-triggered animations run when an element enters or leaves the viewport, w
 <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} />
 ```
 
+<Demo demo={scrollTriggered} height={500} />
+
 Scroll-linked animations tie values directly to scroll progress. [`useScroll`](/docs/use-scroll) returns [motion values](/docs/motion-value), which you can pass straight to `style`:
 
 ```svelte
@@ -132,13 +137,15 @@ Scroll-linked animations tie values directly to scroll progress. [`useScroll`](/
 <motion.div style={{ scaleX: scrollYProgress }} />
 ```
 
+<Demo demo={scrollLinked} height={400} />
+
 [Learn more about scroll animations](/docs/scroll-animations).
 
 ### Layout animations
 
 Motion can animate between any two layouts using transforms, for example switching `justify-content` or resizing a card.
 
-<Demo demo={layoutToggle} />
+<Demo demo={layoutAnimation} />
 
 Svelte has no hook that runs right before the DOM updates, which is where React and Vue measure the old layout. So in motion-sv you create a layout namespace with `createLayoutMotion()`, render the elements through it, and call its `update()` together with the state change:
 
@@ -157,7 +164,15 @@ Svelte has no hook that runs right before the DOM updates, which is where React 
 </button>
 ```
 
-This is the one part of motion-sv that works differently from Motion for React and Vue, so it has [its own guide](/docs/layout-animations).
+To animate between different elements, give them the same `layoutId`. When one replaces the other, it animates from the old one's place, without `update()`:
+
+```svelte
+<motion.div layoutId="underline" />
+```
+
+<Demo demo={sharedLayoutAnimation} height={440} />
+
+Layout animations are the one part of motion-sv that works differently from Motion for React and Vue, so they have [their own guide](/docs/layout-animations).
 
 ### Exit animations
 
@@ -171,7 +186,7 @@ Svelte removes elements from the DOM straight away. Wrap them in [`AnimatePresen
 </AnimatePresence>
 ```
 
-<Demo demo={exit} />
+<Demo demo={exitAnimation} />
 
 ## Learn next
 

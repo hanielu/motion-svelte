@@ -7,17 +7,19 @@
 	const toggle = layout.update.with(() => (isOpen = !isOpen));
 </script>
 
-<layout.div
-	class={["card", { open: isOpen }]}
-	style={{ borderRadius: 20 }}
-	transition={{ type: "spring", visualDuration: 0.35, bounce: 0.2 }}
-	onclick={toggle}
->
-	<layout.span class="label" layout="position">{isOpen ? "Click to close" : "Open"}</layout.span>
-</layout.div>
+<div class="resize">
+	<layout.div
+		class={["card", { open: isOpen }]}
+		style={{ borderRadius: 20 }}
+		transition={{ type: "spring", visualDuration: 0.35, bounce: 0.2 }}
+		onclick={toggle}
+	>
+		<layout.span class="label" layout="position">{isOpen ? "Click to close" : "Open"}</layout.span>
+	</layout.div>
+</div>
 
 <style>
-	:global(.card) {
+	.resize :global(.card) {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -29,7 +31,7 @@
 		cursor: pointer;
 	}
 
-	:global(.card.open) {
+	.resize :global(.card.open) {
 		width: 320px;
 		height: 180px;
 	}

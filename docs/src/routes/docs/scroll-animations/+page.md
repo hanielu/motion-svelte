@@ -6,9 +6,11 @@ description: Trigger animations when elements enter the viewport, or link values
 <script>
 	import Callout from "#lib/components/callout.svelte";
 	import Demo from "#lib/components/demo.svelte";
-	import inView from "#lib/demos/scroll-animations/in-view.svelte?demo";
-	import progress from "#lib/demos/scroll-animations/progress.svelte?demo";
-	import trackElement from "#lib/demos/scroll-animations/track-element.svelte?demo";
+	import parallax from "#lib/demos/scroll-animations/parallax.svelte?demo";
+	import scrollContainer from "#lib/demos/scroll-animations/scroll-container.svelte?demo";
+	import scrollLinked from "#lib/demos/scroll-animations/scroll-linked.svelte?demo";
+	import scrollTrackElementInViewport from "#lib/demos/scroll-animations/scroll-track-element-in-viewport.svelte?demo";
+	import scrollTriggered from "#lib/demos/scroll-animations/scroll-triggered.svelte?demo";
 </script>
 
 There are two kinds of scroll animations:
@@ -30,7 +32,9 @@ The `whileInView` prop sets a target, or variant, to animate to while the elemen
 
 When the element leaves the viewport, it animates back.
 
-<Demo demo={inView} height={340} />
+Here, each card container animates to its `onscreen` variant once 80% of it is in view, and the card inside it inherits the variant:
+
+<Demo demo={scrollTriggered} height={500} />
 
 `whileInView` is configured with the `inViewOptions` prop. To set the same options for every `motion` component in a part of your app, pass `inViewOptions` to [`MotionConfig`](/docs/motion-config).
 
@@ -139,11 +143,15 @@ Pass them straight to `style`. For instance, `scrollYProgress` on `scaleX` makes
 		top: 0,
 		left: 0,
 		right: 0,
-		height: 8,
-		background: "#ff3e00",
+		height: 10,
+		background: "#ff0088",
 	}}
 />
 ```
+
+The demo's article scrolls inside a box rather than the page, so it passes that box to `useScroll` as its [`container`](#scrollable-containers):
+
+<Demo demo={scrollLinked} height={400} />
 
 ### Value smoothing
 
@@ -181,30 +189,32 @@ With [`useTransform`](/docs/use-transform), the progress values can drive any ot
 
 ### Scrollable containers
 
-By default, `useScroll` tracks the page. To track a scrollable element instead, pass it as `container`. Elements bound with `bind:this` are set after the component is created, so pass it through a getter, which `useScroll` reads once the element exists:
+By default, `useScroll` tracks the page. To track a scrollable element instead, pass it as `container`. Elements bound with `bind:this`, or `bind:ref` on a `motion` component, are set after the component is created, so pass it through a getter, which `useScroll` reads once the element exists:
 
 ```svelte
 <script lang="ts">
-	import { motion, useScroll, useSpring } from "motion-sv";
+	import { motion, useScroll } from "motion-sv";
 
-	let container = $state<HTMLElement>();
+	let list = $state<HTMLElement>();
 
-	const { scrollYProgress } = useScroll({
+	const { scrollXProgress } = useScroll({
 		get container() {
-			return container;
+			return list;
 		},
 	});
-
-	const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
 </script>
 
-<motion.div class="bar" style={{ scaleX }} />
-<div bind:this={container} style="overflow-y: auto">
-	<!-- ...content -->
-</div>
+<svg viewBox="0 0 100 100">
+	<motion.circle cx="50" cy="50" r="30" style={{ pathLength: scrollXProgress }} />
+</svg>
+<ul bind:this={list} style="overflow-x: scroll">
+	<!-- ...items -->
+</ul>
 ```
 
-<Demo demo={progress} height={300} />
+Here, the list's horizontal scroll progress fills the ring. The list also animates its `maskImage` whenever it reaches or leaves either end, to fade out the edges that have more to scroll to:
+
+<Demo demo={scrollContainer} height={330} />
 
 ### Tracking an element
 
@@ -212,7 +222,7 @@ By default, `useScroll` tracks the page. To track a scrollable element instead, 
 
 ```svelte
 <script lang="ts">
-	import { motion, useScroll, useTransform } from "motion-sv";
+	import { motion, useScroll } from "motion-sv";
 
 	let target = $state<HTMLElement>();
 
@@ -220,23 +230,22 @@ By default, `useScroll` tracks the page. To track a scrollable element instead, 
 		get target() {
 			return target;
 		},
-		offset: ["start end", "end start"],
+		offset: ["end end", "start start"],
 	});
-
-	const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.6, 1, 0.6]);
-	const rotate = useTransform(scrollYProgress, [0, 1], [-90, 90]);
 </script>
 
 <div bind:this={target}>
-	<motion.div style={{ scale, rotate }} />
+	<svg viewBox="0 0 100 100">
+		<motion.circle cx="50" cy="50" r="30" style={{ pathLength: scrollYProgress }} />
+	</svg>
 </div>
 ```
 
-`offset` sets where tracking starts and ends. Each entry describes a point where the target and the viewport meet: `"start end"` means the start of the target meets the end of the viewport. So `["start end", "end start"]` tracks from when the target starts to enter the viewport until it has completely left. Edges can be `"start"`, `"center"` and `"end"`, numbers between `0` and `1`, or pixel and percentage values. The default is `["start start", "end end"]`. [`useScroll`](/docs/use-scroll) covers offsets in detail.
+`offset` sets where tracking starts and ends. Each entry describes a point where the target and the viewport meet: `"end end"` means the end of the target meets the end of the viewport. So `["end end", "start start"]` tracks from when the target is fully in view at the bottom of the viewport until its start reaches the top. Edges can be `"start"`, `"center"` and `"end"`, numbers between `0` and `1`, or pixel and percentage values. The default is `["start start", "end end"]`. [`useScroll`](/docs/use-scroll) covers offsets in detail.
 
-Here, the box's scroll container is also passed as `container`, so its progress is measured within the container:
+Here, each item fills its own progress ring as it moves through a scrollable box. The box is passed as `container` too, so the progress is measured within it:
 
-<Demo demo={trackElement} />
+<Demo demo={scrollTrackElementInViewport} height={440} />
 
 <Callout type="note">
 
@@ -250,24 +259,31 @@ Map an element's scroll progress to `y` to move it at a different speed than the
 
 ```svelte
 <script lang="ts">
-	import { motion, useScroll, useTransform } from "motion-sv";
+	import { motion, useScroll, useTransform, type MotionValue } from "motion-sv";
 
-	let section = $state<HTMLElement>();
+	function useParallax(value: MotionValue<number>, distance: number) {
+		return useTransform(value, [0, 1], [-distance, distance]);
+	}
+
+	let image = $state<HTMLElement>();
 
 	const { scrollYProgress } = useScroll({
 		get target() {
-			return section;
+			return image;
 		},
-		offset: ["start end", "end start"],
 	});
-
-	const y = useTransform(scrollYProgress, [0, 1], [-100, 100]);
+	const y = useParallax(scrollYProgress, 300);
 </script>
 
-<section bind:this={section}>
-	<motion.img src="/photo.jpg" alt="" style={{ y }} />
+<section>
+	<img bind:this={image} src="/photo.jpg" alt="" />
+	<motion.h2 style={{ y }}>#001</motion.h2>
 </section>
 ```
+
+Here, each heading follows its image's scroll progress, so it overtakes the image as it scrolls past. The images snap into place with CSS scroll snapping, and the scroll progress of the whole box drives a [smoothed](#value-smoothing) progress bar:
+
+<Demo demo={parallax} height={560} />
 
 ### Scroll velocity and direction
 

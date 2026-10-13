@@ -4,19 +4,30 @@ description: Animate between any two layouts, even between different elements, w
 ---
 
 <script>
+	import { LayoutGroup } from "motion-sv";
 	import Callout from "#lib/components/callout.svelte";
 	import Demo from "#lib/components/demo.svelte";
-	import toggle from "#lib/demos/layout-animations/toggle.svelte?demo";
+	import layoutAnimation from "#lib/demos/layout-animations/layout-animation.svelte?demo";
+	import sharedLayoutAnimation from "#lib/demos/layout-animations/shared-layout-animation.svelte?demo";
+	import appStore from "#lib/demos/layout-animations/app-store.svelte?demo";
+	import notificationsList from "#lib/demos/layout-animations/notifications-list.svelte?demo";
 	import resize from "#lib/demos/layout-animations/resize.svelte?demo";
+	import reorderItems from "#lib/demos/layout-animations/reorder-items.svelte?demo";
 	import list from "#lib/demos/layout-animations/list.svelte?demo";
-	import sharedUnderline from "#lib/demos/layout-animations/shared-underline.svelte?demo";
 	import sharedModal from "#lib/demos/layout-animations/shared-modal.svelte?demo";
 	import group from "#lib/demos/layout-animations/group.svelte?demo";
+	import scaleCorrection from "#lib/demos/layout-animations/scale-correction.svelte?demo";
 </script>
 
 Motion's layout animations can animate between any two layouts, even between different elements. They can animate values CSS can't, like switching `justify-content` from `flex-start` to `flex-end`, and they run on `transform`, so they stay smooth.
 
-<Demo demo={toggle} />
+<Demo demo={layoutAnimation} />
+
+With `layoutId`, they can match two different elements and animate from one to the other, for anything from an underline that follows the selected tab to a card that expands into a full view.
+
+<Demo demo={sharedLayoutAnimation} height={440} />
+
+<Demo demo={appStore} height={700} />
 
 Layout animations are the one part of motion-sv that works differently from Motion for React and Vue. Read [how they work in Svelte](#how-layout-animations-work-in-svelte) first, and the rest of this page will feel familiar.
 
@@ -38,14 +49,14 @@ React and Vue take the "before" measurement for you, in a hook that runs right b
 
 	let isOn = $state(false);
 
-	function toggle() {
+	function toggleSwitch() {
 		isOn = !isOn;
 		layout.update();
 	}
 </script>
 
-<button class={["switch", { on: isOn }]} onclick={toggle}>
-	<layout.div class="handle" />
+<button class={["toggle-container", isOn ? "start" : "end"]} onclick={toggleSwitch}>
+	<layout.div class="toggle-handle" />
 </button>
 ```
 
@@ -53,7 +64,7 @@ React and Vue take the "before" measurement for you, in a hook that runs right b
 
 ```svelte
 <script lang="ts">
-	const toggle = layout.update.with(() => (isOn = !isOn));
+	const toggleSwitch = layout.update.with(() => (isOn = !isOn));
 </script>
 ```
 
@@ -64,11 +75,13 @@ Call `update()` in the same synchronous code as the state change. Svelte applies
 There are two exceptions where you don't need `update()`:
 
 - **Shared layout animations.** When an element with a `layoutId` replaces another, it animates from it automatically. See [shared layout animations](#shared-layout-animations).
-- **Exits and reorders.** Before an element exits, [`AnimatePresence`](/docs/animate-presence) measures the layout elements around it. A [`ReorderGroup`](/docs/reorder) measures its items whenever its `values` change.
+- **Exits and reorders.** Before an element exits, [`AnimatePresence`](/docs/animate-presence) measures the layout elements inside it, and the rest of their [`LayoutGroup`](/docs/layout-group). A [`ReorderGroup`](/docs/reorder) measures its items whenever its `values` change.
 
 </Callout>
 
 ## Usage
+
+<Demo demo={notificationsList} height={564} />
 
 Any layout change you announce with `update()` can be animated: `width` and `height`, grid columns, flex direction, reordering a list, or adding and removing items.
 
@@ -79,6 +92,10 @@ Any layout change you announce with `update()` can be animated: `width` and `hei
 <Demo demo={resize} />
 
 Change CSS immediately, through `style` or a class, rather than through `animate`. The layout animation animates it for you.
+
+Reordering a list is a layout change too. Here, each item's CSS `order` changes every second, and `update()` runs with each change:
+
+<Demo demo={reorderItems} height={300} />
 
 Adding and removing items works the same way. Here, each item is rendered through the namespace, and `update()` runs with every change to the list. [`AnimatePresence`](/docs/animate-presence) keeps removed items around for their `exit` animation, while the others move into place.
 
@@ -178,17 +195,20 @@ Like `motion.create()`, `layout.create()` turns a component into a layout-animat
 When an element with a `layoutId` mounts while another element with the same `layoutId` leaves, it animates out from the old one. This works with plain `motion` components, without `update()`.
 
 ```svelte
-{#each tabs as tab (tab)}
-	<button onclick={() => (selected = tab)}>
-		{tab}
-		{#if tab === selected}
+{#each tabs as item (item.label)}
+	<motion.li onclick={() => (selectedTab = item)}>
+		{item.label}
+		{#if item.label === selectedTab.label}
 			<motion.div class="underline" layoutId="underline" />
 		{/if}
-	</button>
+	</motion.li>
 {/each}
 ```
 
-<Demo demo={sharedUnderline} height={160} />
+<!-- The same demo is at the top of the page. Its own LayoutGroup id keeps the two underlines apart. -->
+<LayoutGroup id="shared-layout-animations">
+<Demo demo={sharedLayoutAnimation} height={440} />
+</LayoutGroup>
 
 If the old element is still on the page when the new one enters, they crossfade from the old to the new. To animate back to the original element when the new one is removed, wrap it in [`AnimatePresence`](/docs/animate-presence), which keeps it on the page until its exit has finished:
 
@@ -315,7 +335,11 @@ Without the `LayoutGroup`, the other items would jump to their new positions.
 
 Layout animations use `transform`, which keeps them fast, but scaling an element can visually distort its children. To correct this, render the children through the namespace too. Layout children are scale-corrected.
 
-Motion also corrects `borderRadius` and `boxShadow` distortion, as long as they're set through `style` rather than CSS:
+Here, the pink dot is rendered through the namespace, so it keeps its shape while its parent resizes. Render it with `motion.div` instead, and the parent's scale distorts it:
+
+<Demo demo={scaleCorrection} height={300} />
+
+Motion also corrects `borderRadius` and `boxShadow` distortion, as long as Motion sets them, like the parent's `initial` border radius above, rather than CSS. If you're not animating them, set them through `style`:
 
 ```svelte
 <layout.div style={{ borderRadius: 20 }} />

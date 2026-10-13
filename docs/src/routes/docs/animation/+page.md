@@ -6,15 +6,17 @@ description: Animate any value with the motion component, from simple prop chang
 <script>
 	import Callout from "#lib/components/callout.svelte";
 	import Demo from "#lib/components/demo.svelte";
-	import state from "#lib/demos/animation/state.svelte?demo";
+	import stateUpdates from "#lib/demos/animation/state-updates.svelte?demo";
 	import heightAuto from "#lib/demos/animation/height-auto.svelte?demo";
 	import pathDrawing from "#lib/demos/animation/path-drawing.svelte?demo";
-	import enter from "#lib/demos/introduction/enter.svelte?demo";
-	import exit from "#lib/demos/introduction/exit.svelte?demo";
+	import enterAnimation from "#lib/demos/introduction/enter-animation.svelte?demo";
+	import exitAnimation from "#lib/demos/introduction/exit-animation.svelte?demo";
 	import keyframes from "#lib/demos/animation/keyframes.svelte?demo";
+	import keyframesWildcards from "#lib/demos/animation/keyframes-wildcards.svelte?demo";
 	import variants from "#lib/demos/animation/variants.svelte?demo";
 	import controls from "#lib/demos/animation/controls.svelte?demo";
-	import content from "#lib/demos/animation/content.svelte?demo";
+	import htmlContent from "#lib/demos/animation/html-content.svelte?demo";
+	import gestures from "#lib/demos/gestures/gestures.svelte?demo";
 </script>
 
 motion-sv gives you several ways to animate your UI, from a single prop that follows your state to orchestrated animations that run through a whole tree of elements.
@@ -45,10 +47,10 @@ Whenever a value in `animate` changes, the component animates to it. Because `an
 </script>
 
 <motion.div animate={{ x }} />
-<input type="range" min={-100} max={100} bind:value={x} />
+<input type="range" min={-200} max={200} bind:value={x} />
 ```
 
-<Demo demo={state} />
+<Demo demo={stateUpdates} height={300} />
 
 ## Animatable values
 
@@ -180,7 +182,7 @@ Many SVG elements can draw themselves with three special values: `pathLength`, `
 
 All three are progress values between `0` and `1`, where `1` is the total length of the path.
 
-<Demo demo={pathDrawing} />
+<Demo demo={pathDrawing} height={600} />
 
 Line drawing works with `circle`, `ellipse`, `line`, `path`, `polygon`, `polyline` and `rect` elements.
 
@@ -202,7 +204,7 @@ When a `motion` component is created, it animates to the values in `animate` if 
 <motion.li initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} />
 ```
 
-<Demo demo={enter} />
+<Demo demo={enterAnimation} />
 
 Set `initial` to `false` to disable the enter animation. The element renders with the values in `animate` straight away.
 
@@ -228,7 +230,7 @@ Svelte removes elements from the DOM as soon as they leave an `{#if}` or `{#each
 </AnimatePresence>
 ```
 
-<Demo demo={exit} />
+<Demo demo={exitAnimation} />
 
 ## Keyframes
 
@@ -238,13 +240,17 @@ Values in `animate` can be arrays of keyframes. The value animates through each 
 <motion.div animate={{ x: [0, 100, 0] }} />
 ```
 
+<Demo demo={keyframes} />
+
 Use `null` as the first keyframe to start from the value's current state:
 
 ```svelte
 <motion.div animate={{ x: [null, 100, 0] }} />
 ```
 
-If this animation interrupts another, it continues from wherever the value is, so the change feels natural.
+<Demo demo={keyframesWildcards} />
+
+If this animation interrupts another, it continues from wherever the value is, so the change feels natural. Hover the box above, move away and hover again before it settles: the scale picks up from where it is rather than jumping back to `1`.
 
 By default, keyframes are spaced evenly through the animation. To place them yourself, set [the `times` option](/docs/transitions#times) of the transition. `times` is an array of progress values between `0` and `1`, one per keyframe:
 
@@ -258,8 +264,6 @@ By default, keyframes are spaced evenly through the animation. To place them you
 />
 ```
 
-<Demo demo={keyframes} />
-
 ## Gesture animations
 
 `motion` components have props that animate to a target while a gesture is active, and back again when it ends:
@@ -272,6 +276,8 @@ By default, keyframes are spaced evenly through the animation. To place them you
 	whileInView={{ opacity: 1 }}
 />
 ```
+
+<Demo demo={gestures} />
 
 There are props for hover, press, focus, drag and in view: `whileHover`, `whilePress`, `whileFocus`, `whileDrag` and `whileInView`. [Learn more about gestures](/docs/gestures).
 
@@ -336,6 +342,10 @@ Variants flow down through `motion` components. Here, when the `ul` enters the v
 
 The children don't set `initial`, `animate` or `whileInView` themselves: they inherit the parent's variant names, and animate with their own definition of each.
 
+In this menu, only the `nav` sets `animate`. The background, the list, each item and the icon's lines all follow it between `"open"` and `"closed"`, each with its own variants:
+
+<Demo demo={variants} height={400} />
+
 ### Orchestration
 
 By default, children animate at the same time as their parent. Variants unlock extra `transition` options that change this, like [`when`](/docs/transitions#when) and [`delayChildren`](/docs/transitions#delaychildren):
@@ -361,8 +371,6 @@ const list: Variants = {
 ```
 
 `when: "beforeChildren"` finishes the parent's animation before the children start, and `"afterChildren"` waits for the children to finish first. [`stagger`](https://motion.dev/docs/stagger) spreads the children's delays, from the first child to the last by default.
-
-<Demo demo={variants} height={320} />
 
 <Callout type="note">
 
@@ -472,10 +480,11 @@ For full imperative control, use [`useAnimate`](/docs/use-animate). It can:
 
 ```svelte
 <script lang="ts">
-	import { animate, useCurrentMotionValue, useMotionValue } from "motion-sv";
+	import { animate, useCurrentMotionValue, useMotionValue, useTransform } from "motion-sv";
 
 	const count = useMotionValue(0);
-	const latest = useCurrentMotionValue(count);
+	const rounded = useTransform(() => Math.round(count.get()));
+	const latest = useCurrentMotionValue(rounded);
 
 	$effect(() => {
 		const controls = animate(count, 100, { duration: 5 });
@@ -483,9 +492,9 @@ For full imperative control, use [`useAnimate`](/docs/use-animate). It can:
 	});
 </script>
 
-<pre>{Math.round(latest.current)}</pre>
+<pre>{latest.current}</pre>
 ```
 
-<Demo demo={content} />
+<Demo demo={htmlContent} />
 
-As the value changes, Svelte updates only the text that reads `latest.current`.
+As the value changes, Svelte updates only the text that reads `latest.current`. Because `rounded` only changes when the whole number does, the text updates at most 100 times, not on every frame.

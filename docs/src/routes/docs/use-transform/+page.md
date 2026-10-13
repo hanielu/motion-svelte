@@ -6,8 +6,9 @@ description: Creates a motion value that transforms the output of one or more ot
 <script>
 	import Callout from "#lib/components/callout.svelte";
 	import Demo from "#lib/components/demo.svelte";
+	import pathMorphing from "#lib/demos/use-transform/path-morphing.svelte?demo";
 	import transformFunction from "#lib/demos/use-transform/transform-function.svelte?demo";
-	import valueMapping from "#lib/demos/use-transform/value-mapping.svelte?demo";
+	import useTransformDemo from "#lib/demos/use-transform/use-transform.svelte?demo";
 </script>
 
 `useTransform` creates a new [motion value](/docs/motion-value) that transforms the output of one or more other motion values.
@@ -110,21 +111,27 @@ The output range must contain values of the same type, but they can be in any or
 const backgroundColor = useTransform(x, [0, 100], ["#f00", "#00f"]);
 ```
 
-Drag this box to change its rotation and color:
+Output ranges can also drive SVG attributes and path drawing. Here, the box's `x` sets the stroke color of a path, and how much of it is drawn:
 
 ```svelte
 <script lang="ts">
 	import { motion, useMotionValue, useTransform } from "motion-sv";
 
 	const x = useMotionValue(0);
-	const background = useTransform(x, [-150, 0, 150], ["#ff0088", "#9911ff", "#0cdcf7"]);
-	const rotate = useTransform(x, [-150, 150], [-90, 90]);
+	const color = useTransform(x, [-100, 0, 100], ["rgb(211, 9, 225)", "rgb(68, 0, 255)", "rgb(3, 209, 0)"]);
+	const tickPath = useTransform(x, [10, 100], [0, 1]);
 </script>
 
-<motion.div drag="x" dragConstraints={{ left: -150, right: 150 }} style={{ x, rotate, background }} />
+<motion.div drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.5} style={{ x }}>
+	<svg viewBox="0 0 50 50">
+		<motion.path d="M14,26 L 22,33 L 35,16" fill="none" stroke={color} style={{ pathLength: tickPath }} />
+	</svg>
+</motion.div>
 ```
 
-<Demo demo={valueMapping} />
+Drag the box right to draw the tick, or left to draw a cross from two more paths. `x` maps to the background gradient too:
+
+<Demo demo={useTransformDemo} height={300} />
 
 With `clamp: false`, the ranges keep mapping beyond their ends. For instance, this says "for every `100px` scrolled, rotate another `360deg`":
 
@@ -230,3 +237,7 @@ const label = useTransform(x, [0, 100], ["start", "end"], { mixer });
 ```
 
 This lets you plug in more advanced mixers than Motion's own, for instance [Flubber](https://github.com/veltman/flubber) for morphing between SVG paths.
+
+Here, a `progress` motion value animates from one shape's index to the next, and Flubber's `interpolate` mixes each pair of paths:
+
+<Demo demo={pathMorphing} height={400} />

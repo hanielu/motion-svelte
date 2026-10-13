@@ -6,6 +6,7 @@ description: Tracks whether an element is within the viewport.
 <script>
 	import Callout from "#lib/components/callout.svelte";
 	import Demo from "#lib/components/demo.svelte";
+	import scrollTriggered from "#lib/demos/scroll-animations/scroll-triggered.svelte?demo";
 	import root from "#lib/demos/use-in-view/root.svelte?demo";
 </script>
 
@@ -194,3 +195,9 @@ const inView = useInView(
 	() => ({ amount: 0.5 })
 );
 ```
+
+## Example
+
+These cards animate in as they scroll into view. They're `motion` components, so they use the [`whileInView`](/docs/scroll-animations#scroll-triggered-animations) prop, which detects when they enter the viewport the same way `useInView` does:
+
+<Demo demo={scrollTriggered} height={500} />

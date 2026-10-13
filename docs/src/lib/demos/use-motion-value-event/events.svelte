@@ -65,7 +65,7 @@
 
 	output,
 	ol {
-		font-family: ui-monospace, monospace;
+		font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 		font-size: 14px;
 	}
 

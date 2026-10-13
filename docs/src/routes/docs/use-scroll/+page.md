@@ -6,8 +6,10 @@ description: Creates scroll-linked motion values, for progress indicators, paral
 <script>
 	import Callout from "#lib/components/callout.svelte";
 	import Demo from "#lib/components/demo.svelte";
-	import container from "#lib/demos/use-scroll/container.svelte?demo";
-	import elementPosition from "#lib/demos/use-scroll/element-position.svelte?demo";
+	import scrollContainer from "#lib/demos/scroll-animations/scroll-container.svelte?demo";
+	import scrollLinked from "#lib/demos/scroll-animations/scroll-linked.svelte?demo";
+	import scrollTrackElementInViewport from "#lib/demos/scroll-animations/scroll-track-element-in-viewport.svelte?demo";
+	import scrollLinkedWithSpring from "#lib/demos/use-scroll/scroll-linked-with-spring.svelte?demo";
 </script>
 
 `useScroll` creates scroll-linked animations, like progress indicators and parallax effects.
@@ -66,12 +68,16 @@ For example, you can make a page scroll indicator by passing `scrollYProgress` s
 	:global(.progress-bar) {
 		position: fixed;
 		inset: 0 0 auto;
-		height: 8px;
+		height: 10px;
 		background: #ff0088;
 		transform-origin: 0%;
 	}
 </style>
 ```
+
+In this demo and the next one, the article scrolls inside a box instead of the page, so the box is passed to `useScroll` as its [`container`](#element-scroll):
+
+<Demo demo={scrollLinked} height={400} />
 
 As `useScroll` returns motion values, you can compose them with other motion value hooks, like [`useTransform`](/docs/use-transform) and [`useSpring`](/docs/use-spring). Here, the progress bar follows the scroll position with a spring, which smooths out its movement:
 
@@ -85,6 +91,8 @@ As `useScroll` returns motion values, you can compose them with other motion val
 
 <motion.div class="progress-bar" style={{ scaleX }} />
 ```
+
+<Demo demo={scrollLinkedWithSpring} height={400} />
 
 Since `scrollY` is a motion value, you can also tell which direction the user is scrolling in, by comparing its latest value with its previous one:
 
@@ -114,22 +122,26 @@ To track the scroll position of a scrollable element, pass it as the `container`
 <script lang="ts">
 	import { motion, useScroll } from "motion-sv";
 
-	let container = $state<HTMLElement>();
+	let list = $state<HTMLElement>();
 
-	const { scrollYProgress } = useScroll({
+	const { scrollXProgress } = useScroll({
 		get container() {
-			return container;
+			return list;
 		},
 	});
 </script>
 
-<motion.div class="progress" style={{ scaleX: scrollYProgress }} />
-<div class="scroller" bind:this={container}>
-	<!-- ...content -->
-</div>
+<svg viewBox="0 0 100 100">
+	<motion.circle cx="50" cy="50" r="30" style={{ pathLength: scrollXProgress }} />
+</svg>
+<ul bind:this={list} style="overflow-x: scroll">
+	<!-- ...items -->
+</ul>
 ```
 
-<Demo demo={container} />
+Here, the list's horizontal scroll progress fills the ring. The list is a `motion` component, bound with `bind:ref`, so it can also animate its `maskImage`, fading out the edges that have more to scroll to:
+
+<Demo demo={scrollContainer} height={330} />
 
 ### Element position
 
@@ -145,18 +157,18 @@ To track the progress of an element as it moves through the container, pass it a
 		get target() {
 			return target;
 		},
-		offset: ["start end", "end start"],
+		offset: ["end end", "start start"],
 	});
 </script>
 
 <div bind:this={target}></div>
 ```
 
-Here, each item has its own progress indicator, which fills as the item scrolls through the box, from entering at the bottom to leaving at the top:
+Here, each item has its own progress indicator, which fills as the item scrolls through the box, from when it's fully in view at the bottom until its top reaches the top:
 
-<Demo demo={elementPosition} height={320} />
+<Demo demo={scrollTrackElementInViewport} height={440} />
 
-The `useScroll` call lives in the item component, so each item gets its own scroll progress. The scrollable box is passed down as a prop and read through a getter too.
+The demo calls `useScroll` once per item, so each item gets its own scroll progress. Calling a hook in a loop is fine in Svelte, because a component's setup only runs once. The scrollable box is passed as `container`, through a getter too.
 
 <Callout type="note">
 

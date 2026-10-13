@@ -5,18 +5,20 @@ description: Runs a callback once every animation frame, for as long as the comp
 
 <script>
 	import Demo from "#lib/components/demo.svelte";
-	import cube from "#lib/demos/use-animation-frame/cube.svelte?demo";
+	import useAnimationFrameDemo from "#lib/demos/use-animation-frame/use-animation-frame.svelte?demo";
 </script>
 
 `useAnimationFrame` runs a callback once every animation frame, from when the component mounts until it unmounts.
 
 ```typescript
-useAnimationFrame((time) => {
-	cube.style.transform = `rotateY(${time / 10}deg)`;
+useAnimationFrame((t) => {
+	const rotate = Math.sin(t / 10000) * 200;
+	const y = (1 + Math.sin(t / 1000)) * -50;
+	cube.style.transform = `translateY(${y}px) rotateX(${rotate}deg) rotateY(${rotate}deg)`;
 });
 ```
 
-<Demo demo={cube} height={300} />
+<Demo demo={useAnimationFrameDemo} height={520} />
 
 ## Usage
 

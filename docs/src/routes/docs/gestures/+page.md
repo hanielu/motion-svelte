@@ -7,11 +7,13 @@ description: Hover, press, focus, pan and drag gestures that work across mouse, 
 	import Callout from "#lib/components/callout.svelte";
 	import Demo from "#lib/components/demo.svelte";
 	import variants from "#lib/demos/gestures/variants.svelte?demo";
+	import gestures from "#lib/demos/gestures/gestures.svelte?demo";
 	import press from "#lib/demos/gestures/press.svelte?demo";
 	import focus from "#lib/demos/gestures/focus.svelte?demo";
 	import pan from "#lib/demos/gestures/pan.svelte?demo";
+	import drag from "#lib/demos/gestures/drag.svelte?demo";
 	import dragConstraints from "#lib/demos/gestures/drag-constraints.svelte?demo";
-	import directionLock from "#lib/demos/gestures/direction-lock.svelte?demo";
+	import dragLockDirection from "#lib/demos/gestures/drag-lock-direction.svelte?demo";
 	import propagation from "#lib/demos/gestures/propagation.svelte?demo";
 </script>
 
@@ -63,6 +65,10 @@ Each prop accepts a target, or the name of a variant defined in `variants`. Vari
 <Demo demo={variants} />
 
 ## Gestures
+
+Each gesture below can drive an animation, like this box's `whileHover` and `whilePress`:
+
+<Demo demo={gestures} />
 
 ### Hover
 
@@ -195,7 +201,11 @@ Set `drag` to `"x"` or `"y"` to drag along one axis only:
 
 Draggable elements disable text selection and touch scrolling on the axes they drag, so they work on touch screens out of the box. Dragging doesn't start from an `input`, `select` or `textarea` inside the element, so those stay usable.
 
-When the drag ends, the element keeps moving with the velocity it was released at, and decelerates with an inertia animation. Disable this by setting `dragMomentum` to `false`, or configure it with `dragTransition`, which accepts [inertia options](/docs/transitions#inertia):
+When the drag ends, the element keeps moving with the velocity it was released at, and decelerates with an inertia animation:
+
+<Demo demo={drag} height={360} />
+
+Disable this by setting `dragMomentum` to `false`, or configure it with `dragTransition`, which accepts [inertia options](/docs/transitions#inertia):
 
 ```svelte
 <motion.div drag dragTransition={{ bounceStiffness: 600, bounceDamping: 10 }} />
@@ -243,7 +253,7 @@ By default, the element can be dragged past its constraints with some elasticity
 <motion.div drag dragConstraints={constraints} dragElastic={0.2} />
 ```
 
-<Demo demo={dragConstraints} />
+<Demo demo={dragConstraints} height={364} />
 
 #### Direction locking
 
@@ -253,7 +263,7 @@ By default, the element can be dragged past its constraints with some elasticity
 <motion.div drag dragDirectionLock onDirectionLock={(axis) => console.log(axis)} />
 ```
 
-<Demo demo={directionLock} />
+<Demo demo={dragLockDirection} height={364} />
 
 #### Snap to origin
 

@@ -50,7 +50,7 @@
 		border-radius: 8px;
 		background: #ff3e00;
 		color: white;
-		font-family: ui-monospace, monospace;
+		font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 		cursor: pointer;
 	}
 </style>
