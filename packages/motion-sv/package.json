@@ -1,15 +1,38 @@
 {
 	"name": "motion-sv",
 	"version": "0.1.13",
-	"description": "Motion for Svelte",
+	"description": "Motion (formerly Framer Motion) for Svelte 5: motion components, gestures, layout and shared layout animations, exit animations, scroll and motion values, on the same engine as Motion for React and Vue",
 	"license": "MIT",
 	"author": "Haniel Ubogu <https://github.com/HanielU>",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/HanielU/motion-svelte.git"
+		"url": "git+https://github.com/hanielu/motion-svelte.git"
 	},
+	"homepage": "https://github.com/hanielu/motion-svelte#readme",
+	"bugs": "https://github.com/hanielu/motion-svelte/issues",
 	"keywords": [
-		"svelte"
+		"svelte",
+		"svelte5",
+		"svelte-5",
+		"sveltekit",
+		"runes",
+		"motion",
+		"framer-motion",
+		"framer-motion-svelte",
+		"svelte-motion",
+		"motion-svelte",
+		"animation",
+		"svelte-animation",
+		"layout-animation",
+		"shared-layout",
+		"animate-presence",
+		"exit-animation",
+		"gestures",
+		"drag",
+		"spring",
+		"scroll-animation",
+		"motion-values",
+		"variants"
 	],
 	"scripts": {
 		"dev": "svelte-kit sync && svelte-package --watch",
