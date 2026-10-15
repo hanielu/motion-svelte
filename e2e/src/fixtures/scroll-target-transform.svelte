@@ -2,12 +2,10 @@
 	import { motion, useScroll, useTransform } from "motion-sv";
 
 	let targetRef = $state<HTMLDivElement>();
-	const { scrollYProgress } = useScroll({
-		get target() {
-			return targetRef;
-		},
+	const { scrollYProgress } = useScroll(() => ({
+		target: targetRef,
 		offset: ["start end", "end start"],
-	});
+	}));
 
 	const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
 	const y = useTransform(scrollYProgress, [0, 1], [0, -100]);

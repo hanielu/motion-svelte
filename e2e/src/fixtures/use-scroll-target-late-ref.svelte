@@ -12,12 +12,10 @@
 	 */
 	let targetRef = $state<HTMLDivElement | null>(null);
 
-	const { scrollYProgress } = useScroll({
-		get target() {
-			return targetRef;
-		},
+	const { scrollYProgress } = useScroll(() => ({
+		target: targetRef,
 		offset: ["start end", "end start"],
-	});
+	}));
 
 	$effect(() => {
 		targetRef = document.querySelector<HTMLDivElement>("#target");

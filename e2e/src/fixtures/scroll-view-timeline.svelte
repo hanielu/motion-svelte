@@ -7,38 +7,30 @@
 	 * Default offset (All preset)
 	 */
 	let defaultRef = $state<HTMLDivElement>();
-	const defaultScroll = useScroll({
-		get target() {
-			return defaultRef;
-		},
-	});
+	const defaultScroll = useScroll(() => ({ target: defaultRef }));
 	const defaultOpacity = useTransform(defaultScroll.scrollYProgress, [0, 1], [1, 0]);
 
 	/**
 	 * Enter preset offset — [[0,1],[1,1]]
 	 */
 	let enterRef = $state<HTMLDivElement>();
-	const enterScroll = useScroll({
-		get target() {
-			return enterRef;
-		},
+	const enterScroll = useScroll(() => ({
+		target: enterRef,
 		offset: [
 			[0, 1],
 			[1, 1],
 		],
-	});
+	}));
 	const enterOpacity = useTransform(enterScroll.scrollYProgress, [0, 1], [0, 1]);
 
 	/**
 	 * String offset - maps to the cover range
 	 */
 	let stringRef = $state<HTMLDivElement>();
-	const stringScroll = useScroll({
-		get target() {
-			return stringRef;
-		},
+	const stringScroll = useScroll(() => ({
+		target: stringRef,
 		offset: ["start end", "end start"],
-	});
+	}));
 	const stringOpacity = useTransform(stringScroll.scrollYProgress, [0, 1], [1, 0]);
 
 	const spacer = "height: 100vh";

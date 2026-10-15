@@ -3,15 +3,11 @@
 
 	let containerRef = $state<HTMLDivElement>();
 	let targetRef = $state<HTMLDivElement>();
-	const { scrollYProgress } = useScroll({
-		get container() {
-			return containerRef;
-		},
-		get target() {
-			return targetRef;
-		},
+	const { scrollYProgress } = useScroll(() => ({
+		container: containerRef,
+		target: targetRef,
 		offset: ["start start", "end start"],
-	});
+	}));
 
 	useMotionValueEvent(scrollYProgress, "change", console.log);
 

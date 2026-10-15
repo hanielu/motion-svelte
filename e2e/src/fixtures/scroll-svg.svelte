@@ -4,19 +4,15 @@
 	let rect = $state<any>(null);
 	let svg = $state<any>(null);
 
-	const rectValues = useScroll({
-		get target() {
-			return rect;
-		},
+	const rectValues = useScroll(() => ({
+		target: rect,
 		offset: ["start end", "end start"],
-	});
+	}));
 
-	const svgValues = useScroll({
-		get target() {
-			return svg;
-		},
+	const svgValues = useScroll(() => ({
+		target: svg,
 		offset: ["start end", "end start"],
-	});
+	}));
 
 	// motion-sv: a MotionValue can't be passed as children; render its latest value instead.
 	const rectProgress = useCurrentMotionValue(rectValues.scrollYProgress);

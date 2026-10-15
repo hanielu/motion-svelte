@@ -6,15 +6,11 @@
 
 	// BubbleParallax, one per item (Svelte can't call hooks per {#each} iteration, so they're set up here).
 	const items = Array.from({ length: 10 }, (_, index) => {
-		const { scrollYProgress } = useScroll({
-			get target() {
-				return refs[index];
-			},
-			get container() {
-				return scrollContainerRef;
-			},
+		const { scrollYProgress } = useScroll(() => ({
+			target: refs[index],
+			container: scrollContainerRef,
 			offset: ["start end", "end start"],
-		});
+		}));
 
 		const opacity = useTransform(scrollYProgress, (progressValue) => {
 			const axis = 2 * progressValue - 1;

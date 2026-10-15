@@ -7,12 +7,10 @@
 
 	// ClipReveal
 	let clipRef = $state<HTMLDivElement>();
-	const clipScroll = useScroll({
-		get target() {
-			return clipRef;
-		},
+	const clipScroll = useScroll(() => ({
+		target: clipRef,
 		offset: ["start end", "start 0.3"],
-	});
+	}));
 	const clipPath = useTransform(
 		clipScroll.scrollYProgress,
 		[0, 1],
@@ -24,12 +22,10 @@
 	const text = "Building digital experiences that blur the line between imagination and reality.";
 	let ref = $state<HTMLDivElement>();
 	let jsRef = $state<HTMLSpanElement>();
-	const { scrollYProgress } = useScroll({
-		get target() {
-			return ref;
-		},
+	const { scrollYProgress } = useScroll(() => ({
+		target: ref,
 		offset: ["start start", "end end"],
-	});
+	}));
 
 	$effect(() => {
 		if (!ref) return;

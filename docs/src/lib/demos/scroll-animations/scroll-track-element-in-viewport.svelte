@@ -9,15 +9,11 @@
 	const progress = Array.from(
 		{ length: 12 },
 		(_, i) =>
-			useScroll({
-				get container() {
-					return scroller;
-				},
-				get target() {
-					return items[i];
-				},
+			useScroll(() => ({
+				container: scroller,
+				target: items[i],
 				offset: ["end end", "start start"],
-			}).scrollYProgress
+			})).scrollYProgress
 	);
 </script>
 

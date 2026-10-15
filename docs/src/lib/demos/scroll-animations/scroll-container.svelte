@@ -12,11 +12,7 @@
 
 	let list = $state<HTMLElement | null>(null);
 
-	const { scrollXProgress } = useScroll({
-		get container() {
-			return list;
-		},
-	});
+	const { scrollXProgress } = useScroll(() => ({ container: list }));
 	const maskImage = useScrollOverflowMask(scrollXProgress);
 
 	function useScrollOverflowMask(scrollXProgress: MotionValue<number>) {

@@ -20,22 +20,14 @@
 
 	// Each image moves its heading with its own scroll progress through the box
 	const ys = images.map((_, i) => {
-		const { scrollYProgress } = useScroll({
-			get container() {
-				return scroller;
-			},
-			get target() {
-				return targets[i];
-			},
-		});
+		const { scrollYProgress } = useScroll(() => ({
+			container: scroller,
+			target: targets[i],
+		}));
 		return useParallax(scrollYProgress, 300);
 	});
 
-	const { scrollYProgress } = useScroll({
-		get container() {
-			return scroller;
-		},
-	});
+	const { scrollYProgress } = useScroll(() => ({ container: scroller }));
 	const progress = useSpring(scrollYProgress, {
 		stiffness: 100,
 		damping: 30,
@@ -48,11 +40,7 @@
 		{#each images as { id, background }, i (id)}
 			<section class="img-container">
 				<div bind:this={targets[i]} style:background></div>
-				<motion.h2
-					initial={{ visibility: "hidden" }}
-					animate={{ visibility: "visible" }}
-					style={{ y: ys[i] }}
-				>
+				<motion.h2 initial={{ visibility: "hidden" }} animate={{ visibility: "visible" }} style={{ y: ys[i] }}>
 					{`#00${id}`}
 				</motion.h2>
 			</section>

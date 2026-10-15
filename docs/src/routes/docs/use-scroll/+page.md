@@ -116,7 +116,7 @@ That's handy for hiding a sticky header while the user scrolls down, and showing
 
 To track the scroll position of a scrollable element, pass it as the `container` option.
 
-`bind:this` only assigns the element once the component has mounted, after `useScroll` has run. So pass it through a getter, which `useScroll` reads once the element is bound:
+`bind:this` only assigns the element once the component has mounted, after `useScroll` has run. So pass the options as a getter, which `useScroll` reads again once the element is bound:
 
 ```svelte
 <script lang="ts">
@@ -124,11 +124,7 @@ To track the scroll position of a scrollable element, pass it as the `container`
 
 	let list = $state<HTMLElement>();
 
-	const { scrollXProgress } = useScroll({
-		get container() {
-			return list;
-		},
-	});
+	const { scrollXProgress } = useScroll(() => ({ container: list }));
 </script>
 
 <svg viewBox="0 0 100 100">
@@ -145,7 +141,7 @@ Here, the list's horizontal scroll progress fills the ring. The list is a `motio
 
 ### Element position
 
-To track the progress of an element as it moves through the container, pass it as the `target` option, through a getter too.
+To track the progress of an element as it moves through the container, pass it as the `target` option.
 
 ```svelte
 <script lang="ts">
@@ -153,12 +149,10 @@ To track the progress of an element as it moves through the container, pass it a
 
 	let target = $state<HTMLElement>();
 
-	const { scrollYProgress } = useScroll({
-		get target() {
-			return target;
-		},
+	const { scrollYProgress } = useScroll(() => ({
+		target,
 		offset: ["end end", "start start"],
-	});
+	}));
 </script>
 
 <div bind:this={target}></div>
@@ -168,7 +162,7 @@ Here, each item has its own progress indicator, which fills as the item scrolls 
 
 <Demo demo={scrollTrackElementInViewport} height={440} />
 
-The demo calls `useScroll` once per item, so each item gets its own scroll progress. Calling a hook in a loop is fine in Svelte, because a component's setup only runs once. The scrollable box is passed as `container`, through a getter too.
+The demo calls `useScroll` once per item, so each item gets its own scroll progress. Calling a hook in a loop is fine in Svelte, because a component's setup only runs once. The scrollable box is passed as `container`.
 
 <Callout type="note">
 
@@ -203,19 +197,19 @@ In every other case, including properties like `scaleX`, Motion updates the valu
 
 ## Options
 
-`useScroll` accepts the following options.
+`useScroll` accepts the following options, as an object or a getter that returns them. Use a getter when an option reads an element bound with `bind:this` or `bind:ref`, or state that changes: `useScroll(() => ({ target: element }))`.
 
 ### `container`
 
 **Default:** the page
 
-The scrollable element to track the scroll position of. By default, this is the page, but it can be any scrollable element. Pass bound elements through a getter.
+The scrollable element to track the scroll position of. By default, this is the page, but it can be any scrollable element.
 
 ### `target`
 
 **Default:** the scrollable area of the `container`
 
-An element to track the progress of within the `container`. Pass bound elements through a getter.
+An element to track the progress of within the `container`.
 
 `target` is tracked by its layout position, so any CSS `transform` applied to it or its ancestors is ignored when measuring its progress.
 
@@ -254,12 +248,10 @@ An intersection can also be an array of two numbers, `[target, container]`, so `
 ```typescript
 import { ScrollOffset, useScroll } from "motion-sv";
 
-const { scrollYProgress } = useScroll({
-	get target() {
-		return target;
-	},
+const { scrollYProgress } = useScroll(() => ({
+	target,
 	offset: ScrollOffset.Enter,
-});
+}));
 ```
 
 | Preset | Equivalent to |

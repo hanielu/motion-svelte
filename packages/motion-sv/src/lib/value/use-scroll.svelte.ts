@@ -13,6 +13,7 @@ import {
 	supportsViewTimeline,
 } from "motion-dom";
 import { offsetToViewTimelineRange } from "./scroll/offsets.js";
+import { extract, type MaybeGetter } from "#lib/vendor/runed/index.js";
 
 export interface UseScrollOptions extends Omit<ScrollInfoOptions, "container" | "target"> {
 	container?: HTMLElement | null;
@@ -29,8 +30,8 @@ function createScrollMotionValues() {
 }
 
 /**
- * Whether a container or target element is provided but not bound yet. A getter (`get target() { return el }`)
- * counts as provided from the start, like a React ref whose `current` is still null.
+ * Whether a container or target element is provided but not bound yet. A getter that returns `{ target: element }`
+ * provides it from the start, like a React ref whose `current` is still null.
  */
 const isPending = (options: UseScrollOptions, key: "container" | "target") => key in options && !options[key];
 
@@ -69,10 +70,13 @@ function makeAccelerateConfig(axis: "x" | "y", getOptions: () => UseScrollOption
 	};
 }
 
-/** `container` and `target` can be getters (`get target() { return element }`), so they're read when bound. */
-export function useScroll(scrollOptions: UseScrollOptions = {}) {
+/**
+ * Pass the options as a getter when they read elements that are bound later, or state that changes:
+ * `useScroll(() => ({ target: element }))`. It's read again whenever that state changes.
+ */
+export function useScroll(scrollOptions: MaybeGetter<UseScrollOptions> = {}) {
 	const values = createScrollMotionValues();
-	const getOptions = () => scrollOptions;
+	const getOptions = () => extract(scrollOptions);
 
 	// Set the acceleration config once, at setup. Elements are resolved when the VisualElement invokes the factory.
 	if (canAccelerateScroll(getOptions())) {

@@ -140,11 +140,7 @@ Hooks work like their React and Vue versions. Call them during component setup, 
 
 	let target = $state<HTMLElement>();
 
-	const { scrollYProgress } = useScroll({
-		get target() {
-			return target;
-		},
-	});
+	const { scrollYProgress } = useScroll(() => ({ target }));
 	const inView = useInView(() => target);
 </script>
 

@@ -189,7 +189,7 @@ With [`useTransform`](/docs/use-transform), the progress values can drive any ot
 
 ### Scrollable containers
 
-By default, `useScroll` tracks the page. To track a scrollable element instead, pass it as `container`. Elements bound with `bind:this`, or `bind:ref` on a `motion` component, are set after the component is created, so pass it through a getter, which `useScroll` reads once the element exists:
+By default, `useScroll` tracks the page. To track a scrollable element instead, pass it as `container`. Elements bound with `bind:this`, or `bind:ref` on a `motion` component, are set after the component is created, so pass the options as a getter, which `useScroll` reads again once the element exists:
 
 ```svelte
 <script lang="ts">
@@ -197,11 +197,7 @@ By default, `useScroll` tracks the page. To track a scrollable element instead, 
 
 	let list = $state<HTMLElement>();
 
-	const { scrollXProgress } = useScroll({
-		get container() {
-			return list;
-		},
-	});
+	const { scrollXProgress } = useScroll(() => ({ container: list }));
 </script>
 
 <svg viewBox="0 0 100 100">
@@ -226,12 +222,10 @@ Here, the list's horizontal scroll progress fills the ring. The list also animat
 
 	let target = $state<HTMLElement>();
 
-	const { scrollYProgress } = useScroll({
-		get target() {
-			return target;
-		},
+	const { scrollYProgress } = useScroll(() => ({
+		target,
 		offset: ["end end", "start start"],
-	});
+	}));
 </script>
 
 <div bind:this={target}>
@@ -267,11 +261,7 @@ Map an element's scroll progress to `y` to move it at a different speed than the
 
 	let image = $state<HTMLElement>();
 
-	const { scrollYProgress } = useScroll({
-		get target() {
-			return image;
-		},
-	});
+	const { scrollYProgress } = useScroll(() => ({ target: image }));
 	const y = useParallax(scrollYProgress, 300);
 </script>
 
