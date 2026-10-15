@@ -1,5 +1,13 @@
 # motion-sv
 
+## 0.2.1
+
+### Patch Changes
+
+- [`a0d9fcb`](https://github.com/hanielu/motion-svelte/commit/a0d9fcb7c638b46f666679917c4397fb13ac51ae) Thanks [@hanielu](https://github.com/hanielu)! - `animate` from `useAnimate` no longer makes the effect that calls it depend on the state it reads itself (the scope's element, `MotionConfig` and the reduced motion preference), so it doesn't need wrapping in `untrack`.
+
+- [`3cf768d`](https://github.com/hanielu/motion-svelte/commit/3cf768de8729c5924225c61712f347318f102133) Thanks [@hanielu](https://github.com/hanielu)! - `useScroll` takes its options as a getter, like the other hooks: `useScroll(() => ({ target: element }))`. It's read again once bound elements exist and whenever state it reads changes. A plain object still works.
+
 ## 0.2.0
 
 ### Minor Changes
