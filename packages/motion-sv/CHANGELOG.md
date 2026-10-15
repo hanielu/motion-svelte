@@ -1,5 +1,11 @@
 # motion-sv
 
+## 0.2.2
+
+### Patch Changes
+
+- [`208e98a`](https://github.com/hanielu/motion-svelte/commit/208e98a12eb98d85d52fface58e834ec2fdc4aef) Thanks [@hanielu](https://github.com/hanielu)! - Update the package README: it's now the repository's README, with current layout animation docs, examples and links.
+
 ## 0.2.1
 
 ### Patch Changes
