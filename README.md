@@ -1,8 +1,12 @@
-# Motion For Svelte
+# Motion for Svelte
 
-This is an attempt to bring a Motion (formerly known as Framer Motion) to Svelte.
+[![npm](https://img.shields.io/npm/v/motion-sv)](https://www.npmjs.com/package/motion-sv)
+[![downloads](https://img.shields.io/npm/dm/motion-sv)](https://www.npmjs.com/package/motion-sv)
 
-# Documentation
+Motion (formerly Framer Motion) for Svelte 5: animations, gestures, layout and exit animations, scroll and motion
+values, built on the same engine as Motion for React and Vue.
+
+## Documentation
 
 Read the docs at **[motion.hyprsonic.dev](https://motion.hyprsonic.dev)**. The site's in [`docs/`](./docs); run it locally with `bun install` and `bun run docs`.
 
@@ -24,7 +28,7 @@ Then import the `motion` component:
 
 ## Built with motion-sv
 
-- [Svelte Animations](https://sv-animations.vercel.app): 50+ free, open-source animated components and effects.
+- [Svelte Animations](https://sv-animations.vercel.app): 90+ free, open-source animated components and effects.
 
 ## Svelte Playground Examples
 

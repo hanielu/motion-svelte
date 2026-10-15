@@ -32,3 +32,6 @@ vite.config.ts.timestamp-*
 .cursor
 # AGENTS.md
 GEMINI.md
+
+# Copied from the root README when the package is packed
+packages/motion-sv/README.md
