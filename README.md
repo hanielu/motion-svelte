@@ -4,7 +4,7 @@ This is an attempt to bring a Motion (formerly known as Framer Motion) to Svelte
 
 # Documentation
 
-Read the docs at **[motion.hyprsonic.dev](https://motion.hyprsonic.dev)**. The site lives in [`docs/`](./docs); run it locally with `bun install` and `bun run docs`.
+Read the docs at **[motion.hyprsonic.dev](https://motion.hyprsonic.dev)**. The site's in [`docs/`](./docs); run it locally with `bun install` and `bun run docs`.
 
 ## Quick Start
 
