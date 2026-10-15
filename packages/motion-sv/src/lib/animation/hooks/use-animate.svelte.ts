@@ -1,4 +1,5 @@
 import { createScopedAnimate, type AnimationPlaybackControls } from "framer-motion/dom";
+import { untrack } from "svelte";
 import { prefersReducedMotion } from "svelte/motion";
 import { useMotionConfig } from "#lib/components/motion-config/index.js";
 
@@ -15,12 +16,16 @@ export function useAnimate<T extends Element = HTMLElement | SVGElement>() {
 	const config = useMotionConfig();
 
 	// Created per call, so imperative animations follow the current MotionConfig, as React's re-created animate does.
-	const animate = ((...args: Parameters<ScopedAnimate>) => {
-		const { reducedMotion, skipAnimations } = config();
-		const reduceMotion =
-			reducedMotion === "always" ? true : reducedMotion === "never" ? false : prefersReducedMotion.current;
-		return createScopedAnimate({ scope, reduceMotion, skipAnimations })(...args);
-	}) as ScopedAnimate;
+	// Untracked: called from an effect, the state it reads itself (the scope's element, MotionConfig, the reduced
+	// motion preference) must not become the effect's dependencies and replay the animation when it changes. The
+	// arguments are evaluated by the caller, so state they read is still tracked.
+	const animate = ((...args: Parameters<ScopedAnimate>) =>
+		untrack(() => {
+			const { reducedMotion, skipAnimations } = config();
+			const reduceMotion =
+				reducedMotion === "always" ? true : reducedMotion === "never" ? false : prefersReducedMotion.current;
+			return createScopedAnimate({ scope, reduceMotion, skipAnimations })(...args);
+		})) as ScopedAnimate;
 
 	// Stop the scope's animations on unmount
 	$effect(() => () => {

@@ -20,13 +20,12 @@ It returns a `scope` and an `animate` function. Every selector you pass to `anim
 ```svelte
 <script lang="ts">
 	import { useAnimate } from "motion-sv";
-	import { untrack } from "svelte";
 
 	const [scope, animate] = useAnimate();
 
 	$effect(() => {
 		// This "li" selector only matches children of the <ul>
-		untrack(() => animate("li", { opacity: 1 }));
+		animate("li", { opacity: 1 });
 	});
 </script>
 
@@ -116,14 +115,12 @@ An `$effect` re-runs whenever state it reads changes. That's useful when an anim
 </script>
 ```
 
-`animate` reads some state itself, like `scope.current` and the nearest `MotionConfig`'s settings. To run an animation only once, when the component mounts, wrap the call in `untrack`, so later changes don't start it again:
+The effect re-runs when the state it reads changes, here `isOpen`. `animate` doesn't track the state it reads itself, like `scope.current` and the nearest `MotionConfig`'s settings, so an effect that reads no other state runs once, when the component mounts:
 
 ```svelte
 <script lang="ts">
-	import { untrack } from "svelte";
-
 	$effect(() => {
-		untrack(() => animate("li", { opacity: 1, x: 0 }, { delay: stagger(0.1) }));
+		animate("li", { opacity: 1, x: 0 }, { delay: stagger(0.1) });
 	});
 </script>
 ```

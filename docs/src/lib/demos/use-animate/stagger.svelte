@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { stagger, useAnimate } from "motion-sv";
-	import { untrack } from "svelte";
 
 	const [scope, animate] = useAnimate<HTMLUListElement>();
 
-	// Runs once, after the list mounts. `untrack` keeps the effect from re-running when state `animate` reads changes.
+	// Runs once, after the list mounts
 	$effect(() => {
-		untrack(() => animate("li", { opacity: 1, x: 0 }, { delay: stagger(0.1) }));
+		animate("li", { opacity: 1, x: 0 }, { delay: stagger(0.1) });
 	});
 </script>
 

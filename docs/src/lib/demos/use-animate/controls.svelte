@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { useAnimate, type AnimationPlaybackControls } from "motion-sv";
-	import { untrack } from "svelte";
 
 	const [scope, animate] = useAnimate<HTMLDivElement>();
 
@@ -9,12 +8,10 @@
 	let isSlow = $state(false);
 
 	$effect(() => {
-		animation = untrack(() =>
-			animate(
-				".ball",
-				{ x: [-100, 100] },
-				{ duration: 1, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }
-			)
+		animation = animate(
+			".ball",
+			{ x: [-100, 100] },
+			{ duration: 1, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }
 		);
 	});
 

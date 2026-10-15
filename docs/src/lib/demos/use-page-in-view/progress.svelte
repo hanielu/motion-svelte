@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { useAnimate, usePageInView, type AnimationPlaybackControls } from "motion-sv";
-	import { untrack } from "svelte";
 
 	const pageInView = usePageInView();
 	const [scope, animate] = useAnimate<HTMLDivElement>();
@@ -8,7 +7,7 @@
 	let progress: AnimationPlaybackControls | undefined;
 
 	$effect(() => {
-		progress = untrack(() => animate(".fill", { scaleX: [0, 1] }, { duration: 5, ease: "linear", repeat: Infinity }));
+		progress = animate(".fill", { scaleX: [0, 1] }, { duration: 5, ease: "linear", repeat: Infinity });
 	});
 
 	// Pause while the tab is hidden, so the bar picks up where it left off

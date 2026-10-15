@@ -68,7 +68,6 @@ To pick up where they left off, pause animations while the page is hidden. With 
 ```svelte
 <script lang="ts">
 	import { useAnimate, usePageInView, type AnimationPlaybackControls } from "motion-sv";
-	import { untrack } from "svelte";
 
 	const pageInView = usePageInView();
 	const [scope, animate] = useAnimate<HTMLDivElement>();
@@ -76,7 +75,7 @@ To pick up where they left off, pause animations while the page is hidden. With 
 	let progress: AnimationPlaybackControls | undefined;
 
 	$effect(() => {
-		progress = untrack(() => animate(".fill", { scaleX: [0, 1] }, { duration: 5, repeat: Infinity }));
+		progress = animate(".fill", { scaleX: [0, 1] }, { duration: 5, repeat: Infinity });
 	});
 
 	$effect(() => {
