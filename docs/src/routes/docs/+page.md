@@ -189,3 +189,5 @@ Svelte removes elements from the DOM straight away. Wrap them in [`AnimatePresen
 ## Learn next
 
 That's a quick overview of what motion-sv can do. Next, read about [the `motion` component](/docs/motion-component) and [animation](/docs/animation) in depth, or if you know Motion from React or Vue, see [what's different in Svelte](/docs/coming-from-react-or-vue).
+
+Looking for ready-made components? [Svelte Animations](https://sv-animations.vercel.app) has 50+ free, open-source animated components and effects built with motion-sv.

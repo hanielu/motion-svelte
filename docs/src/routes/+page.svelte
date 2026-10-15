@@ -3,6 +3,7 @@
 	import HeroShapes from "#lib/home/hero-shapes.svelte";
 	import { browser } from "$app/env";
 	import IconArrowRight from "~icons/lucide/arrow-right";
+	import IconArrowUpRight from "~icons/lucide/arrow-up-right";
 	import IconCheck from "~icons/lucide/check";
 	import IconCopy from "~icons/lucide/copy";
 
@@ -82,6 +83,14 @@
 			</a>
 		{/each}
 	</section>
+
+	<a class="components" href="https://sv-animations.vercel.app" target="_blank" rel="noopener">
+		<div>
+			<h2>Ready-made components</h2>
+			<p>Svelte Animations has 50+ free, open-source animated components and effects built with motion-sv.</p>
+		</div>
+		<IconArrowUpRight />
+	</a>
 </main>
 
 <style>
@@ -164,7 +173,8 @@
 		gap: 1rem;
 	}
 
-	.features a {
+	.features a,
+	.components {
 		padding: 1.25rem;
 		border: 1px solid var(--border);
 		border-radius: 0.75rem;
@@ -173,16 +183,27 @@
 		transition: border-color 0.2s;
 	}
 
-	.features a:hover {
+	.features a:hover,
+	.components:hover {
 		border-color: var(--accent);
 	}
 
-	.features h2 {
+	.components {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-top: 1rem;
+	}
+
+	.features h2,
+	.components h2 {
 		margin: 0 0 0.375rem;
 		font-size: 1rem;
 	}
 
-	.features p {
+	.features p,
+	.components p {
 		margin: 0;
 		color: var(--text-muted);
 		font-size: 0.875rem;
